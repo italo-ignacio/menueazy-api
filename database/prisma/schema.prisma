@@ -1,0 +1,585 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:123@localhost:5432/menueazy"
+}
+
+model LoginRequest {
+  id          Int     @id @default(autoincrement())
+  email       String  @db.VarChar(150)
+  name        String  @db.VarChar(150)
+  companyName String  @map("company_name") @db.VarChar(150)
+  description String? @db.Text()
+
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  currencyId Int      @map("currency_id")
+
+  code String? @unique @db.VarChar(36)
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("login_request")
+}
+
+model Currency {
+  id     Int    @id @default(autoincrement())
+  code   String @unique @db.VarChar(3) // Ex: USD, BRL, EUR
+  name   String @db.VarChar(50) // Nome da moeda
+  symbol String @db.VarChar(5) // Ex: $, R$, €
+
+  planPriceList    PlanPrice[]
+  companyList      Company[]
+  loginRequestList LoginRequest[]
+
+  @@index([code])
+  @@map("currency")
+}
+
+model Plan {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(50)
+  description String? @db.Text()
+
+  planPriceList    PlanPrice[]
+  subscriptionList Subscription[]
+
+  minimumOfRestaurant Int @map("minimum_of_restaurant")
+  minimumOfProduct    Int @map("minimum_of_product")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("plan")
+}
+
+model PlanPrice {
+  id Int @id @default(autoincrement())
+
+  plan   Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId Int  @map("plan_id")
+
+  monthlyPrice      Decimal @map("monthly_price") @db.Decimal(10, 2) // @default(99.98)
+  priceOfRestaurant Decimal @map("price_of_restaurant") @db.Decimal(10, 2) //@default(69.99)
+  priceOfProduct    Decimal @map("price_of_product") @db.Decimal(10, 2) // @default(0.99) 
+  discount          Decimal @db.Decimal(10, 2)
+
+  currency   Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
+  currencyId Int      @map("currency_id")
+
+  period PlanPricePeriod
+
+  @@unique([planId, currencyId])
+  @@index([planId, currencyId])
+  @@map("plan_price")
+}
+
+enum PlanPricePeriod {
+  MONTHLY
+  QUARTERLY
+  SEMIANNUAL
+  ANNUAL
+}
+
+model Subscription {
+  id Int @id @default(autoincrement())
+
+  company Company?
+
+  plan   Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId Int  @map("plan_id")
+
+  price           Decimal @db.Decimal(10, 2)
+  restaurantLimit Int     @map("restaurant_limit")
+  productLimit    Int     @map("product_limit")
+
+  expiresAt    DateTime @map("expires_at") @db.Timestamptz()
+  contactAdmin Boolean  @default(false) @map("contact_admin")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("subscription")
+}
+
+model Guest {
+  id             Int     @id @default(autoincrement())
+  name           String  @db.VarChar(150)
+  email          String  @db.VarChar(150)
+  phone          String? @db.VarChar(25)
+  guestId        String  @unique @map("guest_id") @db.VarChar(255)
+  ipAddress      String  @map("ip_address") @db.VarChar(45)
+  deviceId       String  @map("device_id") @db.VarChar(255)
+  failedAttempts Int     @default(0)
+  isBlocked      Boolean @default(false)
+
+  orderList Order[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@index([guestId])
+  @@index([ipAddress])
+  @@index([deviceId])
+  @@index([isBlocked])
+  @@map("guest")
+}
+
+model Client {
+  id         Int     @id @default(autoincrement())
+  firebaseId String  @unique @map("firebase_id")
+  email      String  @unique @db.VarChar(150)
+  phone      String? @unique @db.VarChar(25)
+  name       String? @db.VarChar(150)
+  avatarUrl  String? @db.Text()
+
+  orderList Order[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  Device    Device[]
+
+  @@map("client")
+}
+
+model User {
+  id         Int     @id @default(autoincrement())
+  firebaseId String  @unique @map("firebase_id")
+  email      String  @unique @db.VarChar(150)
+  name       String? @db.VarChar(150)
+  phone      String? @unique @db.VarChar(25)
+  avatarUrl  String? @db.Text()
+  role       Role
+
+  device             Device[]
+  userRestaurantList UserRestaurant[]
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int     @map("company_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("user")
+}
+
+enum Role {
+  ADMIN
+  OWNER
+  EDIT
+  VIEW
+}
+
+model Device {
+  id         Int      @id @default(autoincrement())
+  token      String   @unique @db.Text()
+  deviceId   String   @unique @db.VarChar(255)
+  ipAddress  String?  @db.VarChar(45)
+  lastActive DateTime @default(now()) @map("last_active") @db.Timestamptz()
+
+  client   Client? @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId Int?    @map("client_id")
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?  @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@index([clientId])
+  @@index([userId])
+  @@index([lastActive])
+  @@map("device")
+}
+
+model UserRestaurant {
+  id Int @id @default(autoincrement())
+
+  restaurantRole RestaurantRole @map("restaurant_role")
+
+  user       User       @relation(fields: [userId], references: [id])
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id])
+
+  userId       Int @map("user_id")
+  restaurantId Int @map("restaurant_id")
+
+  @@map("user_restaurant")
+}
+
+enum RestaurantRole {
+  EDIT
+  VIEW
+}
+
+model Restaurant {
+  id            Int     @id @default(autoincrement())
+  name          String  @db.VarChar(150)
+  phone         String  @db.VarChar(25)
+  restaurantUrl String  @unique @map("restaurant_url") @db.VarChar(255)
+  description   String? @db.Text()
+  logoUrl       String? @map("logo_url") @db.Text()
+
+  style   Style @relation(fields: [styleId], references: [id])
+  styleId Int   @map("style_id")
+
+  paymentMethodList     PaymentMethod[]
+  openingHourList       OpeningHour[]
+  productRestaurantList ProductRestaurant[]
+  tableList             Table[]
+  orderList             Order[]
+  userRestaurantList    UserRestaurant[]
+
+  address   Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  addressId Int     @unique @map("address_id")
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int     @map("company_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@index([companyId])
+  @@index([restaurantUrl])
+  @@map("restaurant")
+}
+
+model Address {
+  id      Int    @id @default(autoincrement())
+  street  String @db.VarChar(255)
+  city    String @db.VarChar(100)
+  state   String @db.VarChar(50)
+  zipCode String @map("zip_code") @db.VarChar(20)
+  country String @db.VarChar(50)
+
+  restaurant Restaurant?
+
+  @@map("address")
+}
+
+model OpeningHour {
+  id Int @id @default(autoincrement())
+
+  dayOfWeek   DayOfWeek @map("day_of_week")
+  openingTime DateTime  @map("opening_time") @db.Timetz()
+  closingTime DateTime  @map("closing_time") @db.Timetz()
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId Int        @map("restaurant_id")
+
+  @@map("opening_hour")
+}
+
+enum DayOfWeek {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+model PaymentMethod {
+  id          Int     @id @default(autoincrement())
+  title       String  @db.VarChar(100)
+  description String  @db.Text()
+  logoUrl     String? @map("logo_url") @db.Text()
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId Int        @map("restaurant_id")
+
+  @@map("payment_method")
+}
+
+model Style {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(150)
+
+  color   Color @relation(fields: [colorId], references: [id], onDelete: Cascade)
+  colorId Int   @map("color_id")
+
+  restaurant Restaurant[]
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int     @map("company_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("style")
+}
+
+model Color {
+  id Int @id @default(autoincrement())
+
+  primary       String @db.VarChar(7)
+  textPrimary   String @map("text_primary") @db.VarChar(7)
+  secondary     String @db.VarChar(7)
+  textSecondary String @map("text_secondary") @db.VarChar(7)
+  background    String @db.VarChar(7)
+  text          String @db.VarChar(7)
+
+  styleList Style[]
+
+  @@map("color")
+}
+
+model Company {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(255)
+  description String? @db.Text()
+  logoUrl     String? @map("logo_url") @db.Text()
+
+  companyUrl     String  @unique @map("company_url") @db.VarChar(255)
+  customDomain   String? @unique @map("custom_domain") @db.VarChar(255)
+  dnsCNAME       String? @map("dns_cname") @db.VarChar(255)
+  domainVerified Boolean @default(false)
+
+  restaurantList Restaurant[]
+  styleList      Style[]
+  categoryList   Category[]
+  productList    Product[]
+  userList       User[]
+
+  currency   Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
+  currencyId Int
+
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscriptionId Int          @unique @map("subscription_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@index([companyUrl])
+  @@index([customDomain])
+  @@index([domainVerified])
+  @@map("company")
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(100)
+  description String? @db.Text()
+
+  productCategoryList ProductCategory[]
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int     @map("company_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("category")
+}
+
+model ProductCategory {
+  id Int @id @default(autoincrement())
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  categoryId Int @map("category_id")
+  productId  Int @map("product_id")
+
+  @@map("product_category")
+}
+
+model ProductImage {
+  id      Int     @id @default(autoincrement())
+  url     String
+  primary Boolean @default(false)
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int     @map("product_id")
+
+  @@map("product_image")
+}
+
+model ProductRestaurant {
+  id    Int     @id @default(autoincrement())
+  price Decimal @db.Decimal(10, 2)
+
+  outOfStock   Boolean   @default(false) @map("out_of_stock")
+  startSellAt  DateTime  @map("start_sell_at") @db.Timestamptz()
+  finishSellAt DateTime? @map("finish_sell_at") @db.Timestamptz()
+
+  discount         Decimal   @db.Decimal(10, 2)
+  startDiscountAt  DateTime? @map("start_discount_at") @db.Timestamptz()
+  finishDiscountAt DateTime? @map("finish_discount_at") @db.Timestamptz()
+
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  productId    Int @map("product_id")
+  restaurantId Int @map("restaurant_id")
+
+  @@map("product_restaurant")
+}
+
+model Product {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(150)
+  description String? @db.Text()
+
+  productOptionGroupList ProductOptionGroup[]
+  productImageList       ProductImage[]
+  orderProductList       OrderProduct[]
+  productCategoryList    ProductCategory[]
+  productRestaurantList  ProductRestaurant[]
+  productOptionItemList  ProductOptionItem[]
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("product")
+}
+
+model ProductOptionGroup {
+  id Int @id @default(autoincrement())
+
+  name         String  @db.VarChar(150)
+  description  String? @db.Text()
+  minSelection Int     @default(1) @map("min_selection")
+  maxSelection Int     @default(1) @map("max_selection")
+  required     Boolean
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int     @map("product_id")
+
+  productOptionItemList ProductOptionItem[]
+
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("product_option_group")
+}
+
+model ProductOptionItem {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(150)
+  description String? @db.Text()
+  imageUrl    String? @db.Text()
+
+  product            Product?            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productOptionGroup ProductOptionGroup? @relation(fields: [productOptionGroupId], references: [id], onDelete: SetNull)
+
+  orderProductOptionItemList OrderProductOptionItem[]
+
+  productId            Int? @map("product_id")
+  productOptionGroupId Int? @map("product_option_group_id")
+
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("product_option_item")
+}
+
+model Table {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(50)
+  description String? @db.Text()
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId Int        @map("restaurant_id")
+
+  orderList Order[]
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("table")
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+
+  price       Decimal     @db.Decimal(10, 2)
+  observation String?     @db.Text()
+  status      OrderStatus
+
+  orderType OrderType
+
+  orderProductList OrderProduct[]
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId Int
+
+  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  guest  Guest?  @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  guestId  Int? @map("guest_id")
+  clientId Int? @map("client_id")
+
+  table   Table? @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  tableId Int?   @map("table_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@index([status, createdAt])
+  @@index([restaurantId, createdAt])
+  @@index([clientId, createdAt])
+  @@index([guestId, createdAt])
+  @@map("order")
+}
+
+enum OrderType {
+  GUEST
+  CLIENT
+}
+
+model OrderProduct {
+  id Int @id @default(autoincrement())
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  orderProductOptionItemList OrderProductOptionItem[]
+
+  status OrderStatus
+
+  orderId   Int @map("order_id")
+  productId Int @map("product_id")
+
+  quantity Int
+  price    Decimal @db.Decimal(10, 2)
+  subtotal Decimal @db.Decimal(10, 2)
+
+  @@map("order_product")
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  ON_THE_WAY
+  FINISHED
+  CANCELED_BY_RESTAURANT
+  CANCELED_BY_CLIENT
+}
+
+model OrderProductOptionItem {
+  id Int @id @default(autoincrement())
+
+  quantity Int
+
+  productOptionItem ProductOptionItem @relation(fields: [productOptionItemId], references: [id], onDelete: Cascade)
+  orderProduct      OrderProduct      @relation(fields: [orderProductId], references: [id], onDelete: Cascade)
+
+  orderProductId      Int @map("order_product_id")
+  productOptionItemId Int @map("product_option_item_id")
+
+  @@map("order_product_option_item")
+}

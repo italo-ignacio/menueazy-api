@@ -119,7 +119,8 @@ model Guest {
   failedAttempts Int     @default(0)
   isBlocked      Boolean @default(false)
 
-  orderList Order[]
+  orderList  Order[]
+  reviewList Review[]
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
@@ -135,16 +136,19 @@ model Client {
   id         Int     @id @default(autoincrement())
   firebaseId String  @unique @map("firebase_id")
   email      String  @unique @db.VarChar(150)
-  phone      String? @unique @db.VarChar(25)
+  phone      String? @db.VarChar(25)
   name       String? @db.VarChar(150)
   avatarUrl  String? @db.Text()
 
-  orderList  Order[]
   deviceList Device[]
+  orderList  Order[]
+  reviewList Review[]
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
+  @@index([email])
+  @@index([firebaseId])
   @@map("client")
 }
 
@@ -153,7 +157,7 @@ model User {
   firebaseId String  @unique @map("firebase_id")
   email      String  @unique @db.VarChar(150)
   name       String? @db.VarChar(150)
-  phone      String? @unique @db.VarChar(25)
+  phone      String? @db.VarChar(25)
   avatarUrl  String? @db.Text()
   role       Role
 
@@ -168,6 +172,9 @@ model User {
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
   finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
+  @@index([email])
+  @@index([companyId])
+  @@index([firebaseId])
   @@map("user")
 }
 
@@ -238,6 +245,7 @@ model Restaurant {
   tableList             Table[]
   orderList             Order[]
   userRestaurantList    UserRestaurant[]
+  reviewList            Review[]
 
   address   Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
   addressId Int     @unique @map("address_id")
@@ -299,6 +307,7 @@ model PaymentMethod {
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId Int        @map("restaurant_id")
 
+  @@index([restaurantId])
   @@map("payment_method")
 }
 
@@ -352,6 +361,7 @@ model Company {
   categoryList   Category[]
   productList    Product[]
   userList       User[]
+  reviewList     Review[]
 
   currency   Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
   currencyId Int
@@ -413,6 +423,8 @@ model ProductRestaurant {
   id    Int     @id @default(autoincrement())
   price Decimal @db.Decimal(10, 2)
 
+  reviewList Review[]
+
   outOfStock   Boolean   @default(false) @map("out_of_stock")
   startSellAt  DateTime  @map("start_sell_at") @db.Timestamptz()
   finishSellAt DateTime? @map("finish_sell_at") @db.Timestamptz()
@@ -427,6 +439,10 @@ model ProductRestaurant {
   productId    Int @map("product_id")
   restaurantId Int @map("restaurant_id")
 
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@index([restaurantId])
+  @@index([outOfStock])
   @@map("product_restaurant")
 }
 
@@ -435,11 +451,11 @@ model Product {
   name        String  @db.VarChar(150)
   description String? @db.Text()
 
+  productRestaurantList  ProductRestaurant[]
   productOptionGroupList ProductOptionGroup[]
   productImageList       ProductImage[]
   orderProductList       OrderProduct[]
   productCategoryList    ProductCategory[]
-  productRestaurantList  ProductRestaurant[]
   productOptionItemList  ProductOptionItem[]
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -492,6 +508,7 @@ model ProductOptionItem {
 
 model Table {
   id          Int     @id @default(autoincrement())
+  code        String  @unique @default(uuid())
   name        String  @db.VarChar(50)
   description String? @db.Text()
 
@@ -504,6 +521,7 @@ model Table {
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
   finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
+  @@index([restaurantId])
   @@map("table")
 }
 
@@ -514,10 +532,10 @@ model Order {
   deliveryPrice Decimal?    @map("delivery_price") @db.Decimal(10, 2)
   observation   String?     @db.Text()
   status        OrderStatus
-
-  orderType OrderType @map("order_type")
+  type          OrderType
 
   orderProductList OrderProduct[]
+  reviewList       Review[]
 
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId Int
@@ -538,11 +556,23 @@ model Order {
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
   finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
+  @@index([status])
+  @@index([type, createdAt])
   @@index([status, createdAt])
   @@index([restaurantId, createdAt])
   @@index([clientId, createdAt])
   @@index([guestId, createdAt])
   @@map("order")
+}
+
+enum OrderStatus {
+  OPENING
+  PENDING
+  IN_PROGRESS
+  ON_THE_WAY
+  FINISHED
+  CANCELED_BY_RESTAURANT
+  CANCELED_BY_CLIENT
 }
 
 enum OrderType {
@@ -558,7 +588,7 @@ model OrderProduct {
 
   orderProductOptionItemList OrderProductOptionItem[]
 
-  status OrderStatus
+  status OrderStatus @default(PENDING)
 
   orderId   Int @map("order_id")
   productId Int @map("product_id")
@@ -567,13 +597,17 @@ model OrderProduct {
   price    Decimal @db.Decimal(10, 2)
   subtotal Decimal @db.Decimal(10, 2)
 
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@index([orderId])
+  @@index([productId])
   @@map("order_product")
 }
 
-enum OrderStatus {
+enum ProductStatus {
   PENDING
-  IN_PROGRESS
-  ON_THE_WAY
+  PREPARING
   FINISHED
   CANCELED_BY_RESTAURANT
   CANCELED_BY_CLIENT
@@ -591,4 +625,41 @@ model OrderProductOptionItem {
   productOptionItemId Int @map("product_option_item_id")
 
   @@map("order_product_option_item")
+}
+
+model Review {
+  id          Int    @id @default(autoincrement())
+  description String @db.Text()
+  rate        Rate
+
+  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  guest  Guest?  @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  guestId  Int? @map("guest_id")
+  clientId Int? @map("client_id")
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int     @map("company_id")
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId Int        @map("restaurant_id")
+
+  order   Order? @relation(fields: [orderId], references: [id])
+  orderId Int?   @map("order_id")
+
+  productRestaurant   ProductRestaurant? @relation(fields: [productRestaurantId], references: [id])
+  productRestaurantId Int?               @map("product_restaurant_id")
+
+  @@unique([clientId, orderId])
+  @@index([companyId])
+  @@index([restaurantId])
+  @@map("review")
+}
+
+enum Rate {
+  TERRIBLE
+  BAD
+  AVERAGE
+  GOOD
+  EXCELLENT
 }

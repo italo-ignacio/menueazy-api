@@ -7,6 +7,12 @@ datasource db {
   url      = "postgresql://postgres:123@localhost:5432/menueazy"
 }
 
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   output   = "./aa.svg"
+//   format   = "svg"
+// }
+
 model RegisterRequest {
   id          Int     @id @default(autoincrement())
   email       String  @db.VarChar(150)
@@ -14,17 +20,17 @@ model RegisterRequest {
   phone       String  @db.VarChar(25)
   companyName String  @map("company_name") @db.VarChar(150)
   description String? @db.Text()
+  code        String  @unique @default(uuid())
+  canRegister Boolean @default(false)
 
   currency   Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
   currencyId Int      @map("currency_id")
-
-  code String? @unique @db.VarChar(36)
 
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
   finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
-  @@map("login_request")
+  @@map("register_request")
 }
 
 model Currency {
@@ -36,6 +42,10 @@ model Currency {
   planPriceList       PlanPrice[]
   companyList         Company[]
   registerRequestList RegisterRequest[]
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@index([code])
   @@map("currency")
@@ -75,6 +85,10 @@ model PlanPrice {
 
   period PlanPricePeriod
 
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
   @@unique([planId, currencyId])
   @@index([planId, currencyId])
   @@map("plan_price")
@@ -87,6 +101,22 @@ enum PlanPricePeriod {
   ANNUAL
 }
 
+model Coupon {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique @db.VarChar(20)
+  discount  Decimal  @db.Decimal(10, 2)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz()
+
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  subscriptionId Int?          @map("subscription_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("coupon")
+}
+
 model Subscription {
   id Int @id @default(autoincrement())
 
@@ -95,6 +125,8 @@ model Subscription {
   plan   Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId Int  @map("plan_id")
 
+  couponList Coupon[]
+
   price           Decimal @db.Decimal(10, 2)
   restaurantLimit Int     @map("restaurant_limit")
   productLimit    Int     @map("product_limit")
@@ -102,54 +134,58 @@ model Subscription {
   expiresAt    DateTime @map("expires_at") @db.Timestamptz()
   contactAdmin Boolean  @default(false) @map("contact_admin")
 
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@map("subscription")
 }
 
-model Guest {
-  id             Int     @id @default(autoincrement())
-  name           String  @db.VarChar(150)
-  email          String  @db.VarChar(150)
-  phone          String? @db.VarChar(25)
-  guestId        String  @unique @map("guest_id") @db.VarChar(255)
-  ipAddress      String  @map("ip_address") @db.VarChar(45)
-  deviceId       String  @map("device_id") @db.VarChar(255)
-  failedAttempts Int     @default(0)
-  isBlocked      Boolean @default(false)
-
-  orderList  Order[]
-  reviewList Review[]
-
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
-
-  @@index([guestId])
-  @@index([ipAddress])
-  @@index([deviceId])
-  @@index([isBlocked])
-  @@map("guest")
-}
-
 model Client {
   id         Int     @id @default(autoincrement())
-  firebaseId String  @unique @map("firebase_id")
   email      String  @unique @db.VarChar(150)
+  name       String  @db.VarChar(150)
   phone      String? @db.VarChar(25)
-  name       String? @db.VarChar(150)
-  avatarUrl  String? @db.Text()
+  firebaseId String? @unique @map("firebase_id")
+  avatarUrl  String? @map("avatar_url") @db.Text()
+  isBlocked  Boolean @default(false)
 
-  deviceList Device[]
-  orderList  Order[]
-  reviewList Review[]
+  deviceList        Device[]
+  orderList         Order[]
+  reviewList        Review[]
+  clientReportList  ClientReport[]
+  clientAddressList ClientAddress[]
 
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@index([email])
   @@index([firebaseId])
   @@map("client")
+}
+
+model ClientReport {
+  id          Int     @id @default(autoincrement())
+  description String? @db.Text()
+
+  client   Client @relation(fields: [clientId], references: [id])
+  clientId Int    @map("client_id")
+
+  order   Order? @relation(fields: [orderId], references: [id])
+  orderId Int?   @unique
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId Int        @map("restaurant_id")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("client_report")
 }
 
 model User {
@@ -158,12 +194,13 @@ model User {
   email      String  @unique @db.VarChar(150)
   name       String? @db.VarChar(150)
   phone      String? @db.VarChar(25)
-  avatarUrl  String? @db.Text()
+  avatarUrl  String? @map("avatar_url") @db.Text()
   role       Role
 
   deviceList         Device[]
   userRestaurantList UserRestaurant[]
   orderList          Order[]
+  clientReportList   ClientReport[]
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId Int     @map("company_id")
@@ -189,8 +226,7 @@ enum Role {
 model Device {
   id         Int      @id @default(autoincrement())
   token      String   @unique @db.Text()
-  deviceId   String   @unique @db.VarChar(255)
-  ipAddress  String?  @db.VarChar(45)
+  code       String   @unique @default(uuid())
   lastActive DateTime @default(now()) @map("last_active") @db.Timestamptz()
 
   client   Client? @relation(fields: [clientId], references: [id], onDelete: Cascade)
@@ -205,6 +241,7 @@ model Device {
 
   @@index([clientId])
   @@index([userId])
+  @@index([code])
   @@index([lastActive])
   @@map("device")
 }
@@ -220,6 +257,10 @@ model UserRestaurant {
   userId       Int @map("user_id")
   restaurantId Int @map("restaurant_id")
 
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
   @@map("user_restaurant")
 }
 
@@ -233,6 +274,7 @@ model Restaurant {
   name          String  @db.VarChar(150)
   phone         String  @db.VarChar(25)
   restaurantUrl String  @unique @map("restaurant_url") @db.VarChar(255)
+  contactLink   String  @map("contact_link") @db.Text()
   description   String? @db.Text()
   logoUrl       String? @map("logo_url") @db.Text()
 
@@ -246,9 +288,8 @@ model Restaurant {
   orderList             Order[]
   userRestaurantList    UserRestaurant[]
   reviewList            Review[]
-
-  address   Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  addressId Int     @unique @map("address_id")
+  clientReportList      ClientReport[]
+  restaurantAddressList RestaurantAddress[]
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId Int     @map("company_id")
@@ -262,6 +303,54 @@ model Restaurant {
   @@map("restaurant")
 }
 
+model ClientAddress {
+  id Int @id @default(autoincrement())
+
+  client   Client @relation(fields: [clientId], references: [id])
+  clientId Int
+
+  address   Address @relation(fields: [addressId], references: [id])
+  addressId Int
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("client_address")
+}
+
+model RestaurantAddress {
+  id Int @id @default(autoincrement())
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId Int
+
+  address   Address @relation(fields: [addressId], references: [id])
+  addressId Int
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("restaurant_address")
+}
+
+model OrderAddress {
+  id Int @id @default(autoincrement())
+
+  order   Order @relation(fields: [orderId], references: [id])
+  orderId Int
+
+  address   Address @relation(fields: [addressId], references: [id])
+  addressId Int
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("order_address")
+}
+
 model Address {
   id      Int    @id @default(autoincrement())
   street  String @db.VarChar(255)
@@ -270,7 +359,13 @@ model Address {
   zipCode String @map("zip_code") @db.VarChar(20)
   country String @db.VarChar(50)
 
-  restaurant Restaurant?
+  clientAddressList     ClientAddress[]
+  restaurantAddressList RestaurantAddress[]
+  orderAddressList      OrderAddress[]
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@map("address")
 }
@@ -284,6 +379,10 @@ model OpeningHour {
 
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId Int        @map("restaurant_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@map("opening_hour")
 }
@@ -306,6 +405,10 @@ model PaymentMethod {
 
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId Int        @map("restaurant_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@index([restaurantId])
   @@map("payment_method")
@@ -341,6 +444,10 @@ model Color {
   text          String @db.VarChar(7)
 
   styleList Style[]
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@map("color")
 }
@@ -405,6 +512,10 @@ model ProductCategory {
   categoryId Int @map("category_id")
   productId  Int @map("product_id")
 
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
   @@map("product_category")
 }
 
@@ -415,6 +526,10 @@ model ProductImage {
 
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int     @map("product_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@map("product_image")
 }
@@ -439,7 +554,9 @@ model ProductRestaurant {
   productId    Int @map("product_id")
   restaurantId Int @map("restaurant_id")
 
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@index([restaurantId])
   @@index([outOfStock])
@@ -473,7 +590,7 @@ model ProductOptionGroup {
 
   name         String  @db.VarChar(150)
   description  String? @db.Text()
-  minSelection Int     @default(1) @map("min_selection")
+  minSelection Int     @default(0) @map("min_selection")
   maxSelection Int     @default(1) @map("max_selection")
   required     Boolean
 
@@ -482,6 +599,8 @@ model ProductOptionGroup {
 
   productOptionItemList ProductOptionItem[]
 
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
   finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@map("product_option_group")
@@ -493,14 +612,16 @@ model ProductOptionItem {
   description String? @db.Text()
   imageUrl    String? @db.Text()
 
-  product            Product?            @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productOptionGroup ProductOptionGroup? @relation(fields: [productOptionGroupId], references: [id], onDelete: SetNull)
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?     @map("product_id")
+
+  productOptionGroup   ProductOptionGroup @relation(fields: [productOptionGroupId], references: [id], onDelete: Cascade)
+  productOptionGroupId Int                @map("product_option_group_id")
 
   orderProductOptionItemList OrderProductOptionItem[]
 
-  productId            Int? @map("product_id")
-  productOptionGroupId Int? @map("product_option_group_id")
-
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
   finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@map("product_option_item")
@@ -529,6 +650,7 @@ model Order {
   id Int @id @default(autoincrement())
 
   price         Decimal     @db.Decimal(10, 2)
+  total         Decimal     @db.Decimal(10, 2)
   deliveryPrice Decimal?    @map("delivery_price") @db.Decimal(10, 2)
   observation   String?     @db.Text()
   status        OrderStatus
@@ -536,6 +658,8 @@ model Order {
 
   orderProductList OrderProduct[]
   reviewList       Review[]
+  clientReport     ClientReport?
+  orderAddressList OrderAddress[]
 
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId Int
@@ -543,11 +667,8 @@ model Order {
   deliveryPerson   User? @relation(fields: [deliveryPersonId], references: [id], onDelete: SetNull)
   deliveryPersonId Int?  @map("delivery_person_id")
 
-  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  guest  Guest?  @relation(fields: [guestId], references: [id], onDelete: SetNull)
-
-  guestId  Int? @map("guest_id")
-  clientId Int? @map("client_id")
+  client   Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  clientId Int?    @map("client_id")
 
   table   Table? @relation(fields: [tableId], references: [id], onDelete: SetNull)
   tableId Int?   @map("table_id")
@@ -561,7 +682,6 @@ model Order {
   @@index([status, createdAt])
   @@index([restaurantId, createdAt])
   @@index([clientId, createdAt])
-  @@index([guestId, createdAt])
   @@map("order")
 }
 
@@ -581,14 +701,15 @@ enum OrderType {
 }
 
 model OrderProduct {
-  id Int @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
+  observation String? @db.Text()
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   orderProductOptionItemList OrderProductOptionItem[]
 
-  status OrderStatus @default(PENDING)
+  status ProductStatus @default(PENDING)
 
   orderId   Int @map("order_id")
   productId Int @map("product_id")
@@ -597,8 +718,9 @@ model OrderProduct {
   price    Decimal @db.Decimal(10, 2)
   subtotal Decimal @db.Decimal(10, 2)
 
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@index([orderId])
   @@index([productId])
@@ -624,6 +746,10 @@ model OrderProductOptionItem {
   orderProductId      Int @map("order_product_id")
   productOptionItemId Int @map("product_option_item_id")
 
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
   @@map("order_product_option_item")
 }
 
@@ -632,13 +758,10 @@ model Review {
   description String @db.Text()
   rate        Rate
 
-  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  guest  Guest?  @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId Int    @map("client_id")
 
-  guestId  Int? @map("guest_id")
-  clientId Int? @map("client_id")
-
-  company   Company @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId Int     @map("company_id")
 
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
@@ -649,6 +772,10 @@ model Review {
 
   productRestaurant   ProductRestaurant? @relation(fields: [productRestaurantId], references: [id])
   productRestaurantId Int?               @map("product_restaurant_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@unique([clientId, orderId])
   @@index([companyId])

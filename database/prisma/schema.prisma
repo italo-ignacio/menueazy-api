@@ -21,7 +21,7 @@ model RegisterRequest {
   companyName String  @map("company_name") @db.VarChar(150)
   description String? @db.Text()
   code        String  @unique @default(uuid())
-  canRegister Boolean @default(false)
+  canRegister Boolean @default(false) @map("can_register")
 
   currency   Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
   currencyId Int      @map("currency_id")
@@ -169,16 +169,16 @@ model ClientReport {
   id          Int     @id @default(autoincrement())
   description String? @db.Text()
 
-  client   Client @relation(fields: [clientId], references: [id])
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId Int    @map("client_id")
 
-  order   Order? @relation(fields: [orderId], references: [id])
+  order   Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
   orderId Int?   @unique
 
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId Int        @map("restaurant_id")
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
 
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
@@ -278,8 +278,12 @@ model Restaurant {
   description   String? @db.Text()
   logoUrl       String? @map("logo_url") @db.Text()
 
-  style   Style @relation(fields: [styleId], references: [id])
-  styleId Int   @map("style_id")
+  open                    Boolean
+  hasDelivery             Boolean
+  maxDeliveryDistanceInKm Int     @default(10) @map("max_delivery_distance_in_km")
+  minimumOrderValue       Decimal @default(0) @map("minimum_order_value") @db.Decimal(10, 2)
+  minimumDeliveryValue    Decimal @default(0) @map("minimum_delivery_value") @db.Decimal(10, 2)
+  valueByKmInDelivery     Decimal @default(0) @map("value_by_km_in_delivery") @db.Decimal(10, 2)
 
   paymentMethodList     PaymentMethod[]
   openingHourList       OpeningHour[]
@@ -290,6 +294,10 @@ model Restaurant {
   reviewList            Review[]
   clientReportList      ClientReport[]
   restaurantAddressList RestaurantAddress[]
+  restaurantCategory    RestaurantCategory[]
+
+  style   Style @relation(fields: [styleId], references: [id])
+  styleId Int   @map("style_id")
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId Int     @map("company_id")
@@ -352,12 +360,16 @@ model OrderAddress {
 }
 
 model Address {
-  id      Int    @id @default(autoincrement())
-  street  String @db.VarChar(255)
-  city    String @db.VarChar(100)
-  state   String @db.VarChar(50)
-  zipCode String @map("zip_code") @db.VarChar(20)
-  country String @db.VarChar(50)
+  id         Int     @id @default(autoincrement())
+  street     String  @db.VarChar(255)
+  city       String  @db.VarChar(100)
+  state      String  @db.VarChar(50)
+  number     String  @db.VarChar(30)
+  complement String  @db.VarChar(255)
+  zipCode    String  @map("zip_code") @db.VarChar(20)
+  country    String  @db.VarChar(50)
+  latitude   Decimal @db.Decimal(10, 8)
+  longitude  Decimal @db.Decimal(11, 8)
 
   clientAddressList     ClientAddress[]
   restaurantAddressList RestaurantAddress[]
@@ -415,16 +427,17 @@ model PaymentMethod {
 }
 
 model Style {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(150)
+  id      Int     @id @default(autoincrement())
+  name    String  @db.VarChar(150)
+  generic Boolean @default(false)
 
   color   Color @relation(fields: [colorId], references: [id], onDelete: Cascade)
   colorId Int   @map("color_id")
 
-  restaurant Restaurant[]
+  restaurantList Restaurant[]
 
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId Int     @map("company_id")
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int?     @map("company_id")
 
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
@@ -461,7 +474,7 @@ model Company {
   companyUrl     String  @unique @map("company_url") @db.VarChar(255)
   customDomain   String? @unique @map("custom_domain") @db.VarChar(255)
   dnsCNAME       String? @map("dns_cname") @db.VarChar(255)
-  domainVerified Boolean @default(false)
+  domainVerified Boolean @default(false) @map("domain_verified")
 
   restaurantList Restaurant[]
   styleList      Style[]
@@ -471,7 +484,7 @@ model Company {
   reviewList     Review[]
 
   currency   Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
-  currencyId Int
+  currencyId Int      @map("currency_id")
 
   subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   subscriptionId Int          @unique @map("subscription_id")
@@ -482,7 +495,8 @@ model Company {
 
   @@index([companyUrl])
   @@index([customDomain])
-  @@index([domainVerified])
+  @@index([companyUrl, domainVerified])
+  @@index([customDomain, domainVerified])
   @@map("company")
 }
 
@@ -491,7 +505,8 @@ model Category {
   name        String  @db.VarChar(100)
   description String? @db.Text()
 
-  productCategoryList ProductCategory[]
+  productCategoryList    ProductCategory[]
+  restaurantCategoryList RestaurantCategory[]
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId Int     @map("company_id")
@@ -500,17 +515,34 @@ model Category {
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
   finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
+  @@index([companyId])
   @@map("category")
+}
+
+model RestaurantCategory {
+  id Int @id @default(autoincrement())
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId Int        @map("restaurant_id")
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int      @map("category_id")
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("restaurant_category")
 }
 
 model ProductCategory {
   id Int @id @default(autoincrement())
 
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int     @map("product_id")
 
-  categoryId Int @map("category_id")
-  productId  Int @map("product_id")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int      @map("category_id")
 
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
@@ -535,24 +567,25 @@ model ProductImage {
 }
 
 model ProductRestaurant {
-  id    Int     @id @default(autoincrement())
-  price Decimal @db.Decimal(10, 2)
+  id                  Int       @id @default(autoincrement())
+  price               Decimal   @db.Decimal(10, 2)
+  onlyInRestaurant    Boolean   @default(false) @map("only_in_restaurant")
+  valueByKmInDelivery Decimal?  @map("value_by_km_in_delivery") @db.Decimal(10, 2)
+  outOfStock          Boolean   @default(false) @map("out_of_stock")
+  startSellAt         DateTime  @default(now()) @map("start_sell_at") @db.Timestamptz()
+  finishSellAt        DateTime? @map("finish_sell_at") @db.Timestamptz()
 
-  reviewList Review[]
-
-  outOfStock   Boolean   @default(false) @map("out_of_stock")
-  startSellAt  DateTime  @map("start_sell_at") @db.Timestamptz()
-  finishSellAt DateTime? @map("finish_sell_at") @db.Timestamptz()
-
-  discount         Decimal   @db.Decimal(10, 2)
+  discount         Decimal?  @db.Decimal(10, 2)
   startDiscountAt  DateTime? @map("start_discount_at") @db.Timestamptz()
   finishDiscountAt DateTime? @map("finish_discount_at") @db.Timestamptz()
 
-  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int     @map("product_id")
 
-  productId    Int @map("product_id")
-  restaurantId Int @map("restaurant_id")
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId Int        @map("restaurant_id")
+
+  reviewList Review[]
 
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
@@ -560,6 +593,7 @@ model ProductRestaurant {
 
   @@index([restaurantId])
   @@index([outOfStock])
+  @@index([onlyInRestaurant])
   @@map("product_restaurant")
 }
 
@@ -576,7 +610,7 @@ model Product {
   productOptionItemList  ProductOptionItem[]
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId Int
+  companyId Int     @map("company_at")
 
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()

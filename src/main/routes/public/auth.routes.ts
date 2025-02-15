@@ -1,11 +1,18 @@
+import {
+  preUserLoginController,
+  recoverPasswordController,
+  userLoginController
+} from '@application/controller/auth';
 import { Router } from 'express';
-import { loginController, recoverPasswordController } from '@application/controller/auth';
 
 export default (inputRouter: Router): void => {
   const router = Router();
 
-  router.post('/login', loginController());
+  // User Login
+  router.post('/pre-user-login', preUserLoginController());
+  router.post('/user-login', userLoginController());
+
   router.post('/recover-password', recoverPasswordController());
 
-  inputRouter.use('/', router);
+  inputRouter.use('/auth', router);
 };

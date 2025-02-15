@@ -22,7 +22,8 @@
   },
   "css.lint.unknownAtRules": "ignore",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "always"
   },
   "editor.formatOnSave": true,
   "editor.tabSize": 2,

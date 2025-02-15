@@ -1,52 +1,59 @@
+import { Langs } from '@domain/enum';
+import { statusCodeList } from '@domain/helpers';
+import { messages } from '@i18n/index';
 import { formatYupError } from '@main/utils/yup-resolver-errors';
-import { messages, statusCodeList } from '@domain/helpers';
-import type { PrettyYupError } from '@main/utils';
 import type { Response } from 'express';
 import type { ValidationError } from 'yup';
-import type { messageTypeResponse } from '@domain/errors';
 
 export const created = ({
   response,
-  payload = messages.default.successfullyCreated
+  lang,
+  payload
 }: {
   response: Response;
-  payload?: object;
-}): Response =>
-  response.status(statusCodeList.CREATED).json({
+  lang: Langs;
+  payload?: unknown;
+}): Response => {
+  return response.status(statusCodeList.CREATED).json({
     errors: [],
-    message: messages.default.ok,
-    payload,
+    message: messages[lang].default.ok,
+    payload: payload || messages[lang].default.successfullyCreated,
     status: 'request successfully'
   });
+};
 
 export const ok = ({
   response,
-  payload = {}
+  lang,
+  payload
 }: {
   response: Response;
-  payload?: object;
+  lang: Langs;
+  payload?: unknown;
 }): Response =>
   response.status(statusCodeList.OK).json({
     errors: [],
-    message: messages.default.ok,
+    message: messages[lang].default.ok,
     payload,
     status: 'request successfully'
   });
 
 export const badRequest = ({
   response,
-  message = messages.default.badRequest,
+  message,
   errors = [],
+  lang,
   payload = {}
 }: {
   response: Response;
-  message?: messageTypeResponse;
-  errors?: PrettyYupError[] | [];
+  message?: unknown;
+  lang: Langs;
+  errors?: unknown;
   payload?: object;
 }): Response =>
   response.status(statusCodeList.BAD_REQUEST).json({
     errors,
-    message,
+    message: message || messages[lang].error.badRequest,
     payload,
     status: 'bad request'
   });
@@ -54,37 +61,41 @@ export const badRequest = ({
 export const notFound = ({
   entity,
   response,
-  message = messages.default.notFound(entity),
+  message,
   payload = {},
+  lang,
   errors = []
 }: {
-  entity: messageTypeResponse;
+  entity: unknown;
   response: Response;
-  message?: messageTypeResponse;
+  lang: Langs;
+  message?: unknown;
   payload?: object;
-  errors?: PrettyYupError[] | [];
+  errors?: unknown;
 }): Response =>
   response.status(statusCodeList.NOT_FOUND).json({
     errors,
-    message,
+    message: message || `${entity} ${messages[lang].error.notFound}`,
     payload,
     status: 'not found'
   });
 
 export const unauthorized = ({
   response,
-  message = messages.default.unauthorized,
+  message,
+  lang,
   errors = [],
   payload = {}
 }: {
   response: Response;
-  message?: messageTypeResponse;
-  errors?: PrettyYupError[] | [];
+  message?: unknown;
+  lang: Langs;
+  errors?: unknown;
   payload?: object;
 }): Response =>
   response.status(statusCodeList.NOT_AUTHORIZED).json({
     errors,
-    message,
+    message: message || messages[lang].error.unauthorized,
     payload,
     status: 'unauthorized'
   });
@@ -92,77 +103,72 @@ export const unauthorized = ({
 export const forbidden = ({
   response,
   message,
+  lang,
   errors = [],
   payload = {}
 }: {
   response: Response;
-  message: {
-    english: string;
-    portuguese: string;
-  };
-  errors?: PrettyYupError[] | [];
-  payload?: object;
+  message?: unknown;
+  lang: Langs;
+  errors?: unknown;
+  payload?: unknown;
 }): Response =>
   response.status(statusCodeList.FORBIDDEN).json({
     errors,
-    message: messages.auth.notPermission(message),
+    message: message || messages[lang].error.notPermission,
     payload,
     status: 'forbidden'
   });
 
 export const timeout = ({
   response,
-  message = messages.default.timeout,
+  message,
+  lang,
   errors = [],
   payload = {}
 }: {
   response: Response;
-  message?: messageTypeResponse;
-  errors?: PrettyYupError[] | [];
+  message?: unknown;
+  errors?: unknown;
+  lang: Langs;
   payload?: object;
 }): Response =>
   response.status(statusCodeList.TIMEOUT).json({
     errors,
-    message,
+    message: message || messages[lang].error.timeout,
     payload,
     status: 'timeout'
   });
 
 export const messageErrorResponse = ({
   error,
+  lang,
   response
 }: {
   error: unknown;
+  lang: Langs;
   response: Response;
 }): Response => {
-  const newError = error as { message?: string };
-  let message: messageTypeResponse | undefined;
-
-  if (error instanceof Error)
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    message = newError.message
-      ? {
-          english: newError.message,
-          portuguese: 'Erro interno do servidor...'
-        }
-      : // eslint-disable-next-line no-undefined
-        undefined;
-
   return badRequest({
-    message,
-    response
+    message: messages[lang].error.internalServerError,
+    response,
+    lang,
+    errors: error
   });
 };
 
 export const validationErrorResponse = ({
   error,
+  lang,
   response
 }: {
   error: ValidationError;
+  lang: Langs;
   response: Response;
 }): Response =>
   badRequest({
     errors: formatYupError(error),
-    message: messages.default.validationErrorResponse,
-    response
+    message: messages[lang].error.validationErrorResponse,
+    response,
+    lang
   });

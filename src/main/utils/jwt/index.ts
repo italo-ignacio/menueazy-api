@@ -1,6 +1,6 @@
+import type { UserTokenInput } from '@domain/token';
 import { env } from '@main/config/env';
 import { sign } from 'jsonwebtoken';
-import type { tokenInput } from '@domain/token';
 
 export const removeBearer = (accessToken: string): string | null => {
   const [Bearer, hash] = accessToken.split(' ');
@@ -16,12 +16,8 @@ interface generateTokenOutput {
   accessToken: string;
 }
 
-export const generateToken = (user: tokenInput): generateTokenOutput => {
+export const generateToken = (data: UserTokenInput): generateTokenOutput => {
   const { EXPIRES_IN, SECRET } = env.JWT;
 
-  const data = {
-    accessToken: sign({ user }, SECRET, { expiresIn: EXPIRES_IN })
-  };
-
-  return data;
+  return { accessToken: sign(data, SECRET, { expiresIn: EXPIRES_IN }) };
 };

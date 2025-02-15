@@ -42,7 +42,7 @@ export const options = {
     }
   ],
 
-  swaggerUIPath: '/api-docs',
+  swaggerUIPath: '/swagger-doc-api',
 
   // You can customize your UI options.
   // you can extend swagger-ui-express config. You can checkout an example of this

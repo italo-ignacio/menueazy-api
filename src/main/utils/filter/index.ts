@@ -54,7 +54,8 @@ export const getGenericFilter = <QueryType extends string>({
   const orderBy = {};
   const where: object = {};
 
-  if (String(query.history) !== 'true') Object.assign(where, { finishedAt: IsNull() });
+  // if (String(query.history) !== 'true')
+  Object.assign(where, { finishedAt: IsNull() });
 
   let startDate = null;
   let endDate = null;

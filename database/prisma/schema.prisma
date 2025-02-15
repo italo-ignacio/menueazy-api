@@ -15,10 +15,10 @@ datasource db {
 
 model RegisterRequest {
   id          Int     @id @default(autoincrement())
-  email       String  @db.VarChar(150)
-  name        String  @db.VarChar(150)
+  email       String  @db.VarChar(255)
+  name        String  @db.VarChar(255)
   phone       String  @db.VarChar(25)
-  companyName String  @map("company_name") @db.VarChar(150)
+  companyName String  @map("company_name") @db.VarChar(255)
   description String? @db.Text()
   code        String  @unique @default(uuid())
   canRegister Boolean @default(false) @map("can_register")
@@ -96,25 +96,40 @@ model PlanPrice {
 
 enum PlanPricePeriod {
   MONTHLY
-  QUARTERLY
-  SEMIANNUAL
   ANNUAL
 }
 
 model Coupon {
-  id        Int      @id @default(autoincrement())
-  code      String   @unique @db.VarChar(20)
-  discount  Decimal  @db.Decimal(10, 2)
-  expiresAt DateTime @map("expires_at") @db.Timestamptz()
+  id       Int      @id @default(autoincrement())
+  code     String   @unique @db.VarChar(20)
+  discount Decimal  @db.Decimal(10, 2)
+  duration DateTime @map("expires_at") @db.Timestamptz()
 
-  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  subscriptionId Int?          @map("subscription_id")
+  subscriptionCouponList SubscriptionCoupon[]
 
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
   finishedAt DateTime? @map("finished_at") @db.Timestamptz()
 
   @@map("coupon")
+}
+
+model SubscriptionCoupon {
+  id Int @id @default(autoincrement())
+
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscriptionId Int          @map("subscription_id")
+
+  coupon   Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  couponId Int
+
+  expiresAt DateTime @map("expires_at") @db.Timestamptz()
+
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz()
+
+  @@map("subscription_coupon")
 }
 
 model Subscription {
@@ -125,7 +140,7 @@ model Subscription {
   plan   Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId Int  @map("plan_id")
 
-  couponList Coupon[]
+  subscriptionCouponList SubscriptionCoupon[]
 
   price           Decimal @db.Decimal(10, 2)
   restaurantLimit Int     @map("restaurant_limit")
@@ -143,8 +158,8 @@ model Subscription {
 
 model Client {
   id         Int     @id @default(autoincrement())
-  email      String  @unique @db.VarChar(150)
-  name       String  @db.VarChar(150)
+  email      String  @unique @db.VarChar(255)
+  name       String  @db.VarChar(255)
   phone      String? @db.VarChar(25)
   firebaseId String? @unique @map("firebase_id")
   avatarUrl  String? @map("avatar_url") @db.Text()
@@ -191,8 +206,8 @@ model ClientReport {
 model User {
   id         Int     @id @default(autoincrement())
   firebaseId String  @unique @map("firebase_id")
-  email      String  @unique @db.VarChar(150)
-  name       String? @db.VarChar(150)
+  email      String  @unique @db.VarChar(255)
+  name       String? @db.VarChar(255)
   phone      String? @db.VarChar(25)
   avatarUrl  String? @map("avatar_url") @db.Text()
   role       Role
@@ -271,7 +286,7 @@ enum RestaurantRole {
 
 model Restaurant {
   id            Int     @id @default(autoincrement())
-  name          String  @db.VarChar(150)
+  name          String  @db.VarChar(255)
   phone         String  @db.VarChar(25)
   restaurantUrl String  @unique @map("restaurant_url") @db.VarChar(255)
   contactLink   String  @map("contact_link") @db.Text()
@@ -400,13 +415,13 @@ model OpeningHour {
 }
 
 enum DayOfWeek {
-  Monday
-  Tuesday
-  Wednesday
-  Thursday
-  Friday
-  Saturday
-  Sunday
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
 
 model PaymentMethod {
@@ -428,7 +443,7 @@ model PaymentMethod {
 
 model Style {
   id      Int     @id @default(autoincrement())
-  name    String  @db.VarChar(150)
+  name    String  @db.VarChar(255)
   generic Boolean @default(false)
 
   color   Color @relation(fields: [colorId], references: [id], onDelete: Cascade)
@@ -599,7 +614,7 @@ model ProductRestaurant {
 
 model Product {
   id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(150)
+  name        String  @db.VarChar(255)
   description String? @db.Text()
 
   productRestaurantList  ProductRestaurant[]
@@ -610,7 +625,7 @@ model Product {
   productOptionItemList  ProductOptionItem[]
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId Int     @map("company_at")
+  companyId Int     @map("company_id")
 
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
@@ -622,7 +637,7 @@ model Product {
 model ProductOptionGroup {
   id Int @id @default(autoincrement())
 
-  name         String  @db.VarChar(150)
+  name         String  @db.VarChar(255)
   description  String? @db.Text()
   minSelection Int     @default(0) @map("min_selection")
   maxSelection Int     @default(1) @map("max_selection")
@@ -642,7 +657,7 @@ model ProductOptionGroup {
 
 model ProductOptionItem {
   id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(150)
+  name        String  @db.VarChar(255)
   description String? @db.Text()
   imageUrl    String? @db.Text()
 

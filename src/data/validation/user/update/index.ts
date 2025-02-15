@@ -1,15 +1,11 @@
-import { emailNotRequired, phoneNotRequired, stringNotRequired } from '@main/utils';
 import { yup } from '@infra/yup';
+import { emailNotRequired, stringNotRequired } from '@main/utils';
 
 export const updateUserSchema = yup.object().shape({
   body: yup.object().shape({
     email: emailNotRequired(),
-    name: stringNotRequired({
-      english: 'name',
-      length: 255,
-      portuguese: 'nome'
-    }),
+    name: stringNotRequired(),
     password: stringNotRequired(),
-    phone: phoneNotRequired()
+    phone: stringNotRequired()
   })
 });

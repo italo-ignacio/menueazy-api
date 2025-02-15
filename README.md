@@ -38,3 +38,5 @@ criar nova branch
 alterar branch
 
 - `git checkout "nome-branch"`
+
+npm i bcrypt cors date-fns dotenv env-cmd express express-jsdoc-swagger jsonwebtoken module-alias multer pg typeorm typeorm-ts-node-commonjs yup

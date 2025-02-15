@@ -7,6 +7,10 @@ src/static
 package-lock.json
 yarn.lock
 
+/test
+
+src/main/credentials.json
+
 # Gatsby files
 .cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js

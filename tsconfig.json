@@ -8,6 +8,7 @@
     "isolatedModules": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
     "lib": ["ES6"],
     "module": "CommonJS",
     "moduleResolution": "Node",
@@ -19,6 +20,7 @@
       "@main/*": ["main/*"],
       "@data/*": ["data/*"],
       "@domain/*": ["domain/*"],
+      "@i18n/*": ["i18n/*"],
       "@entity/*": ["entity/*"],
       "@repository/*": ["repository/*"],
       "@infra/*": ["infra/*"],
@@ -31,5 +33,6 @@
     "target": "ES6",
     "useDefineForClassFields": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["database"]
 }

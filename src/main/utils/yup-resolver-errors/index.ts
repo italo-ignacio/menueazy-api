@@ -1,5 +1,3 @@
-/* eslint-disable no-ternary */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { ValidationError } from 'yup';
 
 export interface PrettyYupError {
@@ -9,6 +7,6 @@ export interface PrettyYupError {
 
 export const formatYupError = (error: ValidationError): PrettyYupError[] =>
   error.inner.map((item) => ({
-    message: item.message.includes('portuguese') ? JSON.parse(item.message) : item.message,
+    message: item.message,
     param: item.path
   }));

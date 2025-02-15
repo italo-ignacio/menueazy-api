@@ -14,7 +14,7 @@ export const errorLogger = (error: unknown): void => {
   if (error instanceof Error)
     stringError = `------------------------------------------------\nDate: ${date}\nError: ${
       error.name
-      // eslint-disable-next-line no-ternary
+       
     }: ${error.message} ${typeof error.stack === 'undefined' ? '' : `at ${error.stack}`}`;
   else
     stringError = `------------------------------------------------\nDate: ${date}\nError: ${JSON.stringify(

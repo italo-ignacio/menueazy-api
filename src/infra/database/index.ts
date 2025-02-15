@@ -1,7 +1,7 @@
 import { DataSource as TypeOrmDataSource } from 'typeorm';
-import { env } from '@main/config/env';
+import { env } from '../../main/config/env';
 
-const rootPath = typeof process.env.TS_NODE_DEV === 'undefined' ? 'build' : 'src';
+const rootPath = typeof env.TS_NODE_DEV === 'undefined' ? 'build' : 'src';
 
 export const DataSource = new TypeOrmDataSource({
   database: env.DATABASE.name,
@@ -13,5 +13,7 @@ export const DataSource = new TypeOrmDataSource({
   ssl: env.DATABASE.ssl,
   synchronize: env.DATABASE.synchronize,
   type: 'postgres',
-  username: env.DATABASE.userName
+  migrations: [`${rootPath}/migration/*.ts`],
+  username: env.DATABASE.userName,
+  migrationsRun: true
 });

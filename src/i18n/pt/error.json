@@ -1,0 +1,12 @@
+{
+  "badRequest": "Falha na requisição",
+  "loginFailed": "Erro ao realizar login",
+  "unauthorized": "Usuário não autenticado",
+  "badLoginCredentials": "E-mail e/ou senha inválido(s)",
+  "validationErrorResponse": "Falha durante validação do formulário",
+  "notFound": "não encontrado",
+  "notPermission": "Permissão negada",
+  "timeout": "Solicitação expirou. Tente novamente mais tarde",
+  "internalServerError": "Erro interno do servidor",
+  "checkYourEmail": "Verifique seu e-mail antes de realizar login"
+}

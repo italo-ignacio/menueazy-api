@@ -14,7 +14,7 @@ import { CompanyEntity } from '../company';
 import { OpeningHourEntity } from '../opening-hour';
 import { OrderEntity } from '../order';
 import { PaymentMethodEntity } from '../payment-method';
-import { ProductRestaurantEntity } from '../product-restaurant';
+import { ProductEntity } from '../product';
 import { RestaurantAddressEntity } from '../restaurant-address';
 import { RestaurantCategoryEntity } from '../restaurant-category';
 import { ReviewEntity } from '../review';
@@ -121,8 +121,8 @@ export class RestaurantEntity {
   @OneToMany(() => PaymentMethodEntity, (paymentMethod) => paymentMethod.restaurant)
   public paymentMethodList: PaymentMethodEntity[];
 
-  @OneToMany(() => ProductRestaurantEntity, (productRestaurant) => productRestaurant.restaurant)
-  public productRestaurantList: ProductRestaurantEntity[];
+  @OneToMany(() => ProductEntity, (product) => product.restaurant)
+  public productList: ProductEntity[];
 
   @OneToMany(() => RestaurantAddressEntity, (restaurantAddress) => restaurantAddress.restaurant)
   public restaurantAddressList: RestaurantAddressEntity[];

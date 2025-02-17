@@ -12,7 +12,7 @@ import { Rate } from '../../domain/enum';
 import { ClientEntity } from '../client';
 import { CompanyEntity } from '../company';
 import { OrderEntity } from '../order';
-import { ProductRestaurantEntity } from '../product-restaurant';
+import { ProductEntity } from '../product';
 import { RestaurantEntity } from '../restaurant';
 
 @Index('review_client_id_order_id_idx', ['client', 'order'], {
@@ -64,13 +64,13 @@ export class ReviewEntity {
   // @Column({ type: 'integer', name: 'product_restaurant_id', nullable: true })
   // public productRestaurantId: number | null;
 
-  @ManyToOne(() => ProductRestaurantEntity, (productRestaurant) => productRestaurant.reviewList, {
+  @ManyToOne(() => ProductEntity, (product) => product.reviewList, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
     nullable: true
   })
-  @JoinColumn([{ name: 'product_restaurant_id', referencedColumnName: 'id' }])
-  public productRestaurant: ProductRestaurantEntity | null;
+  @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
+  public product: ProductEntity | null;
 
   // @Index()
   // @Column({ type: 'integer', name: 'restaurant_id' })

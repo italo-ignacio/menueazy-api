@@ -12,7 +12,7 @@
     "start": "node build/main/server.js",
     "check-build": "rmdir /s /q node_modules && npm install --omit=dev && tsc",
     "migration:create": "npx typeorm migration:create",
-    "migration:generate": "set TS_NODE_DEV=true && typeorm-ts-node-commonjs migration:generate src/migration/migration-0 -d ./src/infra/database/index.ts",
+    "migration:generate": "set TS_NODE_DEV=true && typeorm-ts-node-commonjs migration:generate src/migration/migration -d ./src/infra/database/index.ts",
     "migration:run": "set TS_NODE_DEV=true && typeorm-ts-node-commonjs migration:run -d src/infra/database/index.ts",
     "migration:revert": "set TS_NODE_DEV=true && typeorm-ts-node-commonjs migration:revert -d src/infra/database/index.ts",
     "migration:remove": "set TS_NODE_DEV=true && typeorm-ts-node-commonjs migration:show -d src/infra/database/index.ts"

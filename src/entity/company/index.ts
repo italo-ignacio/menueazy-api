@@ -10,13 +10,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
-import { CategoryEntity } from '../category';
 import { CurrencyEntity } from '../currency';
-import { SubscriptionEntity } from '../subscription';
-import { ProductEntity } from '../product';
 import { RestaurantEntity } from '../restaurant';
 import { ReviewEntity } from '../review';
 import { StyleEntity } from '../style';
+import { SubscriptionEntity } from '../subscription';
 import { UserEntity } from '../user';
 
 @Index('company_company_url_domain_verified_idx', ['companyUrl', 'domainVerified'])
@@ -49,9 +47,6 @@ export class CompanyEntity {
   @Column({ type: 'boolean', name: 'domain_verified', default: false })
   public domainVerified: boolean;
 
-  @OneToMany(() => CategoryEntity, (category) => category.company)
-  public categoryList: CategoryEntity[];
-
   // @Column({ type: 'integer', name: 'currency_id' })
   // public currencyId: number;
 
@@ -71,9 +66,6 @@ export class CompanyEntity {
   })
   @JoinColumn([{ name: 'subscription_id', referencedColumnName: 'id' }])
   public subscription: SubscriptionEntity;
-
-  @OneToMany(() => ProductEntity, (product) => product.company)
-  public productList: ProductEntity[];
 
   @OneToMany(() => RestaurantEntity, (restaurant) => restaurant.company)
   public restaurantList: RestaurantEntity[];

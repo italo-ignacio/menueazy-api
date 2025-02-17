@@ -2,13 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
-import { CompanyEntity } from '../company';
 import { ProductCategoryEntity } from '../product-category';
 import { RestaurantCategoryEntity } from '../restaurant-category';
 
@@ -25,13 +22,6 @@ export class CategoryEntity {
 
   // @Column({ name: 'company_id', type: 'integer' })
   // public companyId: number;
-
-  @ManyToOne(() => CompanyEntity, (company) => company.categoryList, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-  })
-  @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
-  public company: CompanyEntity;
 
   @OneToMany(() => ProductCategoryEntity, (productCategory) => productCategory.category)
   public productCategoryList: ProductCategoryEntity[];

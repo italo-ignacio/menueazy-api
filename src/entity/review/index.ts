@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { Rate } from '../../domain/enum';
 import { ClientEntity } from '../client';
-import { CompanyEntity } from '../company';
 import { OrderEntity } from '../order';
 import { ProductEntity } from '../product';
 import { RestaurantEntity } from '../restaurant';
@@ -34,21 +33,11 @@ export class ReviewEntity {
 
   @ManyToOne(() => ClientEntity, (client) => client.reviewList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'client_id', referencedColumnName: 'id' }])
   public client: ClientEntity;
-
-  // @Index()
-  // @Column({ type: 'integer', name: 'company_id' })
-  // public companyId: number;
-
-  @ManyToOne(() => CompanyEntity, (company) => company.reviewList, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-  })
-  @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
-  public company: CompanyEntity;
 
   // @Column({ type: 'integer', name: 'order_id', nullable: true })
   // public orderId: number | null;
@@ -77,7 +66,8 @@ export class ReviewEntity {
   // public restaurantId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.reviewList, {
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;

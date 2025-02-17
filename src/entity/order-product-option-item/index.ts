@@ -26,7 +26,8 @@ export class OrderProductOptionItemEntity {
 
   @ManyToOne(() => OrderProductEntity, (orderProduct) => orderProduct.orderProductOptionItemList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'order_product_id', referencedColumnName: 'id' }])
   public orderProduct: OrderProductEntity;
@@ -34,7 +35,7 @@ export class OrderProductOptionItemEntity {
   @ManyToOne(
     () => ProductOptionItemEntity,
     (productOptionItem) => productOptionItem.orderProductOptionItemList,
-    { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
+    { onDelete: 'CASCADE', onUpdate: 'CASCADE', nullable: false }
   )
   @JoinColumn([{ name: 'product_option_item_id', referencedColumnName: 'id' }])
   public productOptionItem: ProductOptionItemEntity;

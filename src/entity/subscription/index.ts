@@ -41,7 +41,8 @@ export class SubscriptionEntity {
 
   @ManyToOne(() => PlanEntity, (plan) => plan.subscriptionList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'plan_id', referencedColumnName: 'id' }])
   public plan: PlanEntity;

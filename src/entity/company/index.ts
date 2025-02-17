@@ -12,7 +12,6 @@ import {
 } from 'typeorm';
 import { CurrencyEntity } from '../currency';
 import { RestaurantEntity } from '../restaurant';
-import { ReviewEntity } from '../review';
 import { StyleEntity } from '../style';
 import { SubscriptionEntity } from '../subscription';
 import { UserEntity } from '../user';
@@ -52,7 +51,8 @@ export class CompanyEntity {
 
   @ManyToOne(() => CurrencyEntity, (currency) => currency.companyList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'currency_id', referencedColumnName: 'id' }])
   public currency: CurrencyEntity;
@@ -62,16 +62,14 @@ export class CompanyEntity {
 
   @OneToOne(() => SubscriptionEntity, (subscription) => subscription.company, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'subscription_id', referencedColumnName: 'id' }])
   public subscription: SubscriptionEntity;
 
   @OneToMany(() => RestaurantEntity, (restaurant) => restaurant.company)
   public restaurantList: RestaurantEntity[];
-
-  @OneToMany(() => ReviewEntity, (review) => review.company)
-  public reviewList: ReviewEntity[];
 
   @OneToMany(() => StyleEntity, (style) => style.company)
   public styleList: StyleEntity[];

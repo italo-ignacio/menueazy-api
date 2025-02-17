@@ -29,7 +29,8 @@ export class OpeningHourEntity {
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.openingHourList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;

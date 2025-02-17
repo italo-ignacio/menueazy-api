@@ -48,14 +48,16 @@ export class OrderProductEntity {
 
   @ManyToOne(() => OrderEntity, (order) => order.orderProductList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'order_id', referencedColumnName: 'id' }])
   public order: OrderEntity;
 
   @ManyToOne(() => ProductEntity, (product) => product.orderProductList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   public product: ProductEntity;

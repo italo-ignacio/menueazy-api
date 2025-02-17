@@ -5,9 +5,9 @@ export class Seeds1739547118552 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `INSERT INTO currency (code, "name", symbol) VALUES 
-      ('USD', 'US dollar', '$'), 
-      ('BRL', 'Real brasileiro', 'R$'), 
-      ('MXN', 'Pesos Mexicanos', '$');`
+      ('USD', 'US Dollar', '$'), 
+      ('EUR', 'Euro', '€'),
+      ('BRL', 'Real Brasileiro', 'R$');`
     );
 
     await queryRunner.query(
@@ -27,19 +27,19 @@ export class Seeds1739547118552 implements MigrationInterface {
       (219.98,  55.99,  0.49,  0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'USD'), (SELECT id FROM plan WHERE name = 'Enterprise')),
       (219.98,  55.99,  0.49,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'USD'), (SELECT id FROM plan WHERE name = 'Enterprise')),
 
+      (99.98,   89.99,  1.49,  0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'EUR'), (SELECT id FROM plan WHERE name = 'Basic')),
+      (99.98,   89.99,  1.49,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'EUR'), (SELECT id FROM plan WHERE name = 'Basic')),
+      (159.98,  69.99,  0.99,  0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'EUR'), (SELECT id FROM plan WHERE name = 'Pro')),
+      (159.98,  69.99,  0.99,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'EUR'), (SELECT id FROM plan WHERE name = 'Pro')),
+      (219.98,  55.99,  0.49,  0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'EUR'), (SELECT id FROM plan WHERE name = 'Enterprise')),
+      (219.98,  55.99,  0.49,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'EUR'), (SELECT id FROM plan WHERE name = 'Enterprise')),
+
       (168.98,  119.99, 2.49,  0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'BRL'), (SELECT id FROM plan WHERE name = 'Basic')),
       (168.98,  119.99, 2.49,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'BRL'), (SELECT id FROM plan WHERE name = 'Basic')),
       (239.98,  99.99,  1.89,  0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'BRL'), (SELECT id FROM plan WHERE name = 'Pro')),
       (239.98,  99.99,  1.89,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'BRL'), (SELECT id FROM plan WHERE name = 'Pro')),
       (339.98,  79.99,  1.09,  0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'BRL'), (SELECT id FROM plan WHERE name = 'Enterprise')),
-      (339.98,  79.99,  1.09,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'BRL'), (SELECT id FROM plan WHERE name = 'Enterprise')),
-
-      (819.98,  719.99, 14.49, 0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'MXN'), (SELECT id FROM plan WHERE name = 'Basic')),
-      (819.98,  719.99, 14.49, 16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'MXN'), (SELECT id FROM plan WHERE name = 'Basic')),
-      (1099.98, 79.99,  10.99, 0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'MXN'), (SELECT id FROM plan WHERE name = 'Pro')),
-      (1099.98, 79.99,  10.99, 16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'MXN'), (SELECT id FROM plan WHERE name = 'Pro')),
-      (1399.98, 79.99,  5.98,  0,  'MONTHLY', (SELECT id FROM currency WHERE code = 'MXN'), (SELECT id FROM plan WHERE name = 'Enterprise')),
-      (1399.98, 79.99,  5.98,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'MXN'), (SELECT id FROM plan WHERE name = 'Enterprise'))`
+      (339.98,  79.99,  1.09,  16, 'ANNUAL',  (SELECT id FROM currency WHERE code = 'BRL'), (SELECT id FROM plan WHERE name = 'Enterprise'));`
     );
 
     await queryRunner.query(
@@ -60,7 +60,7 @@ export class Seeds1739547118552 implements MigrationInterface {
 
     await queryRunner.query(
       `INSERT INTO "user" ("name", email, firebase_id, phone, role, company_id) VALUES 
-      ('Menu Eazy', ${env.ADMIN.email}, ${env.ADMIN.firebaseId}, ${env.ADMIN.phone}, 'ADMIN', (SELECT id FROM company WHERE company_url = 'menu-eazy'));`
+      ('Menu Eazy', '${env.ADMIN.email}', '${env.ADMIN.firebaseId}', '${env.ADMIN.phone}', 'ADMIN', (SELECT id FROM company WHERE company_url = 'menu-eazy'));`
     );
   }
 
@@ -79,6 +79,6 @@ export class Seeds1739547118552 implements MigrationInterface {
       `DELETE FROM plan WHERE name IN ('Basic', 'Pro', 'Enterprise', 'Premium');`
     );
 
-    await queryRunner.query(`DELETE FROM currency WHERE code IN ('USD', 'BRL', 'MXN');`);
+    await queryRunner.query(`DELETE FROM currency WHERE code IN ('USD', 'BRL', 'EUR');`);
   }
 }

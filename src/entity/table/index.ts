@@ -33,7 +33,8 @@ export class TableEntity {
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.tableList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;

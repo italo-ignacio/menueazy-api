@@ -30,14 +30,16 @@ export class UserRestaurantEntity {
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.userRestaurantList, {
     onDelete: 'RESTRICT',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.userRestaurantList, {
     onDelete: 'RESTRICT',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   public user: UserEntity;

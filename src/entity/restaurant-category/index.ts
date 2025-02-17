@@ -23,14 +23,16 @@ export class RestaurantCategoryEntity {
 
   @ManyToOne(() => CategoryEntity, (category) => category.restaurantCategoryList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'category_id', referencedColumnName: 'id' }])
   public category: CategoryEntity;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.restaurantCategoryList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;

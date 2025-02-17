@@ -25,7 +25,8 @@ export class ProductImageEntity {
 
   @ManyToOne(() => ProductEntity, (product) => product.productImageList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   public product: ProductEntity;

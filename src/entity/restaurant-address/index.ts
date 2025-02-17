@@ -22,13 +22,15 @@ export class RestaurantAddressEntity {
   public restaurantId: number;
 
   @ManyToOne(() => AddressEntity, (address) => address.restaurantAddressList, {
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'address_id', referencedColumnName: 'id' }])
   public address: AddressEntity;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.restaurantAddressList, {
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;

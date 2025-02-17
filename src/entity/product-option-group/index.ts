@@ -36,7 +36,8 @@ export class ProductOptionGroupEntity {
 
   @ManyToOne(() => ProductEntity, (product) => product.productOptionGroupList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   public product: ProductEntity;

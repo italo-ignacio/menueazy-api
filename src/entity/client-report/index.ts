@@ -26,7 +26,8 @@ export class ClientReportEntity {
 
   @ManyToOne(() => ClientEntity, (client) => client.clientReportList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'client_id', referencedColumnName: 'id' }])
   public client: ClientEntity;
@@ -46,7 +47,8 @@ export class ClientReportEntity {
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.clientReportList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;
@@ -56,7 +58,8 @@ export class ClientReportEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.clientReportList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   public user: UserEntity;

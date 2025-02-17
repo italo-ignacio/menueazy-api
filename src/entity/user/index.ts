@@ -55,7 +55,8 @@ export class UserEntity {
 
   @ManyToOne(() => CompanyEntity, (company) => company.userList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
   public company: CompanyEntity;

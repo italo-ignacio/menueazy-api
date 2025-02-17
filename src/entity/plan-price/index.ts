@@ -33,8 +33,8 @@ export class PlanPriceEntity {
   @Column({ type: 'numeric', name: 'price_of_product', precision: 10, scale: 2 })
   public priceOfProduct: number;
 
-  @Column({ type: 'numeric', name: 'discount', precision: 10, scale: 2, nullable: true })
-  public discount: number | null;
+  @Column({ type: 'numeric', name: 'discount', precision: 10, scale: 2 })
+  public discount: number;
 
   @Column({
     type: 'enum',
@@ -45,14 +45,16 @@ export class PlanPriceEntity {
 
   @ManyToOne(() => CurrencyEntity, (currency) => currency.planPriceList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'currency_id', referencedColumnName: 'id' }])
   public currency: CurrencyEntity;
 
   @ManyToOne(() => PlanEntity, (plan) => plan.planPriceList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'plan_id', referencedColumnName: 'id' }])
   public plan: PlanEntity;

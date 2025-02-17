@@ -97,7 +97,8 @@ export class RestaurantEntity {
 
   @ManyToOne(() => CompanyEntity, (company) => company.restaurantList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
   public company: CompanyEntity;
@@ -105,7 +106,10 @@ export class RestaurantEntity {
   // @Column({ type: 'integer', name: 'style_id' })
   // public styleId: number;
 
-  @ManyToOne(() => StyleEntity, (style) => style.restaurantList, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => StyleEntity, (style) => style.restaurantList, {
+    onUpdate: 'CASCADE',
+    nullable: false
+  })
   @JoinColumn([{ name: 'style_id', referencedColumnName: 'id' }])
   public style: StyleEntity;
 

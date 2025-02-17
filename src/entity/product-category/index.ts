@@ -23,14 +23,16 @@ export class ProductCategoryEntity {
 
   @ManyToOne(() => CategoryEntity, (category) => category.productCategoryList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'category_id', referencedColumnName: 'id' }])
   public category: CategoryEntity;
 
   @ManyToOne(() => ProductEntity, (product) => product.productCategoryList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   public product: ProductEntity;

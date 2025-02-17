@@ -23,14 +23,16 @@ export class ClientAddressEntity {
 
   @ManyToOne(() => AddressEntity, (address) => address.clientAddressList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'address_id', referencedColumnName: 'id' }])
   public address: AddressEntity;
 
   @ManyToOne(() => ClientEntity, (client) => client.clientAddressList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'client_id', referencedColumnName: 'id' }])
   public client: ClientEntity;

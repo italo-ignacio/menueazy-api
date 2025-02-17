@@ -1,12 +1,13 @@
 /**
  * @typedef {object} RegisterRequest
- * @property {string} email.required
- * @property {string} name.required
- * @property {string} phone.required
- * @property {string} companyName.required
- * @property {integer} currencyId.required
- * @property {string} description
- * @property {date} finishedAt
- * @property {date} createdAt
- * @property {date} updatedAt
+ * @property {integer} id
+ * @property {string} email
+ * @property {string} name
+ * @property {string} phone
+ * @property {string} companyName
+ * @property {Currency} currency
+ * @property {string|null} description
+ * @property {string} finishedAt
+ * @property {string} createdAt
+ * @property {string} updatedAt
  */

@@ -65,7 +65,8 @@ export class ProductEntity {
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.productList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;

@@ -26,14 +26,16 @@ export class SubscriptionCouponEntity {
 
   @ManyToOne(() => CouponEntity, (coupon) => coupon.subscriptionCouponList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'coupon_id', referencedColumnName: 'id' }])
   public coupon: CouponEntity;
 
   @ManyToOne(() => SubscriptionEntity, (subscription) => subscription.subscriptionCouponList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'subscription_id', referencedColumnName: 'id' }])
   public subscription: SubscriptionEntity;

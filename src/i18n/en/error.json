@@ -9,5 +9,5 @@
   "timeout": "Solicitação expirou. Tente novamente mais tarde",
   "internalServerError": "Erro interno do servidor",
   "checkYourEmail": "Verifique seu e-mail antes de realizar login",
-  "selectAValidCurrencyType": "Selecione um tipo de moeda válido"
+  "selectAValidCurrencyType": "Select a valid currency type"
 }

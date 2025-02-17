@@ -31,14 +31,16 @@ export class StyleEntity {
 
   @ManyToOne(() => ColorEntity, (color) => color.styleList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'color_id', referencedColumnName: 'id' }])
   public color: ColorEntity;
 
   @ManyToOne(() => CompanyEntity, (company) => company.styleList, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onUpdate: 'CASCADE',
+    nullable: false
   })
   @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
   public company: CompanyEntity;

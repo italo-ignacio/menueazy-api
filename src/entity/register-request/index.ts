@@ -41,7 +41,8 @@ export class RegisterRequestEntity {
   @ManyToOne(() => CurrencyEntity, (currency) => currency.registerRequestList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-    eager: true
+    eager: true,
+    nullable: false
   })
   @JoinColumn([{ name: 'currency_id', referencedColumnName: 'id' }])
   public currency: CurrencyEntity;

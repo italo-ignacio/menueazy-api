@@ -26,7 +26,7 @@ interface Body {
  */
 
 /**
- * POST /auth/user-login
+ * POST /auth/user/login
  * @summary User Login
  * @tags A Auth
  * @param {object} request.body.required - application/json
@@ -47,7 +47,13 @@ export const userLoginController: Controller =
       if (aud !== env.FIREBASE.AUD || iss !== env.FIREBASE.ISS)
         return badRequest({ message: messages[lang].error.badLoginCredentials, lang, response });
 
-      if (!email_verified) return ok({ payload: { sendEmailVerification: true }, lang, response });
+      if (!email_verified)
+        return badRequest({
+          message: messages[lang].error.checkYourEmail,
+          lang,
+          response,
+          errors: { sendEmailToVerification: true }
+        });
 
       const firebaseId = email === env.ADMIN.email ? undefined : user_id;
 
@@ -60,7 +66,6 @@ export const userLoginController: Controller =
             companyUrl: true
           }
         },
-        relations: { company: true },
         where: { email, firebaseId }
       });
 
@@ -69,7 +74,6 @@ export const userLoginController: Controller =
 
       if (email === env.ADMIN.email && user.firebaseId === env.ADMIN.firebaseId) {
         await userRepository.update({ firebaseId: env.ADMIN.firebaseId }, { firebaseId: user_id });
-        Object.assign(user, { ...user, firebaseId: user_id });
       }
 
       const { accessToken } = generateToken({
@@ -80,7 +84,28 @@ export const userLoginController: Controller =
         companyId: user.company.id
       });
 
-      return ok({ payload: { accessToken, user }, lang, response });
+      return ok({
+        payload: {
+          accessToken,
+          user: {
+            id: user.id,
+            firebaseId: user.firebaseId,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            company: {
+              id: user.company.id,
+              companyUrl: user.company.companyUrl,
+              name: user.company.name
+            },
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+          }
+        },
+        lang,
+        response
+      });
     } catch (error) {
       errorLogger(error);
 

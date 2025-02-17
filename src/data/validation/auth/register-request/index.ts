@@ -14,7 +14,10 @@ export const insertRegisterRequestSchema = yup.object().shape({
     phone: stringRequired(25),
     companyName: stringRequired(255),
     description: stringNotRequired(),
-    currencyId: numberRequired().integer()
+    currencyId: numberRequired().integer(),
+    planId: numberRequired().integer(),
+    numberOfRestaurant: numberRequired().integer(),
+    numberOfProduct: numberRequired().integer()
   })
 });
 

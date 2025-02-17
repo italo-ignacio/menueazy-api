@@ -10,8 +10,11 @@ interface Body {
   name: string;
   phone: string;
   companyName: string;
-  description?: string;
   currencyId: number;
+  planId: number;
+  numberOfRestaurant: number;
+  numberOfProduct: number;
+  description?: string;
 }
 
 /**
@@ -21,6 +24,9 @@ interface Body {
  * @property {string} phone.required
  * @property {string} companyName.required
  * @property {integer} currencyId.required
+ * @property {integer} planId.required
+ * @property {integer} numberOfRestaurant.required
+ * @property {integer} numberOfProduct.required
  * @property {string} description
  */
 
@@ -45,14 +51,27 @@ export const insertRegisterRequestController: Controller =
     try {
       await insertRegisterRequestSchema.validate(request, { abortEarly: false });
 
-      const { email, companyName, currencyId, name, phone, description } = request.body as Body;
+      const {
+        email,
+        companyName,
+        currencyId,
+        name,
+        phone,
+        description,
+        numberOfProduct,
+        numberOfRestaurant,
+        planId
+      } = request.body as Body;
 
       await registerRequestRepository.insert({
         email,
         companyName,
         name,
         phone,
+        numberOfProduct,
+        numberOfRestaurant,
         currency: { id: currencyId },
+        plan: { id: planId },
         description
       });
 

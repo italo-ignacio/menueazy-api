@@ -26,8 +26,8 @@ interface Body {
  */
 
 /**
- * POST /auth/user-login
- * @summary User Login
+ * POST /auth/user/register
+ * @summary User Register
  * @tags A Auth
  * @param {object} request.body.required - application/json
  * @return {UserLoginResponse} 200 - Successful response - application/json

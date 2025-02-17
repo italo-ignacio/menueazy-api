@@ -1,4 +1,3 @@
-import { userFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import {
@@ -35,7 +34,7 @@ interface Body {
  */
 
 /**
- * POST /auth/pre-user-login
+ * POST /auth/user/pre-login
  * @summary Pre User Login
  * @tags A Auth
  * @example request - payload example
@@ -56,11 +55,9 @@ export const preUserLoginController: Controller =
         return badRequest({ message: messages[lang].error.loginFailed, lang, response });
 
       const user = await userRepository.findOne({
-        select: { ...userFindParams },
+        select: { id: true },
         where: { email }
       });
-
-      console.log(user);
 
       return ok({
         payload: { hasUser: user !== null, code: random() },

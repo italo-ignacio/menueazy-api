@@ -8,6 +8,7 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { CurrencyEntity } from '../currency';
+import { PlanEntity } from '../plan';
 
 @Entity('register_request')
 export class RegisterRequestEntity {
@@ -35,8 +36,20 @@ export class RegisterRequestEntity {
   @Column({ type: 'boolean', name: 'can_register', default: false })
   public canRegister: boolean;
 
-  // @Column({ type: 'integer', name: 'currency_id' })
-  // public currencyId: number;
+  @Column({ type: 'integer' })
+  public numberOfRestaurant: number;
+
+  @Column({ type: 'integer' })
+  public numberOfProduct: number;
+
+  @ManyToOne(() => PlanEntity, (plan) => plan.registerRequestList, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    eager: true,
+    nullable: false
+  })
+  @JoinColumn([{ name: 'plan_id', referencedColumnName: 'id' }])
+  public plan: PlanEntity;
 
   @ManyToOne(() => CurrencyEntity, (currency) => currency.registerRequestList, {
     onDelete: 'CASCADE',

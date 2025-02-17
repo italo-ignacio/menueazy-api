@@ -7,6 +7,7 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { PlanPriceEntity } from '../plan-price';
+import { RegisterRequestEntity } from '../register-request';
 import { SubscriptionEntity } from '../subscription';
 
 @Entity('plan')
@@ -31,6 +32,9 @@ export class PlanEntity {
 
   @OneToMany(() => SubscriptionEntity, (subscription) => subscription.plan)
   public subscriptionList: SubscriptionEntity[];
+
+  @OneToMany(() => RegisterRequestEntity, (registerRequest) => registerRequest.currency)
+  public registerRequestList: RegisterRequestEntity[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date;

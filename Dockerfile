@@ -1,11 +1,11 @@
-FROM node:18.15.0-alpine3.16
+FROM node:18.20-alpine
 
 WORKDIR /app
 
 COPY package.json ./
 COPY tsconfig.json ./ 
 
-RUN npm install --omit=dev
+RUN npm install 
 
 COPY . .
 

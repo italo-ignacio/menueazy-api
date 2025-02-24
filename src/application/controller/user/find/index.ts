@@ -1,3 +1,7 @@
+import { userFindParams } from '@data/search';
+import type { userQueryFields } from '@data/validation';
+import { userListQueryFields } from '@data/validation';
+import type { Controller } from '@domain/protocols';
 import {
   errorLogger,
   getGenericFilter,
@@ -5,12 +9,8 @@ import {
   messageErrorResponse,
   ok
 } from '@main/utils';
-import { userFindParams } from '@data/search';
-import { userListQueryFields } from '@data/validation';
 import { userRepository } from '@repository/user';
-import type { Controller } from '@domain/protocols';
 import type { Request, Response } from 'express';
-import type { userQueryFields } from '@data/validation';
 
 /**
  * @typedef {object} FindUserPayload
@@ -21,7 +21,7 @@ import type { userQueryFields } from '@data/validation';
 
 /**
  * @typedef {object} FindUserResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {FindUserPayload} payload
  */
@@ -46,7 +46,7 @@ import type { userQueryFields } from '@data/validation';
  */
 export const findUserController: Controller =
   () =>
-  async ({ query }: Request, response: Response) => {
+  async ({ query, lang }: Request, response: Response) => {
     try {
       const { skip, take } = getPagination({ query });
 
@@ -69,11 +69,12 @@ export const findUserController: Controller =
           totalElements,
           totalPages: Math.ceil(totalElements / take)
         },
+        lang,
         response
       });
     } catch (error) {
       errorLogger(error);
 
-      return messageErrorResponse({ error, response });
+      return messageErrorResponse({ error, lang, response });
     }
   };

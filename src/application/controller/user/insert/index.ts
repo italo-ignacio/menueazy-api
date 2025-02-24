@@ -1,4 +1,8 @@
-import { ValidationError } from 'yup';
+import { hasUserByEmail } from '@application/helper';
+import { insertUserSchema } from '@data/validation';
+import { Role } from '@domain/enum';
+import type { Controller } from '@domain/protocols';
+import { messages } from '@i18n/index';
 import {
   badRequest,
   created,
@@ -6,15 +10,9 @@ import {
   messageErrorResponse,
   validationErrorResponse
 } from '@main/utils';
-import { env } from '@main/config';
-import { hasUserByEmail } from '@application/helper';
-import { hash } from 'bcrypt';
-import { insertUserSchema } from '@data/validation';
-import { messages } from '@domain/helpers';
 import { userRepository } from '@repository/user';
-import type { Controller } from '@domain/protocols';
 import type { Request, Response } from 'express';
-import { Role } from '@domain/enum';
+import { ValidationError } from 'yup';
 
 interface Body {
   name: string;
@@ -37,6 +35,7 @@ interface Body {
  * POST /user
  * @summary Insert User
  * @tags User
+ * @security BearerAuth
  * @example request - payload example
  * {
  *   "name": "admin",
@@ -50,33 +49,30 @@ interface Body {
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertUserController: Controller =
-  () => async (request: Request, response: Response) => {
+  () =>
+  async ({ lang, ...request }: Request, response: Response) => {
     try {
       await insertUserSchema.validate(request, { abortEarly: false });
 
-      const { email, name, password, phone, role } = request.body as Body;
+      const { email, name, phone, role } = request.body as Body;
 
       if ((await hasUserByEmail(email)) !== false)
-        return badRequest({ message: messages.auth.userAlreadyExists, response });
-
-      const { HASH_SALT } = env;
-
-      const hashedPassword = await hash(password, HASH_SALT);
+        return badRequest({ message: messages[lang].error.emailInUse, lang, response });
 
       await userRepository.insert({
         email,
         name,
         role,
-        password: hashedPassword,
         phone: phone.replace(/\D/gu, '')
       });
 
-      return created({ response });
+      return created({ response, lang });
     } catch (error) {
       errorLogger(error);
 
-      if (error instanceof ValidationError) return validationErrorResponse({ error, response });
+      if (error instanceof ValidationError)
+        return validationErrorResponse({ error, lang, response });
 
-      return messageErrorResponse({ error, response });
+      return messageErrorResponse({ error, lang, response });
     }
   };

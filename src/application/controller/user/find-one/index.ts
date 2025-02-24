@@ -1,12 +1,14 @@
-import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
+import { finishedAt } from '@application/helper';
 import { userFindParams } from '@data/search';
-import { userRepository } from '@repository/user';
 import type { Controller } from '@domain/protocols';
+import { messages } from '@i18n/index';
+import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
+import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
 
 /**
  * @typedef {object} FindOneUserResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {User} payload
  */
@@ -23,26 +25,29 @@ import type { Request, Response } from 'express';
  * @return {NotFoundRequest} 404 - Not found response - application/json
  */
 export const findOneUserController: Controller =
-  () => async (request: Request, response: Response) => {
+  () =>
+  async ({ lang, ...request }: Request, response: Response) => {
     try {
       const payload = await userRepository.findOne({
         select: userFindParams,
-        where: { id: Number(request.params.id) }
+        where: { id: Number(request.params.id), finishedAt }
       });
 
       if (payload === null)
         return notFound({
-          entity: { english: 'User', portuguese: 'Usuário' },
+          entity: messages[lang].entity.user,
+          lang,
           response
         });
 
       return ok({
         payload,
+        lang,
         response
       });
     } catch (error) {
       errorLogger(error);
 
-      return messageErrorResponse({ error, response });
+      return messageErrorResponse({ error, lang, response });
     }
   };

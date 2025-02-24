@@ -1,3 +1,4 @@
+import { finishedAt } from '@application/helper';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import {
@@ -28,7 +29,7 @@ interface Body {
 
 /**
  * @typedef {object} PreLoginResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {PreLoginPayload} payload
  */
@@ -56,7 +57,7 @@ export const preUserLoginController: Controller =
 
       const user = await userRepository.findOne({
         select: { id: true },
-        where: { email }
+        where: { email, finishedAt }
       });
 
       return ok({

@@ -18,8 +18,8 @@ export class CouponEntity {
   @Column({ type: 'varchar', name: 'code', length: 20 })
   public code: string;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public discount: number;
+  @Column({ type: 'float4' })
+  public discount: string;
 
   @Column({ type: 'integer' })
   public duration: number;

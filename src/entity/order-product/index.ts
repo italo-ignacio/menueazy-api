@@ -33,10 +33,10 @@ export class OrderProductEntity {
   public quantity: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public price: number;
+  public price: string;
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public subtotal: number;
+  public subtotal: string;
 
   @Column({
     type: 'enum',

@@ -34,10 +34,10 @@ export class AddressEntity {
   public complement: string | null;
 
   @Column({ type: 'numeric', precision: 10, scale: 8 })
-  public latitude: number;
+  public latitude: string;
 
   @Column({ type: 'numeric', precision: 11, scale: 8 })
-  public longitude: number;
+  public longitude: string;
 
   @Column({ type: 'varchar', length: 30 })
   public number: string;

@@ -21,7 +21,7 @@ import type { Request, Response } from 'express';
 
 /**
  * @typedef {object} FindRegisterRequestResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {FindRegisterRequestPayload} payload
  */

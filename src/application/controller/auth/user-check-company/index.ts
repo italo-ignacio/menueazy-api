@@ -1,3 +1,4 @@
+import { finishedAt } from '@application/helper';
 import { userFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import {
@@ -27,7 +28,7 @@ interface Body {
 
 /**
  * @typedef {object} CheckUserCompanyResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {CheckUserCompanyPayload} payload
  */
@@ -61,7 +62,8 @@ export const checkUserCompanyController: Controller =
         relations: { company: true },
         where: {
           id: user.id,
-          company: { companyUrl }
+          company: { companyUrl, finishedAt },
+          finishedAt
         }
       });
 

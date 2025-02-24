@@ -27,13 +27,13 @@ export class OrderEntity {
   public id: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public price: number;
+  public price: string;
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public total: number;
+  public total: string;
 
   @Column({ type: 'numeric', name: 'delivery_price', nullable: true, precision: 10, scale: 2 })
-  public deliveryPrice: number | null;
+  public deliveryPrice: string | null;
 
   @Column({ type: 'text', nullable: true })
   public observation: string | null;

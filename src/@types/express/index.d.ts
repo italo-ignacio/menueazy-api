@@ -1,10 +1,26 @@
-import { Langs } from '@domain/enum';
-import type { ClientTokenInput, UserTokenInput } from '@domain/token';
+import { Langs, Role } from '@domain/enum';
+import type { ClientTokenInput } from '@domain/token';
 
 declare global {
   namespace Express {
     interface Request {
-      user: UserTokenInput;
+      user: {
+        id: number;
+        email: string;
+        avatarUrl: string;
+        firebaseId: string;
+        name: string;
+        phone: string;
+        role: Role;
+        createdAt: Date;
+        updatedAt: Date;
+        finishedAt: Date | null;
+        company: {
+          id: number;
+          name: string;
+          companyUrl: string;
+        };
+      };
       client: ClientTokenInput;
       lang: Langs;
     }

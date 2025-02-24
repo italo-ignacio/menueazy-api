@@ -1,3 +1,4 @@
+import { finishedAt } from '@application/helper';
 import { userFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { LoginToken } from '@domain/token';
@@ -20,7 +21,7 @@ interface Body {
 
 /**
  * @typedef {object} UserLoginResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {UserLoginPayload} payload
  */
@@ -41,11 +42,8 @@ export const userLoginController: Controller =
 
       const { aud, email, email_verified, iss, user_id } = decode(userIdToken ?? ``) as LoginToken;
 
-      if (!aud || !email || !iss || !user_id)
-        return badRequest({ message: messages[lang].error.badLoginCredentials, lang, response });
-
-      if (aud !== env.FIREBASE.AUD || iss !== env.FIREBASE.ISS)
-        return badRequest({ message: messages[lang].error.badLoginCredentials, lang, response });
+      if (!email || !user_id || aud !== env.FIREBASE.AUD || iss !== env.FIREBASE.ISS)
+        return badRequest({ message: messages[lang].error.badCredentials, lang, response });
 
       if (!email_verified)
         return badRequest({
@@ -66,7 +64,7 @@ export const userLoginController: Controller =
             companyUrl: true
           }
         },
-        where: { email, firebaseId }
+        where: { email, firebaseId, finishedAt }
       });
 
       if (user === null)

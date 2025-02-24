@@ -1,8 +1,8 @@
-import { badRequest, errorLogger, forbidden, ok } from '@main/utils';
-import { messages } from '@domain/helpers';
 import { userIsOwner } from '@application/helper';
-import { userRepository } from '@repository/user';
+import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
+import { badRequest, errorLogger, forbidden, ok } from '@main/utils';
+import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
 
 /**
@@ -17,19 +17,21 @@ import type { Request, Response } from 'express';
  * @return {ForbiddenRequest} 403 - Forbidden response - application/json
  */
 export const deleteUserController: Controller =
-  () => async (request: Request, response: Response) => {
+  () =>
+  async ({ lang, ...request }: Request, response: Response) => {
     try {
-      if (!userIsOwner(request))
+      if (!userIsOwner(request as Request))
         return forbidden({
           message: { english: 'delete this user', portuguese: 'deletar este usuário' },
+          lang,
           response
         });
 
       await userRepository.update({ id: Number(request.params.id) }, { finishedAt: new Date() });
 
-      return ok({ payload: messages.default.successfullyDeleted, response });
+      return ok({ payload: messages.default.successfullyDeleted, lang, response });
     } catch (error) {
       errorLogger(error);
-      return badRequest({ message: messages.auth.notFound, response });
+      return badRequest({ message: messages.auth.notFound, lang, response });
     }
   };

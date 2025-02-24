@@ -27,6 +27,9 @@ export class SubscriptionEntity {
   @Column({ type: 'integer', name: 'product_limit' })
   public productLimit: number;
 
+  @Column({ type: 'uuid', unique: true })
+  public code: string;
+
   // @Column({ type: 'integer', name: 'plan_id' })
   // public planId: number;
 

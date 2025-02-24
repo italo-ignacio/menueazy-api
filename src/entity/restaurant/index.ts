@@ -46,50 +46,26 @@ export class RestaurantEntity {
   @Column({ type: 'text', name: 'logo_url', nullable: true })
   public logoUrl: string | null;
 
-  @Column({ type: 'boolean', name: 'has_delivery' })
-  public hasDelivery: boolean;
-
-  @Column({
-    type: 'numeric',
-    name: 'max_delivery_distance_in_km',
-    precision: 10,
-    scale: 2,
-    default: 10
-  })
-  public maxDeliveryDistanceInKm: number;
-
-  @Column({
-    type: 'numeric',
-    name: 'minimum_delivery_value',
-    precision: 10,
-    scale: 2,
-    default: 0
-  })
-  public minimumDeliveryValue: number;
-
-  @Column({
-    type: 'numeric',
-    name: 'minimum_order_value',
-    precision: 10,
-    scale: 2,
-    default: 0
-  })
-  public minimumOrderValue: number;
-
   @Column({ type: 'boolean' })
   public open: boolean;
 
   @Column({ type: 'boolean', name: 'open_for_delivery', nullable: true })
   public openForDelivery: boolean | null;
 
-  @Column({
-    type: 'numeric',
-    name: 'value_by_km_in_delivery',
-    precision: 10,
-    scale: 2,
-    default: 0
-  })
-  public valueByKmInDelivery: number;
+  @Column({ type: 'boolean', name: 'has_delivery' })
+  public hasDelivery: boolean;
+
+  @Column({ type: 'float4', name: 'max_delivery_distance_in_km' })
+  public maxDeliveryDistanceInKm: number;
+
+  @Column({ type: 'float4', name: 'minimum_delivery_price' })
+  public minimumDeliveryPrice: number;
+
+  @Column({ type: 'float4', name: 'minimum_order_price' })
+  public minimumOrderPrice: number;
+
+  @Column({ type: 'float4', name: 'price_by_km_in_delivery' })
+  public priceByKmInDelivery: number;
 
   // @Index()
   // @Column({ type: 'integer', name: 'company_id' })
@@ -108,7 +84,8 @@ export class RestaurantEntity {
 
   @ManyToOne(() => StyleEntity, (style) => style.restaurantList, {
     onUpdate: 'CASCADE',
-    nullable: false
+    nullable: false,
+    eager: true
   })
   @JoinColumn([{ name: 'style_id', referencedColumnName: 'id' }])
   public style: StyleEntity;

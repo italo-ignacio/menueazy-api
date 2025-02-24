@@ -24,17 +24,17 @@ export class PlanPriceEntity {
   // @Column({ type: 'integer', name: 'plan_id' })
   // public planId: number;
 
-  @Column({ type: 'numeric', name: 'monthly_price', precision: 10, scale: 2 })
+  @Column({ type: 'float4', name: 'monthly_price' })
   public monthlyPrice: number;
 
-  @Column({ type: 'numeric', name: 'price_of_restaurant', precision: 10, scale: 2 })
+  @Column({ type: 'float4', name: 'price_of_restaurant' })
   public priceOfRestaurant: number;
 
-  @Column({ type: 'numeric', name: 'price_of_product', precision: 10, scale: 2 })
+  @Column({ type: 'float4', name: 'price_of_product' })
   public priceOfProduct: number;
 
-  @Column({ type: 'numeric', name: 'discount', precision: 10, scale: 2 })
-  public discount: number;
+  @Column({ type: 'float4' })
+  public discount: string;
 
   @Column({
     type: 'enum',

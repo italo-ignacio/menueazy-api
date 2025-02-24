@@ -32,7 +32,7 @@ interface Body {
 
 /**
  * @typedef {object} InsertRegisterResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {string} payload
  */

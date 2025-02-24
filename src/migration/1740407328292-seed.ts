@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { env } from '../main/config/env';
 
-export class Seeds1739819796669 implements MigrationInterface {
+export class Seed1740407328292 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `INSERT INTO currency (code, "name", symbol) VALUES 
@@ -59,19 +59,15 @@ export class Seeds1739819796669 implements MigrationInterface {
     // );
 
     await queryRunner.query(
-      `INSERT INTO "subscription" (price, restaurant_limit, product_limit, expires_at, plan_id) VALUES 
-      (0, 999999, 999999, NOW(), (SELECT id FROM plan WHERE name = 'Premium'));`
+      `INSERT INTO "subscription" (price, restaurant_limit, product_limit, code, expires_at, plan_id) VALUES 
+      (0, 999999, 999999, '6e72288e-3d9f-4e85-93c2-efaa8d28d241', NOW(), (SELECT id FROM plan WHERE name = 'Premium'));`
     );
 
     await queryRunner.query(
       `INSERT INTO company ("name", company_url, currency_id, subscription_id) VALUES 
       ('Menu Eazy', 'menu-eazy',
       (SELECT id FROM currency WHERE code = 'USD'), 
-      (SELECT id FROM "subscription" WHERE 
-      price = 0 
-      AND restaurant_limit = 999999 
-      AND product_limit = 999999  
-      AND plan_id = (SELECT id FROM plan WHERE name = 'Premium')));`
+      (SELECT id FROM "subscription" WHERE code = '6e72288e-3d9f-4e85-93c2-efaa8d28d241'));`
     );
 
     await queryRunner.query(
@@ -85,7 +81,9 @@ export class Seeds1739819796669 implements MigrationInterface {
 
     await queryRunner.query(`DELETE FROM company WHERE company_url = 'menu-eazy';`);
 
-    await queryRunner.query(`DELETE FROM "subscription" WHERE price = 0;`);
+    await queryRunner.query(
+      `DELETE FROM "subscription" WHERE code = '6e72288e-3d9f-4e85-93c2-efaa8d28d241';`
+    );
 
     await queryRunner.query(
       `DELETE FROM plan_price WHERE plan_id IN (SELECT id FROM plan WHERE name IN ('Basic', 'Pro', 'Enterprise', 'Premium'));`

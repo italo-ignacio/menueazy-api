@@ -3,6 +3,7 @@ import { statusCodeList } from '@domain/helpers';
 import { messages } from '@i18n/index';
 import { formatYupError } from '@main/utils/yup-resolver-errors';
 import type { Response } from 'express';
+import { QueryFailedError } from 'typeorm';
 import type { ValidationError } from 'yup';
 
 export const created = ({
@@ -149,6 +150,18 @@ export const messageErrorResponse = ({
   lang: Langs;
   response: Response;
 }): Response => {
+  if (error instanceof QueryFailedError) {
+    const err = error as unknown as { code?: string };
+
+    if (err?.code === '23505')
+      return badRequest({
+        message: messages[lang].error.duplicateKey,
+        response,
+        lang,
+        errors: error
+      });
+  }
+
   return badRequest({
     message: messages[lang].error.internalServerError,
     response,

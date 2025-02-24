@@ -32,7 +32,8 @@ export class StyleEntity {
   @ManyToOne(() => ColorEntity, (color) => color.styleList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-    nullable: false
+    nullable: false,
+    eager: true
   })
   @JoinColumn([{ name: 'color_id', referencedColumnName: 'id' }])
   public color: ColorEntity;

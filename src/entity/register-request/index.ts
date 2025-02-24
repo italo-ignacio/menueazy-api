@@ -30,7 +30,7 @@ export class RegisterRequestEntity {
   @Column({ type: 'text', nullable: true })
   public description: string | null;
 
-  @Column({ type: 'uuid', default: () => 'uuid_generate_v4()' })
+  @Column({ type: 'uuid', default: () => 'uuid_generate_v4()', unique: true })
   public code: string;
 
   @Column({ type: 'boolean', name: 'can_register', default: false })

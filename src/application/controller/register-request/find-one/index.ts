@@ -4,19 +4,21 @@ import { messages } from '@i18n/index';
 import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
 import { registerRequestRepository } from '@repository/register-request';
 import type { Request, Response } from 'express';
+import { IsNull } from 'typeorm';
 
 /**
  * @typedef {object} FindOneRegisterRequestResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {RegisterRequest} payload
  */
 
 /**
- * GET /register-request/{code}
- * @summary Find one Register Request
+ * GET /register-request/{id}
+ * @summary Find One Register Request
  * @tags Register Request
- * @param {string} code.path.required
+ * @security BearerAuth
+ * @param {integer} id.path.required
  * @return {FindOneRegisterRequestResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
@@ -28,7 +30,7 @@ export const findOneRegisterRequestController: Controller =
     try {
       const payload = await registerRequestRepository.findOne({
         select: registerRequestFindParams,
-        where: { code: request.params.code }
+        where: { id: Number(request.params.id), finishedAt: IsNull() }
       });
 
       if (payload === null)

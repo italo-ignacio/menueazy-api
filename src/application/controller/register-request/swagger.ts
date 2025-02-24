@@ -7,7 +7,7 @@
  * @property {string} companyName
  * @property {Currency} currency
  * @property {string|null} description
- * @property {string} finishedAt
  * @property {string} createdAt
  * @property {string} updatedAt
+ * @property {string|null} finishedAt
  */

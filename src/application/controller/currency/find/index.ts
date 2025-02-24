@@ -14,7 +14,7 @@ import { IsNull } from 'typeorm';
 
 /**
  * @typedef {object} FindCurrencyResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {FindCurrencyPayload} payload
  */

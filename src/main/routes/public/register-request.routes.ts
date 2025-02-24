@@ -8,7 +8,7 @@ export default (inputRouter: Router): void => {
   const router = Router();
 
   router.post('/', insertRegisterRequestController());
-  router.get('/:code', findOneRegisterRequestController());
+  router.get('/:code/code', findOneRegisterRequestController());
 
   inputRouter.use('/register-request', router);
 };

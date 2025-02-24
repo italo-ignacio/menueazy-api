@@ -32,7 +32,7 @@ interface Body {
 
 /**
  * @typedef {object} LoginResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {LoginPayload} payload
  */

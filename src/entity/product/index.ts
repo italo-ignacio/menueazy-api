@@ -39,7 +39,7 @@ export class ProductEntity {
   @Column({ name: 'finish_sell_at', type: 'timestamptz', nullable: true })
   public finishSellAt: Date | null;
 
-  @Column({ type: 'numeric', nullable: true, precision: 10, scale: 2 })
+  @Column({ type: 'float4', nullable: true })
   public discount: number | null;
 
   @Column({ name: 'start_discount_at', type: 'timestamptz', nullable: true })
@@ -51,14 +51,8 @@ export class ProductEntity {
   @Column({ name: 'only_in_restaurant', type: 'boolean', default: false })
   public onlyInRestaurant: boolean;
 
-  @Column({
-    type: 'numeric',
-    name: 'value_by_km_in_delivery',
-    nullable: true,
-    precision: 10,
-    scale: 2
-  })
-  public valueByKmInDelivery: string | null;
+  @Column({ type: 'float4', name: 'price_by_km_in_delivery', nullable: true })
+  public priceByKmInDelivery: number | null;
 
   // @Column({ type: 'integer', name: 'company_id' })
   // public companyId: number;

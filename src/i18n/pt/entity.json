@@ -1,3 +1,6 @@
 {
-  "registerRequest": "Solicitação de registro"
+  "registerRequest": "Solicitação de registro",
+  "subscription": "Inscrição",
+  "user": "Usuário",
+  "restaurant": "Restaurante"
 }

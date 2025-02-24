@@ -17,7 +17,7 @@ interface Body {
 
 /**
  * @typedef {object} UpdateRegisterRequestResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {string} payload
  */

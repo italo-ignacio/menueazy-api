@@ -13,7 +13,7 @@ import type { Request, Response } from 'express';
 
 /**
  * @typedef {object} FindPlanResponse
- * @property {Messages} message
+ * @property {string} message
  * @property {string} status
  * @property {FindPlanPayload} payload
  */

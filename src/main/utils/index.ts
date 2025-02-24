@@ -5,6 +5,7 @@ export * from './delete-files';
 export * from './error-logger';
 export * from './filter';
 export * from './insert-id';
+export * from './is-uuid';
 export * from './jwt';
 export * from './one-file-handler';
 export * from './pagination';

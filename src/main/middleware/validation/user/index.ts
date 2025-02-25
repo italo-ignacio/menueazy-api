@@ -8,7 +8,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 import { IsNull } from 'typeorm';
 
-export const validateViewMiddleware: Controller =
+export const validateUserMiddleware: Controller =
   () => async (request: Request, response: Response, next: NextFunction) => {
     const { lang } = request;
     try {

@@ -2,5 +2,6 @@
   "registerRequest": "Solicitação de registro",
   "subscription": "Subscription",
   "user": "User",
-  "restaurant": "Restaurant"
+  "restaurant": "Restaurant",
+  "style": "Style"
 }

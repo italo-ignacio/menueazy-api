@@ -7,18 +7,32 @@ import type { Request, Response } from 'express';
 import { ValidationError } from 'yup';
 
 interface Body {
-  password?: string;
-  email?: string;
   name?: string;
   phone?: string;
+  restaurantUrl?: string;
+  hasDelivery?: boolean;
+  minimumOrderPrice?: number;
+  styleId?: number;
+  contactLink?: string;
+  description?: string;
+  maxDeliveryDistanceInKm?: number;
+  minimumDeliveryPrice?: number;
+  priceByKmInDelivery?: number;
 }
 
 /**
  * @typedef {object} UpdateRestaurantBody
  * @property {string} name
- * @property {string} email
- * @property {string} password
  * @property {string} phone
+ * @property {string} restaurantUrl
+ * @property {boolean} hasDelivery
+ * @property {number} minimumOrderPrice
+ * @property {integer} styleId
+ * @property {string} contactLink
+ * @property {string} description
+ * @property {number} maxDeliveryDistanceInKm
+ * @property {number} minimumDeliveryPrice
+ * @property {number} priceByKmInDelivery
  */
 
 /**
@@ -39,9 +53,36 @@ export const updateRestaurantController: Controller =
     try {
       await updateRestaurantSchema.validate(request, { abortEarly: false });
 
-      const { name } = request.body as Body;
+      const {
+        name,
+        contactLink,
+        description,
+        hasDelivery,
+        maxDeliveryDistanceInKm,
+        minimumDeliveryPrice,
+        minimumOrderPrice,
+        phone,
+        priceByKmInDelivery,
+        restaurantUrl,
+        styleId
+      } = request.body as Body;
 
-      await restaurantRepository.update({ id: Number(request.params.id) }, { name });
+      await restaurantRepository.update(
+        { id: Number(request.params.id) },
+        {
+          name,
+          contactLink,
+          description,
+          hasDelivery,
+          maxDeliveryDistanceInKm,
+          minimumDeliveryPrice,
+          minimumOrderPrice,
+          phone,
+          priceByKmInDelivery,
+          restaurantUrl,
+          style: { id: styleId }
+        }
+      );
 
       return ok({ payload: messages.default.successfullyUpdated, lang, response });
     } catch (error) {

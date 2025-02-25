@@ -12,7 +12,6 @@ export const validateClientMiddleware: Controller =
   () =>
   async ({ lang, ...request }: Request, response: Response, next: NextFunction) => {
     try {
-      console.log(`cccccccccccc`);
       const { authorization } = request.headers;
 
       if (typeof authorization === 'undefined') return unauthorized({ lang, response });

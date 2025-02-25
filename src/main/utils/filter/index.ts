@@ -82,6 +82,10 @@ export const getGenericFilter = <QueryType extends string>({
         Object.assign(where, {
           [item.replace('LessThan', '')]: LessThanOrEqual(Number(query[item]))
         });
+      else if (item.endsWith('Boolean'))
+        Object.assign(where, {
+          [item.replace('Boolean', '')]: Boolean(query[item])
+        });
       else if (item.endsWith('Id'))
         Object.assign(where, { [item.replace('Id', '')]: { id: query[item] } });
       else if (item === 'zipCode' || item === 'phone')

@@ -1,4 +1,4 @@
 export * from './admin';
 export * from './client';
-export * from './edit';
-export * from './view';
+export * from './owner';
+export * from './user';

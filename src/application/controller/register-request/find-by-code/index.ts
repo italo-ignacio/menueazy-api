@@ -16,7 +16,7 @@ import { IsNull } from 'typeorm';
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
  * @return {NotFoundRequest} 404 - Not found response - application/json
  */
-export const findOneRegisterRequestController: Controller =
+export const findRegisterRequestByCodeController: Controller =
   () =>
   async ({ lang, ...request }: Request, response: Response) => {
     try {

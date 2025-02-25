@@ -55,16 +55,16 @@ export class RestaurantEntity {
   @Column({ type: 'boolean', name: 'has_delivery' })
   public hasDelivery: boolean;
 
-  @Column({ type: 'float4', name: 'max_delivery_distance_in_km' })
-  public maxDeliveryDistanceInKm: number;
-
-  @Column({ type: 'float4', name: 'minimum_delivery_price' })
-  public minimumDeliveryPrice: number;
-
   @Column({ type: 'float4', name: 'minimum_order_price' })
   public minimumOrderPrice: number;
 
-  @Column({ type: 'float4', name: 'price_by_km_in_delivery' })
+  @Column({ type: 'float4', name: 'max_delivery_distance_in_km', default: 10 })
+  public maxDeliveryDistanceInKm: number;
+
+  @Column({ type: 'float4', name: 'minimum_delivery_price', default: 5 })
+  public minimumDeliveryPrice: number;
+
+  @Column({ type: 'float4', name: 'price_by_km_in_delivery', default: 2 })
   public priceByKmInDelivery: number;
 
   // @Index()

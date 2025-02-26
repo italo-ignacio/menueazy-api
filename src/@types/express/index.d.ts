@@ -21,6 +21,10 @@ declare global {
           companyUrl: string;
         };
       };
+      restaurant: {
+        id: number;
+        url: string;
+      };
       client: ClientTokenInput;
       lang: Langs;
     }

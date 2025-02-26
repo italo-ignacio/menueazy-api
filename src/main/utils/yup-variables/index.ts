@@ -46,3 +46,9 @@ export const dateNotRequired = (): DateSchema<Maybe<Date | undefined>> => yup.da
 export const arrayRequired = (data: AnySchema): AnySchema => yup.array().of(data).required();
 
 export const arrayNotRequired = (data: AnySchema): AnySchema => yup.array().of(data);
+
+export const enumTypeRequired = <Enum extends object>({ data }: { data: Enum }): AnySchema =>
+  yup.mixed<Enum>().oneOf(Object.values(data)).required();
+
+export const enumTypeNotRequired = <Enum extends object>({ data }: { data: Enum }): AnySchema =>
+  yup.mixed<Enum>().oneOf(Object.values(data));

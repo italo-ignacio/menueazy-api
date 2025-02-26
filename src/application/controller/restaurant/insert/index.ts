@@ -1,7 +1,8 @@
 import { insertRestaurantSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
+import { RestaurantEntity } from '@entity/restaurant';
+import { DataSource } from '@infra/database';
 import { created, errorLogger, messageErrorResponse, validationErrorResponse } from '@main/utils';
-import { restaurantRepository } from '@repository/restaurant';
 import type { Request, Response } from 'express';
 import { ValidationError } from 'yup';
 
@@ -11,7 +12,6 @@ interface Body {
   restaurantUrl: string;
   hasDelivery: boolean;
   minimumOrderPrice: number;
-  styleId: number;
   contactLink?: string;
   description?: string;
   maxDeliveryDistanceInKm?: number;
@@ -62,7 +62,6 @@ export const insertRestaurantController: Controller =
         minimumOrderPrice,
         phone,
         restaurantUrl,
-        styleId,
         contactLink,
         description,
         maxDeliveryDistanceInKm,
@@ -70,21 +69,25 @@ export const insertRestaurantController: Controller =
         priceByKmInDelivery
       } = request.body as Body;
 
-      await restaurantRepository.insert({
-        name,
-        company: { id: request.user.company.id },
-        contactLink,
-        description,
-        hasDelivery,
-        maxDeliveryDistanceInKm,
-        minimumDeliveryPrice,
-        minimumOrderPrice,
-        open: false,
-        phone,
-        priceByKmInDelivery,
-        restaurantUrl,
-        style: { id: styleId }
-      });
+      await DataSource.createQueryBuilder()
+        .insert()
+        .into(RestaurantEntity)
+        .values({
+          name,
+          company: { id: request.user.company.id },
+          contactLink,
+          description,
+          hasDelivery,
+          maxDeliveryDistanceInKm,
+          minimumDeliveryPrice,
+          minimumOrderPrice,
+          open: false,
+          phone,
+          priceByKmInDelivery,
+          restaurantUrl,
+          style: () => `(SELECT id FROM style WHERE generic = true LIMIT 1)`
+        })
+        .execute();
 
       return created({ lang, response });
     } catch (error) {

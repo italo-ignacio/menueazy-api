@@ -5,11 +5,11 @@ import { restaurantRepository } from '@repository/restaurant';
 import type { Request, Response } from 'express';
 
 /**
- * DELETE /restaurant/{id}
+ * DELETE /restaurant/{restaurantUrl}
  * @summary Delete Restaurant
  * @tags Restaurant
  * @security BearerAuth
- * @param {integer} id.path.required
+ * @param {string} restaurantUrl.path.required
  * @return {DeleteResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
@@ -20,7 +20,7 @@ export const deleteRestaurantController: Controller =
   async ({ lang, ...request }: Request, response: Response) => {
     try {
       await restaurantRepository.update(
-        { id: Number(request.params.id) },
+        { restaurantUrl: request.params.restaurantUrl },
         { finishedAt: new Date() }
       );
 

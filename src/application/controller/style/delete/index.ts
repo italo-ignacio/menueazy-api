@@ -1,4 +1,4 @@
-import { canDeleteStyle } from '@application/helper';
+import { canChangeStyle } from '@application/helper';
 import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
 import { badRequest, errorLogger, forbidden, ok } from '@main/utils';
@@ -20,7 +20,7 @@ export const deleteStyleController: Controller =
   () =>
   async ({ lang, ...request }: Request, response: Response) => {
     try {
-      if (!canDeleteStyle(request as Request)) return forbidden({ lang, response });
+      if (!(await canChangeStyle(request as Request))) return forbidden({ lang, response });
 
       await styleRepository.update({ id: Number(request.params.id) }, { finishedAt: new Date() });
 

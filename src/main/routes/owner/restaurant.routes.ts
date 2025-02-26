@@ -8,7 +8,7 @@ export default (inputRouter: Router): void => {
   const router = Router();
 
   router.post('/', insertRestaurantController());
-  router.delete('/:id', deleteRestaurantController());
+  router.delete('/:restaurantUrl', deleteRestaurantController());
 
   inputRouter.use('/restaurant', router);
 };

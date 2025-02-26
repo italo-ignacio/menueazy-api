@@ -36,12 +36,12 @@ interface Body {
  */
 
 /**
- * PUT /restaurant/{id}
+ * PUT /restaurant/{restaurantUrl}
  * @summary Update Restaurant
  * @tags Restaurant
  * @security BearerAuth
  * @param {UpdateRestaurantBody} request.body
- * @param {integer} id.path.required
+ * @param {string} restaurantUrl.path.required
  * @return {UpdateResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
@@ -68,7 +68,7 @@ export const updateRestaurantController: Controller =
       } = request.body as Body;
 
       await restaurantRepository.update(
-        { id: Number(request.params.id) },
+        { restaurantUrl: request.params.restaurantUrl },
         {
           name,
           contactLink,

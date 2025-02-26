@@ -1,5 +1,7 @@
 export * from './auth';
 export * from './currency';
+export * from './opening-hour';
+export * from './payment-method';
 export * from './plan';
 export * from './restaurant';
 export * from './style';

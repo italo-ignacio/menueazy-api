@@ -33,14 +33,14 @@ export class AddressEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   public complement: string | null;
 
+  @Column({ type: 'varchar', length: 30 })
+  public number: string;
+
   @Column({ type: 'numeric', precision: 10, scale: 8 })
   public latitude: string;
 
   @Column({ type: 'numeric', precision: 11, scale: 8 })
   public longitude: string;
-
-  @Column({ type: 'varchar', length: 30 })
-  public number: string;
 
   @OneToMany(() => ClientAddressEntity, (clientAddress) => clientAddress.address)
   public clientAddressList: ClientAddressEntity[];

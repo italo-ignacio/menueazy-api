@@ -14,7 +14,6 @@ export const insertRestaurantSchema = yup.object().shape({
     restaurantUrl: stringRequired(255),
     hasDelivery: booleanRequired(),
     minimumOrderPrice: numberRequired(),
-    styleId: numberRequired().integer(),
     contactLink: stringNotRequired(),
     description: stringNotRequired(),
     maxDeliveryDistanceInKm: numberNotRequired(),

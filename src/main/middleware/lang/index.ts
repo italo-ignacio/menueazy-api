@@ -5,6 +5,6 @@ export const langMiddleware: Controller =
   () => async (request: Request, response: Response, next: NextFunction) => {
     const { Lang } = request.headers;
 
-    Object.assign(request, { ...request, lang: Lang ?? 'en' });
+    Object.assign(request, { lang: Lang ?? 'en' });
     next();
   };

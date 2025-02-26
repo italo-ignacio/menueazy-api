@@ -1,3 +1,4 @@
+export * from './address';
 export * from './finished-at';
 export * from './has-user-by-email';
 export * from './owners';

@@ -21,8 +21,8 @@ export class ClientReportEntity {
   @Column({ type: 'text', nullable: true })
   public description: string | null;
 
-  // @Column({ type: 'integer', name: 'client_id' })
-  // public clientId: number;
+  @Column({ type: 'integer', name: 'client_id' })
+  public clientId: number;
 
   @ManyToOne(() => ClientEntity, (client) => client.clientReportList, {
     onDelete: 'CASCADE',
@@ -32,8 +32,8 @@ export class ClientReportEntity {
   @JoinColumn([{ name: 'client_id', referencedColumnName: 'id' }])
   public client: ClientEntity;
 
-  // @Column({ type: 'integer', name: 'order_id', nullable: true })
-  // public orderId: number | null;
+  @Column({ type: 'integer', name: 'order_id', nullable: true })
+  public orderId: number | null;
 
   @OneToOne(() => OrderEntity, (order) => order.clientReport, {
     onDelete: 'SET NULL',
@@ -42,8 +42,8 @@ export class ClientReportEntity {
   @JoinColumn([{ name: 'order_id', referencedColumnName: 'id' }])
   public order: OrderEntity | null;
 
-  // @Column({ type: 'integer', name: 'restaurant_id' })
-  // public restaurantId: number;
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.clientReportList, {
     onDelete: 'CASCADE',
@@ -53,8 +53,8 @@ export class ClientReportEntity {
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;
 
-  // @Column({ type: 'integer', name: 'user_id' })
-  // public userId: number;
+  @Column({ type: 'integer', name: 'user_id' })
+  public userId: number;
 
   @ManyToOne(() => UserEntity, (user) => user.clientReportList, {
     onDelete: 'CASCADE',

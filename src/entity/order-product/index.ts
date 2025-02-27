@@ -21,13 +21,11 @@ export class OrderProductEntity {
   @Column({ type: 'text', nullable: true })
   public observation: string | null;
 
-  // @Index()
-  // @Column({ type: 'integer', name: 'order_id' })
-  // public orderId: number;
+  @Column({ type: 'integer', name: 'order_id' })
+  public orderId: number;
 
-  // @Index()
-  // @Column({ type: 'integer', name: 'product_id' })
-  // public productId: number;
+  @Column({ type: 'integer', name: 'product_id' })
+  public productId: number;
 
   @Column({ type: 'integer' })
   public quantity: number;

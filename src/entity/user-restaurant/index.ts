@@ -22,11 +22,11 @@ export class UserRestaurantEntity {
   })
   public restaurantRole: RestaurantRole;
 
-  // @Column({ type: 'integer', name: 'restaurant_id' })
-  // public restaurantId: number;
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
 
-  // @Column({ type: 'integer', name: 'user_id' })
-  // public userId: number;
+  @Column({ type: 'integer', name: 'user_id' })
+  public userId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.userRestaurantList, {
     onDelete: 'RESTRICT',

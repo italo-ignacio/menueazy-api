@@ -28,8 +28,8 @@ export class ReviewEntity {
   @Column({ type: 'enum', name: 'rate', enum: Rate })
   public rate: Rate;
 
-  // @Column({ type: 'integer', name: 'client_id' })
-  // public clientId: number;
+  @Column({ type: 'integer', name: 'client_id' })
+  public clientId: number;
 
   @ManyToOne(() => ClientEntity, (client) => client.reviewList, {
     onDelete: 'CASCADE',
@@ -39,8 +39,8 @@ export class ReviewEntity {
   @JoinColumn([{ name: 'client_id', referencedColumnName: 'id' }])
   public client: ClientEntity;
 
-  // @Column({ type: 'integer', name: 'order_id', nullable: true })
-  // public orderId: number | null;
+  @Column({ type: 'integer', name: 'order_id', nullable: true })
+  public orderId: number | null;
 
   @ManyToOne(() => OrderEntity, (order) => order.reviewList, {
     onDelete: 'SET NULL',
@@ -50,8 +50,8 @@ export class ReviewEntity {
   @JoinColumn([{ name: 'order_id', referencedColumnName: 'id' }])
   public order: OrderEntity | null;
 
-  // @Column({ type: 'integer', name: 'product_restaurant_id', nullable: true })
-  // public productRestaurantId: number | null;
+  @Column({ type: 'integer', name: 'product_id', nullable: true })
+  public productId: number | null;
 
   @ManyToOne(() => ProductEntity, (product) => product.reviewList, {
     onDelete: 'SET NULL',
@@ -61,9 +61,8 @@ export class ReviewEntity {
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   public product: ProductEntity | null;
 
-  // @Index()
-  // @Column({ type: 'integer', name: 'restaurant_id' })
-  // public restaurantId: number;
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.reviewList, {
     onUpdate: 'CASCADE',

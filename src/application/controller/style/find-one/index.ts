@@ -40,11 +40,7 @@ export const findOneStyleController: Controller =
       });
 
       if (payload === null)
-        return notFound({
-          entity: messages[lang].entity.style,
-          lang,
-          response
-        });
+        return notFound({ entity: messages[lang].entity.style, lang, response });
 
       return ok({ payload, lang, response });
     } catch (error) {

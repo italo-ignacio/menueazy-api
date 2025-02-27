@@ -18,11 +18,11 @@ export class OrderProductOptionItemEntity {
   @Column({ type: 'integer' })
   public quantity: number;
 
-  // @Column({ type: 'integer', name: 'order_product_id' })
-  // public orderProductId: number;
+  @Column({ type: 'integer', name: 'order_product_id' })
+  public orderProductId: number;
 
-  // @Column({ type: 'integer', name: 'product_option_item_id' })
-  // public productOptionItemId: number;
+  @Column({ type: 'integer', name: 'product_option_item_id' })
+  public productOptionItemId: number;
 
   @ManyToOne(() => OrderProductEntity, (orderProduct) => orderProduct.orderProductOptionItemList, {
     onDelete: 'CASCADE',

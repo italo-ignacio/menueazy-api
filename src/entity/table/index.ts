@@ -18,7 +18,7 @@ export class TableEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
   public id: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'uuid', default: () => 'uuid_generate_v4()' })
   public code: string;
 
   @Column({ type: 'varchar', length: 100 })
@@ -27,9 +27,8 @@ export class TableEntity {
   @Column({ type: 'text', name: 'description', nullable: true })
   public description: string | null;
 
-  // @Index()
-  // @Column({ type: 'integer', name: 'restaurant_id' })
-  // public restaurantId: number;
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.tableList, {
     onDelete: 'CASCADE',

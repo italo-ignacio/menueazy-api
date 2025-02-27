@@ -52,9 +52,9 @@ export const insertPaymentMethodController: Controller =
 
       const data = paymentMethods.map((item) => ({
         description: item.description,
-        logoUrl: item.description,
-        title: item.description,
-        restaurant: { id: request.restaurant.id }
+        logoUrl: item.logoUrl,
+        title: item.title,
+        restaurantId: request.restaurant.id
       }));
 
       await paymentMethodRepository.insert(data);

@@ -24,8 +24,8 @@ export class OpeningHourEntity {
   @Column({ type: 'time with time zone', name: 'closing_time' })
   public closingTime: string;
 
-  // @Column({ type: 'integer', name: 'restaurant_id' })
-  // public restaurantId: number;
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.openingHourList, {
     onDelete: 'CASCADE',

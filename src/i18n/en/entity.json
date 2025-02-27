@@ -3,5 +3,7 @@
   "subscription": "Subscription",
   "user": "User",
   "restaurant": "Restaurant",
-  "style": "Style"
+  "style": "Style",
+  "table": "Table",
+  "category": "Category"
 }

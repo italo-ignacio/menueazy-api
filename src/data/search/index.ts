@@ -25,7 +25,6 @@ export * from './product-restaurant';
 export * from './register-request';
 export * from './restaurant';
 export * from './restaurant-address';
-export * from './restaurant-category';
 export * from './review';
 export * from './style';
 export * from './subscription';

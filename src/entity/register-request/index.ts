@@ -42,6 +42,9 @@ export class RegisterRequestEntity {
   @Column({ type: 'integer' })
   public numberOfProduct: number;
 
+  @Column({ type: 'integer', name: 'plan_id' })
+  public planId: number;
+
   @ManyToOne(() => PlanEntity, (plan) => plan.registerRequestList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -50,6 +53,9 @@ export class RegisterRequestEntity {
   })
   @JoinColumn([{ name: 'plan_id', referencedColumnName: 'id' }])
   public plan: PlanEntity;
+
+  @Column({ type: 'integer', name: 'currency_id' })
+  public currencyId: number;
 
   @ManyToOne(() => CurrencyEntity, (currency) => currency.registerRequestList, {
     onDelete: 'CASCADE',

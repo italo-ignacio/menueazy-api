@@ -23,8 +23,8 @@ export class PaymentMethodEntity {
   @Column({ type: 'text', name: 'logo_url', nullable: true })
   public logoUrl: string | null;
 
-  // @Column({ type: 'integer', name: 'restaurant_id' })
-  // public restaurantId: number;
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.paymentMethodList, {
     onDelete: 'CASCADE',

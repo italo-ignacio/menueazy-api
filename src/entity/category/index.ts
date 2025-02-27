@@ -1,13 +1,15 @@
+import { RestaurantEntity } from '@entity/restaurant';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
 import { ProductCategoryEntity } from '../product-category';
-import { RestaurantCategoryEntity } from '../restaurant-category';
 
 @Entity('category')
 export class CategoryEntity {
@@ -20,14 +22,19 @@ export class CategoryEntity {
   @Column({ type: `text`, name: 'description', nullable: true })
   public description: string | null;
 
-  // @Column({ name: 'company_id', type: 'integer' })
-  // public companyId: number;
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
+
+  @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.categoryList, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    nullable: false
+  })
+  @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
+  public restaurant: RestaurantEntity;
 
   @OneToMany(() => ProductCategoryEntity, (productCategory) => productCategory.category)
   public productCategoryList: ProductCategoryEntity[];
-
-  @OneToMany(() => RestaurantCategoryEntity, (restaurantCategory) => restaurantCategory.category)
-  public restaurantCategoryList: RestaurantCategoryEntity[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date;

@@ -1,3 +1,4 @@
+export * from './check-url';
 export * from './delete';
 export * from './find';
 export * from './find-by-url';

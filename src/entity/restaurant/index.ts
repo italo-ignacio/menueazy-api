@@ -1,3 +1,4 @@
+import { CategoryEntity } from '@entity/category';
 import {
   Column,
   CreateDateColumn,
@@ -16,7 +17,6 @@ import { OrderEntity } from '../order';
 import { PaymentMethodEntity } from '../payment-method';
 import { ProductEntity } from '../product';
 import { RestaurantAddressEntity } from '../restaurant-address';
-import { RestaurantCategoryEntity } from '../restaurant-category';
 import { ReviewEntity } from '../review';
 import { StyleEntity } from '../style';
 import { TableEntity } from '../table';
@@ -67,9 +67,8 @@ export class RestaurantEntity {
   @Column({ type: 'float4', name: 'price_by_km_in_delivery', default: 2 })
   public priceByKmInDelivery: number;
 
-  // @Index()
-  // @Column({ type: 'integer', name: 'company_id' })
-  // public companyId: number;
+  @Column({ type: 'integer', name: 'company_id' })
+  public companyId: number;
 
   @ManyToOne(() => CompanyEntity, (company) => company.restaurantList, {
     onDelete: 'CASCADE',
@@ -79,8 +78,8 @@ export class RestaurantEntity {
   @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
   public company: CompanyEntity;
 
-  // @Column({ type: 'integer', name: 'style_id' })
-  // public styleId: number;
+  @Column({ type: 'integer', name: 'style_id' })
+  public styleId: number;
 
   @ManyToOne(() => StyleEntity, (style) => style.restaurantList, {
     onUpdate: 'CASCADE',
@@ -89,6 +88,9 @@ export class RestaurantEntity {
   })
   @JoinColumn([{ name: 'style_id', referencedColumnName: 'id' }])
   public style: StyleEntity;
+
+  @OneToMany(() => CategoryEntity, (category) => category.restaurant)
+  public categoryList: CategoryEntity[];
 
   @OneToMany(() => ClientReportEntity, (clientReport) => clientReport.restaurant)
   public clientReportList: ClientReportEntity[];
@@ -107,9 +109,6 @@ export class RestaurantEntity {
 
   @OneToMany(() => RestaurantAddressEntity, (restaurantAddress) => restaurantAddress.restaurant)
   public restaurantAddressList: RestaurantAddressEntity[];
-
-  @OneToMany(() => RestaurantCategoryEntity, (restaurantCategory) => restaurantCategory.restaurant)
-  public restaurantCategoryList: RestaurantCategoryEntity[];
 
   @OneToMany(() => ReviewEntity, (review) => review.restaurant)
   public reviewList: ReviewEntity[];

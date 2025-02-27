@@ -1,4 +1,5 @@
 export * from './auth';
+export * from './category';
 export * from './currency';
 export * from './opening-hour';
 export * from './payment-method';
@@ -6,4 +7,5 @@ export * from './plan';
 export * from './restaurant';
 export * from './style';
 export * from './subscription';
+export * from './table';
 export * from './user';

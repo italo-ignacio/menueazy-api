@@ -3,5 +3,7 @@
   "subscription": "Inscrição",
   "user": "Usuário",
   "restaurant": "Restaurante",
-  "style": "Estilo"
+  "style": "Estilo",
+  "table": "Mesa",
+  "category": "Categoria"
 }

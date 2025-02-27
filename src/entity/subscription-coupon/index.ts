@@ -18,11 +18,11 @@ export class SubscriptionCouponEntity {
   @Column({ name: 'expires_at', type: 'timestamptz' })
   public expiresAt: Date;
 
-  // @Column({ type: 'integer', name: 'coupon_id' })
-  // public couponId: number;
+  @Column({ type: 'integer', name: 'coupon_id' })
+  public couponId: number;
 
-  // @Column({ type: 'integer', name: 'subscription_id' })
-  // public subscriptionId: number;
+  @Column({ type: 'integer', name: 'subscription_id' })
+  public subscriptionId: number;
 
   @ManyToOne(() => CouponEntity, (coupon) => coupon.subscriptionCouponList, {
     onDelete: 'CASCADE',

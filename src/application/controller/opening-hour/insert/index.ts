@@ -55,7 +55,7 @@ export const insertOpeningHourController: Controller =
         closingTime: item.closingTime,
         dayOfWeek: item.dayOfWeek,
         openingTime: item.openingTime,
-        restaurant: { id: request.restaurant.id }
+        restaurantId: request.restaurant.id
       }));
 
       await openingHourRepository.insert(data);

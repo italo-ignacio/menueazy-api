@@ -40,7 +40,7 @@ export const findOpeningHourController: Controller =
 
       const openingHours = await openingHourRepository.find({
         select: openingHourFindParams,
-        where: { restaurant: { id: Number(request.restaurant.id) }, finishedAt }
+        where: { restaurantId: Number(request.restaurant.id), finishedAt }
       });
 
       const sortedOpeningHours = openingHours.sort(

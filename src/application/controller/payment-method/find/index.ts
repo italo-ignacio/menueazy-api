@@ -29,7 +29,7 @@ export const findPaymentMethodController: Controller =
     try {
       const payload = await paymentMethodRepository.find({
         select: paymentMethodFindParams,
-        where: { restaurant: { id: Number(request.restaurant.id) }, finishedAt }
+        where: { restaurantId: Number(request.restaurant.id), finishedAt }
       });
 
       return ok({ payload, lang, response });

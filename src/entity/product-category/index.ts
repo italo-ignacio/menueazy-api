@@ -15,11 +15,11 @@ export class ProductCategoryEntity {
   @PrimaryGeneratedColumn({ type: 'integer', name: 'id' })
   public id: number;
 
-  // @Column({ type: 'integer', name: 'category_id' })
-  // public categoryId: number;
+  @Column({ type: 'integer', name: 'category_id' })
+  public categoryId: number;
 
-  // @Column({ type: 'integer', name: 'product_id' })
-  // public productId: number;
+  @Column({ type: 'integer', name: 'product_id' })
+  public productId: number;
 
   @ManyToOne(() => CategoryEntity, (category) => category.productCategoryList, {
     onDelete: 'CASCADE',

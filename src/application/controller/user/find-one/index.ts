@@ -33,12 +33,7 @@ export const findOneUserController: Controller =
         where: { id: Number(request.params.id), finishedAt }
       });
 
-      if (payload === null)
-        return notFound({
-          entity: messages[lang].entity.user,
-          lang,
-          response
-        });
+      if (payload === null) return notFound({ entity: messages[lang].entity.user, lang, response });
 
       return ok({
         payload,

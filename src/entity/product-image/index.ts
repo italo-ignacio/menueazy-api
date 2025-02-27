@@ -20,8 +20,8 @@ export class ProductImageEntity {
   @Column({ type: 'boolean', default: false })
   public primary: boolean;
 
-  // @Column({ type: 'integer', name: 'product_id' })
-  // public productId: number;
+  @Column({ type: 'integer', name: 'product_id' })
+  public productId: number;
 
   @ManyToOne(() => ProductEntity, (product) => product.productImageList, {
     onDelete: 'CASCADE',

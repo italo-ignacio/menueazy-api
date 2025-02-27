@@ -23,11 +23,11 @@ export class StyleEntity {
   @Column({ type: 'boolean', default: false })
   public generic: boolean;
 
-  // @Column({ type: 'integer', name: 'color_id' })
-  // public colorId: number;
+  @Column({ type: 'integer', name: 'color_id' })
+  public colorId: number;
 
-  // @Column({ type: 'integer', name: 'company_id' })
-  // public companyId: number;
+  @Column({ type: 'integer', name: 'company_id' })
+  public companyId: number;
 
   @ManyToOne(() => ColorEntity, (color) => color.styleList, {
     onDelete: 'CASCADE',

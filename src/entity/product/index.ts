@@ -54,9 +54,6 @@ export class ProductEntity {
   @Column({ type: 'float4', name: 'price_by_km_in_delivery', nullable: true })
   public priceByKmInDelivery: number | null;
 
-  // @Column({ type: 'integer', name: 'company_id' })
-  // public companyId: number;
-
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.productList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

@@ -24,11 +24,11 @@ export class DeviceEntity {
   @Column({ name: 'last_active', type: 'timestamptz', nullable: true })
   public lastActive: Date | null;
 
-  // @Column({ type: 'integer', name: 'client_id', nullable: true })
-  // public clientId: number | null;
+  @Column({ type: 'integer', name: 'client_id', nullable: true })
+  public clientId: number | null;
 
-  // @Column({ type: 'integer', name: 'user_id', nullable: true })
-  // public userId: number | null;
+  @Column({ type: 'integer', name: 'user_id', nullable: true })
+  public userId: number | null;
 
   @ManyToOne(() => ClientEntity, (client) => client.deviceList, {
     onDelete: 'CASCADE',

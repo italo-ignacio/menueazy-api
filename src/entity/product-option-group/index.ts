@@ -31,8 +31,8 @@ export class ProductOptionGroupEntity {
   @Column({ type: 'boolean' })
   public required: boolean;
 
-  // @Column({ name: 'product_id', type: 'integer' })
-  // public productId: number;
+  @Column({ name: 'product_id', type: 'integer' })
+  public productId: number;
 
   @ManyToOne(() => ProductEntity, (product) => product.productOptionGroupList, {
     onDelete: 'CASCADE',

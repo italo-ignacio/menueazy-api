@@ -28,11 +28,7 @@ export const findSubscriptionByCodeController: Controller =
   async ({ lang, ...request }: Request, response: Response) => {
     try {
       if (!isUuid(request.params.code))
-        return notFound({
-          entity: messages[lang].entity.subscription,
-          lang,
-          response
-        });
+        return notFound({ entity: messages[lang].entity.subscription, lang, response });
 
       const payload = await subscriptionRepository.findOne({
         select: subscriptionFindParams,
@@ -40,11 +36,7 @@ export const findSubscriptionByCodeController: Controller =
       });
 
       if (payload === null)
-        return notFound({
-          entity: messages[lang].entity.subscription,
-          lang,
-          response
-        });
+        return notFound({ entity: messages[lang].entity.subscription, lang, response });
 
       return ok({ payload, lang, response });
     } catch (error) {

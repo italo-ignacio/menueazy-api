@@ -30,8 +30,8 @@ export class SubscriptionEntity {
   @Column({ type: 'uuid', unique: true })
   public code: string;
 
-  // @Column({ type: 'integer', name: 'plan_id' })
-  // public planId: number;
+  @Column({ type: 'integer', name: 'plan_id' })
+  public planId: number;
 
   @Column({ type: 'timestamptz', name: 'expires_at' })
   public expiresAt: Date;

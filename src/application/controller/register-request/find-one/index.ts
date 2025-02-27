@@ -34,11 +34,7 @@ export const findOneRegisterRequestController: Controller =
       });
 
       if (payload === null)
-        return notFound({
-          entity: messages[lang].entity.registerRequest,
-          lang,
-          response
-        });
+        return notFound({ entity: messages[lang].entity.registerRequest, lang, response });
 
       return ok({ payload, lang, response });
     } catch (error) {

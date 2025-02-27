@@ -18,11 +18,11 @@ export class PlanPriceEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
   public id: number;
 
-  // @Column({ type: 'integer', name: 'currency_id' })
-  // public currencyId: number;
+  @Column({ type: 'integer', name: 'currency_id' })
+  public currencyId: number;
 
-  // @Column({ type: 'integer', name: 'plan_id' })
-  // public planId: number;
+  @Column({ type: 'integer', name: 'plan_id' })
+  public planId: number;
 
   @Column({ type: 'float4', name: 'monthly_price' })
   public monthlyPrice: number;

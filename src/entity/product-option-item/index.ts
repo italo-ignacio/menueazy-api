@@ -26,11 +26,11 @@ export class ProductOptionItemEntity {
   @Column({ type: 'text', name: 'image_url', nullable: true })
   public imageUrl: string | null;
 
-  // @Column({ type: 'integer', name: 'product_id', nullable: true })
-  // public productId: number | null;
+  @Column({ type: 'integer', name: 'product_id', nullable: true })
+  public productId: number | null;
 
-  // @Column({ type: 'integer', name: 'product_option_group_id' })
-  // public productOptionGroupId: number;
+  @Column({ type: 'integer', name: 'product_option_group_id' })
+  public productOptionGroupId: number;
 
   @ManyToOne(() => ProductEntity, (product) => product.productOptionItemList, {
     onDelete: 'CASCADE',

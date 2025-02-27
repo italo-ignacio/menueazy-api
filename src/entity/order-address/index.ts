@@ -15,11 +15,11 @@ export class OrderAddressEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
   public id: number;
 
-  // @Column({ type: 'integer', name: 'address_id' })
-  // public addressId: number;
+  @Column({ type: 'integer', name: 'address_id' })
+  public addressId: number;
 
-  // @Column({ type: 'integer', name: 'order_id' })
-  // public orderId: number;
+  @Column({ type: 'integer', name: 'order_id' })
+  public orderId: number;
 
   @ManyToOne(() => AddressEntity, (address) => address.orderAddressList, {
     onDelete: 'CASCADE',

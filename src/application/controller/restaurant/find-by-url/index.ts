@@ -33,11 +33,7 @@ export const findRestaurantByURLController: Controller =
       });
 
       if (payload === null)
-        return notFound({
-          entity: messages[lang].entity.restaurant,
-          lang,
-          response
-        });
+        return notFound({ entity: messages[lang].entity.restaurant, lang, response });
 
       return ok({ payload, lang, response });
     } catch (error) {

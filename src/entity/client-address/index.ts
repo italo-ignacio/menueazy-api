@@ -15,11 +15,11 @@ export class ClientAddressEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
   public id: number;
 
-  // @Column({ type: 'integer', name: 'address_id' })
-  // public addressId: number;
+  @Column({ type: 'integer', name: 'address_id' })
+  public addressId: number;
 
-  // @Column({ type: 'integer', name: 'client_id' })
-  // public clientId: number;
+  @Column({ type: 'integer', name: 'client_id' })
+  public clientId: number;
 
   @ManyToOne(() => AddressEntity, (address) => address.clientAddressList, {
     onDelete: 'CASCADE',

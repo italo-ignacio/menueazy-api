@@ -46,8 +46,8 @@ export class CompanyEntity {
   @Column({ type: 'boolean', name: 'domain_verified', default: false })
   public domainVerified: boolean;
 
-  // @Column({ type: 'integer', name: 'currency_id' })
-  // public currencyId: number;
+  @Column({ type: 'integer', name: 'currency_id' })
+  public currencyId: number;
 
   @ManyToOne(() => CurrencyEntity, (currency) => currency.companyList, {
     onDelete: 'CASCADE',
@@ -57,8 +57,8 @@ export class CompanyEntity {
   @JoinColumn([{ name: 'currency_id', referencedColumnName: 'id' }])
   public currency: CurrencyEntity;
 
-  // @Column({ type: 'integer', name: 'subscription_id' })
-  // public subscriptionId: number;
+  @Column({ type: 'integer', name: 'subscription_id' })
+  public subscriptionId: number;
 
   @OneToOne(() => SubscriptionEntity, (subscription) => subscription.company, {
     onDelete: 'CASCADE',

@@ -41,8 +41,8 @@ export class UserEntity {
   @Column({ type: 'enum', enum: Role })
   public role: Role;
 
-  // @Column({ type: 'integer', name: 'company_id' })
-  // public companyId: number;
+  @Column({ type: 'integer', name: 'company_id' })
+  public companyId: number;
 
   @OneToMany(() => ClientReportEntity, (clientReport) => clientReport.user)
   public clientReportList: ClientReportEntity[];

@@ -21,11 +21,7 @@ export const findRegisterRequestByCodeController: Controller =
   async ({ lang, ...request }: Request, response: Response) => {
     try {
       if (!isUuid(request.params.code))
-        return notFound({
-          entity: messages[lang].entity.subscription,
-          lang,
-          response
-        });
+        return notFound({ entity: messages[lang].entity.subscription, lang, response });
 
       const payload = await registerRequestRepository.findOne({
         select: registerRequestFindParams,
@@ -33,11 +29,7 @@ export const findRegisterRequestByCodeController: Controller =
       });
 
       if (payload === null)
-        return notFound({
-          entity: messages[lang].entity.registerRequest,
-          lang,
-          response
-        });
+        return notFound({ entity: messages[lang].entity.registerRequest, lang, response });
 
       return ok({ payload, lang, response });
     } catch (error) {

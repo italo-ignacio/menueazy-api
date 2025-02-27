@@ -1,4 +1,3 @@
-import { RestaurantEntity } from '@entity/restaurant';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +9,7 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { ProductCategoryEntity } from '../product-category';
+import { RestaurantEntity } from '../restaurant';
 
 @Entity('category')
 export class CategoryEntity {

@@ -1,16 +1,12 @@
- 
- 
- 
- 
- 
-import { badRequest, messageErrorResponse } from '../api-response';
-import { errorLogger } from '../error-logger';
-import { existsSync, mkdirSync } from 'fs';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { messages } from '@domain/helpers';
-import multer, { MulterError, diskStorage } from 'multer';
-import path from 'path';
 import type { Controller } from '@domain/protocols';
 import type { NextFunction, Request, Response } from 'express';
+import { existsSync, mkdirSync } from 'fs';
+import multer, { MulterError, diskStorage } from 'multer';
+import path from 'path';
+import { badRequest, messageErrorResponse } from '../api-response';
+import { errorLogger } from '../error-logger';
 
 const checkTempStorageDir = (): void => {
   const dirPath = path.join(__dirname, '..', '..', '..', 'static', 'uploads');
@@ -19,10 +15,10 @@ const checkTempStorageDir = (): void => {
 };
 
 const storage = diskStorage({
-  destination(req, file, cb) {
+  destination(req: any, file: any, cb: (arg0: null, arg1: string) => void) {
     cb(null, path.join(__dirname, '..', '..', '..', 'static', 'uploads'));
   },
-  filename(req, file, cb) {
+  filename(req: any, file: { originalname: string }, cb: (arg0: null, arg1: string) => void) {
     checkTempStorageDir();
 
     if (file) {
@@ -59,7 +55,8 @@ export const handleMulterError = (
   if (err instanceof MulterError)
     return badRequest({
       message: messages.default.uploadError(err.message),
-      response
+      response,
+      lang: req.lang
     });
 
   next();
@@ -69,10 +66,11 @@ export const insertImage: Controller =
   () => (request: Request, response: Response, next: NextFunction) => {
     try {
       let filename: string | undefined;
+      const req = request as unknown as { file: { filename: string } };
 
-      if (request.file?.filename)
+      if (req.file?.filename)
         filename = `${request.protocol}://${request.get('host') ?? ''}/static/uploads/${
-          request.file.filename
+          req.file.filename
         }`;
 
       if (typeof filename === 'string')
@@ -81,6 +79,6 @@ export const insertImage: Controller =
       next();
     } catch (error) {
       errorLogger(error);
-      return messageErrorResponse({ error, response });
+      return messageErrorResponse({ error, response, lang: request.lang });
     }
   };

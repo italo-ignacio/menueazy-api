@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { env } from '../main/config/env';
 
-export class Seed1740407328292 implements MigrationInterface {
+export class Seed1740695577891 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `INSERT INTO currency (code, "name", symbol) VALUES 
@@ -74,9 +74,41 @@ export class Seed1740407328292 implements MigrationInterface {
       `INSERT INTO "user" ("name", email, firebase_id, phone, role, company_id) VALUES 
       ('Menu Eazy', '${env.ADMIN.email}', '${env.ADMIN.firebaseId}', '${env.ADMIN.phone}', 'ADMIN', (SELECT id FROM company WHERE company_url = 'menu-eazy'));`
     );
+
+    await queryRunner.query(
+      `INSERT INTO "color" ("primary", text_primary, secondary, text_secondary, text, background) VALUES 
+      ('#5E17EB', '#FFFFFF', '#A07CF0', '#2E0C73', '#1E1E1E', '#F4F1FF'),
+      ('#005CA9', '#FFFFFF', '#0091D5', '#003D73', '#1E1E1E', '#E3F2FD'),
+      ('#D97706', '#FFFFFF', '#F59E0B', '#7C4200', '#1E1E1E', '#FFF7E6');`
+    );
+
+    await queryRunner.query(
+      `INSERT INTO "style" ("name", generic, color_id, company_id) VALUES 
+      ('Neo Purple', true, (SELECT id FROM color WHERE "primary" = '#5E17EB' AND text_primary = '#FFFFFF' AND secondary = '#A07CF0' AND text_secondary = '#2E0C73' AND text = '#1E1E1E' AND background = '#F4F1FF'), (SELECT id FROM company WHERE company_url = 'menu-eazy')),
+      ('Deep Blue', true, (SELECT id FROM color WHERE "primary" = '#005CA9' AND text_primary = '#FFFFFF' AND secondary = '#0091D5' AND text_secondary = '#003D73' AND text = '#1E1E1E' AND background = '#E3F2FD'), (SELECT id FROM company WHERE company_url = 'menu-eazy')),
+      ('Warm Sunset', true, (SELECT id FROM color WHERE "primary" = '#D97706' AND text_primary = '#FFFFFF' AND secondary = '#F59E0B' AND text_secondary = '#7C4200' AND text = '#1E1E1E' AND background = '#FFF7E6'), (SELECT id FROM company WHERE company_url = 'menu-eazy'));`
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `DELETE FROM "style" 
+       WHERE ("name", generic) IN (
+          ('Neo Purple', true),
+          ('Deep Blue', true),
+          ('Warm Sunset', true)
+       );`
+    );
+
+    await queryRunner.query(
+      `DELETE FROM "color" 
+       WHERE (primary, text_primary, secondary, text_secondary, text, background) IN (
+          ('#5E17EB', '#FFFFFF', '#A07CF0', '#2E0C73', '#1E1E1E', '#F4F1FF'),
+          ('#005CA9', '#FFFFFF', '#0091D5', '#003D73', '#1E1E1E', '#E3F2FD'),
+          ('#D97706', '#FFFFFF', '#F59E0B', '#7C4200', '#1E1E1E', '#FFF7E6')
+       );`
+    );
+
     await queryRunner.query(`DELETE FROM user WHERE email = ${env.ADMIN.email};`);
 
     await queryRunner.query(`DELETE FROM company WHERE company_url = 'menu-eazy';`);

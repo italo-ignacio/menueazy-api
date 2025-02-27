@@ -1,4 +1,3 @@
-import { CategoryEntity } from '@entity/category';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
+import { CategoryEntity } from '../category';
 import { ClientReportEntity } from '../client-report';
 import { CompanyEntity } from '../company';
 import { OpeningHourEntity } from '../opening-hour';

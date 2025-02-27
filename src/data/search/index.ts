@@ -21,7 +21,6 @@ export * from './product-category';
 export * from './product-image';
 export * from './product-option-group';
 export * from './product-option-item';
-export * from './product-restaurant';
 export * from './register-request';
 export * from './restaurant';
 export * from './restaurant-address';

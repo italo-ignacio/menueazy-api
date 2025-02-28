@@ -1,6 +1,6 @@
 import { updateRestaurantSchema } from '@data/validation';
-import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
+import { messages } from '@i18n/index';
 import { errorLogger, messageErrorResponse, ok, validationErrorResponse } from '@main/utils';
 import { restaurantRepository } from '@repository/restaurant';
 import type { Request, Response } from 'express';
@@ -36,12 +36,12 @@ interface Body {
  */
 
 /**
- * PUT /restaurant/{restaurantUrl}
+ * PUT /restaurant/{restaurantId}
  * @summary Update Restaurant
  * @tags Restaurant
  * @security BearerAuth
  * @param {UpdateRestaurantBody} request.body
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @return {UpdateResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
@@ -49,7 +49,7 @@ interface Body {
  */
 export const updateRestaurantController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       await updateRestaurantSchema.validate(request, { abortEarly: false });
 
@@ -68,7 +68,7 @@ export const updateRestaurantController: Controller =
       } = request.body as Body;
 
       await restaurantRepository.update(
-        { restaurantUrl: request.params.restaurantUrl },
+        { id: restaurant.id },
         {
           name,
           contactLink,
@@ -84,7 +84,7 @@ export const updateRestaurantController: Controller =
         }
       );
 
-      return ok({ payload: messages.default.successfullyUpdated, lang, response });
+      return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
 

@@ -1,6 +1,6 @@
 import { userIsOwner } from '@application/helper';
-import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
+import { messages } from '@i18n/index';
 import { badRequest, errorLogger, forbidden, ok } from '@main/utils';
 import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
@@ -29,9 +29,9 @@ export const deleteUserController: Controller =
 
       await userRepository.update({ id: Number(request.params.id) }, { finishedAt: new Date() });
 
-      return ok({ payload: messages.default.successfullyDeleted, lang, response });
+      return ok({ payload: messages[lang].default.successfullyDeleted, lang, response });
     } catch (error) {
       errorLogger(error);
-      return badRequest({ message: messages.auth.notFound, lang, response });
+      return badRequest({ message: messages[lang].error.notFound, lang, response });
     }
   };

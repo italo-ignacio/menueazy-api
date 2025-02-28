@@ -1,10 +1,10 @@
+import { finishedAt } from '@application/helper';
 import { restaurantFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
 import { restaurantRepository } from '@repository/restaurant';
 import type { Request, Response } from 'express';
-import { IsNull } from 'typeorm';
 
 /**
  * @typedef {object} FindOneRestaurantResponse
@@ -29,7 +29,7 @@ export const findRestaurantByURLController: Controller =
     try {
       const payload = await restaurantRepository.findOne({
         select: restaurantFindParams,
-        where: { restaurantUrl: request.params.restaurantUrl, finishedAt: IsNull() }
+        where: { restaurantUrl: request.params.restaurantUrl, finishedAt }
       });
 
       if (payload === null)

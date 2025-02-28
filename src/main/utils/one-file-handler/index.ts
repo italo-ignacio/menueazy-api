@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
 import type { NextFunction, Request, Response } from 'express';
 import { existsSync, mkdirSync } from 'fs';
@@ -54,7 +53,6 @@ export const handleMulterError = (
 ) => {
   if (err instanceof MulterError)
     return badRequest({
-      message: messages.default.uploadError(err.message),
       response,
       lang: req.lang
     });

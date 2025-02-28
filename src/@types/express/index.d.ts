@@ -17,13 +17,10 @@ declare global {
         finishedAt: Date | null;
         company: {
           id: number;
-          name: string;
-          companyUrl: string;
         };
       };
       restaurant: {
         id: number;
-        url: string;
       };
       client: ClientTokenInput;
       lang: Langs;

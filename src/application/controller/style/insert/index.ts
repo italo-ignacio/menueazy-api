@@ -54,7 +54,7 @@ interface Body {
  */
 export const insertStyleController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, user, ...request }: Request, response: Response) => {
     try {
       await insertStyleSchema.validate(request, { abortEarly: false });
 
@@ -78,8 +78,8 @@ export const insertStyleController: Controller =
         const style = manager.create(StyleEntity, {
           name,
           color,
-          company: { id: request.user.company.id },
-          generic: request.user.role === Role.ADMIN
+          company: { id: user.company.id },
+          generic: user.role === Role.ADMIN
         });
 
         await manager.save(style);

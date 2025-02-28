@@ -14,11 +14,10 @@ import type { Request, Response } from 'express';
  */
 
 /**
- * GET /restaurant/{restaurantUrl}/category/{id}
+ * GET /restaurant/{restaurantId}/category/{id}
  * @summary Find One Category
  * @tags Category
- * @security BearerAuth
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @param {integer} id.path.required
  * @return {FindOneCategoryResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
@@ -27,11 +26,11 @@ import type { Request, Response } from 'express';
  */
 export const findOneCategoryController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       const payload = await categoryRepository.findOne({
         select: categoryFindParams,
-        where: { id: Number(request.params.id), restaurantId: request.restaurant.id, finishedAt }
+        where: { id: Number(request.params.id), restaurantId: restaurant.id, finishedAt }
       });
 
       if (payload === null)

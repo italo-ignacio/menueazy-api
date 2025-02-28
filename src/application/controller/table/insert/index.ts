@@ -24,23 +24,24 @@ interface Body {
  */
 
 /**
- * POST /restaurant/{restaurantUrl}/table
+ * POST /restaurant/{restaurantId}/table
  * @summary Insert Table
  * @tags Table
  * @security BearerAuth
+ * @param {integer} restaurantId.path.required
  * @param {InsertTableBody} request.body.required - application/json
  * @return {InsertTableResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertTableController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       await insertTableSchema.validate(request, { abortEarly: false });
 
       const { name, description } = request.body as Body;
 
-      await tableRepository.insert({ description, name, restaurantId: request.restaurant.id });
+      await tableRepository.insert({ description, name, restaurantId: restaurant.id });
 
       return created({ lang, response });
     } catch (error) {

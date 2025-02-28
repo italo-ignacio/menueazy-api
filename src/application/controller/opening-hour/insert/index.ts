@@ -34,18 +34,18 @@ interface Body {
  */
 
 /**
- * POST /restaurant/{restaurantUrl}/opening-hour
+ * POST /restaurant/{restaurantId}/opening-hour
  * @summary Insert Opening Hour
  * @tags Opening Hour
  * @security BearerAuth
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @param {InsertOpeningHourBody} request.body.required - application/json
  * @return {InsertOpeningHourResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertOpeningHourController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       await insertOpeningHourSchema.validate(request, { abortEarly: false });
 
@@ -55,7 +55,7 @@ export const insertOpeningHourController: Controller =
         closingTime: item.closingTime,
         dayOfWeek: item.dayOfWeek,
         openingTime: item.openingTime,
-        restaurantId: request.restaurant.id
+        restaurantId: restaurant.id
       }));
 
       await openingHourRepository.insert(data);

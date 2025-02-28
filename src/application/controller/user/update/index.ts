@@ -1,7 +1,7 @@
 import { hasUserByEmail, userIsOwner } from '@application/helper';
 import { updateUserSchema } from '@data/validation';
-import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
+import { messages } from '@i18n/index';
 import {
   badRequest,
   errorLogger,
@@ -57,7 +57,7 @@ export const updateUserController: Controller =
       const { email, name, phone } = request.body as Body;
 
       if (typeof email === 'string' && (await hasUserByEmail(email)) !== false)
-        return badRequest({ message: messages.auth.userAlreadyExists, lang, response });
+        return badRequest({ message: messages[lang].error.duplicateKey, lang, response });
 
       let newPhone: string | undefined;
 
@@ -68,7 +68,7 @@ export const updateUserController: Controller =
         { email, name, phone: newPhone }
       );
 
-      return ok({ payload: messages.default.successfullyUpdated, lang, response });
+      return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
 

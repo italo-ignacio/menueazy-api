@@ -1,7 +1,7 @@
 import { updateTableSchema } from '@data/validation';
-import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
 import { TableEntity } from '@entity/table';
+import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
 import { errorLogger, messageErrorResponse, ok, validationErrorResponse } from '@main/utils';
 import type { Request, Response } from 'express';
@@ -19,12 +19,12 @@ interface Body {
  */
 
 /**
- * PUT /restaurant/{restaurantUrl}/table/{id}
+ * PUT /restaurant/{restaurantId}/table/{id}
  * @summary Update Table
  * @tags Table
  * @security BearerAuth
  * @param {UpdateTableBody} request.body
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @param {integer} id.path.required
  * @return {UpdateResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
@@ -33,7 +33,7 @@ interface Body {
  */
 export const updateTableController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       await updateTableSchema.validate(request, { abortEarly: false });
 
@@ -43,10 +43,10 @@ export const updateTableController: Controller =
         .update(TableEntity)
         .set({ name, description })
         .where('id = :id', { id: Number(request.params.id) })
-        .andWhere('restaurant_id = :restaurantId', { restaurantId: request.restaurant.id })
+        .andWhere('restaurant_id = :restaurantId', { restaurantId: restaurant.id })
         .execute();
 
-      return ok({ payload: messages.default.successfullyUpdated, lang, response });
+      return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
 

@@ -63,7 +63,7 @@ export const findStyleController: Controller =
         select: styleFindParams,
         skip,
         take,
-        where: { generic: true }
+        where
       });
 
       return ok({

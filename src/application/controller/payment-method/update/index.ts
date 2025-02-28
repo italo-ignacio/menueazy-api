@@ -1,7 +1,7 @@
 import { updatePaymentMethodSchema } from '@data/validation';
-import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
 import { PaymentMethodEntity } from '@entity/payment-method';
+import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
 import { errorLogger, messageErrorResponse, ok, validationErrorResponse } from '@main/utils';
 import type { Request, Response } from 'express';
@@ -21,12 +21,12 @@ interface Body {
  */
 
 /**
- * PUT /restaurant/{restaurantUrl}/payment-method/{id}
+ * PUT /restaurant/{restaurantId}/payment-method/{id}
  * @summary Update Payment Method
  * @tags Payment Method
  * @security BearerAuth
  * @param {UpdatePaymentMethodBody} request.body
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @param {integer} id.path.required
  * @return {UpdateResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
@@ -35,7 +35,7 @@ interface Body {
  */
 export const updatePaymentMethodController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       await updatePaymentMethodSchema.validate(request, { abortEarly: false });
 
@@ -45,10 +45,10 @@ export const updatePaymentMethodController: Controller =
         .update(PaymentMethodEntity)
         .set({ title, description, logoUrl })
         .where('id = :id', { id: Number(request.params.id) })
-        .andWhere('restaurant_id = :restaurantId', { restaurantId: request.restaurant.id })
+        .andWhere('restaurant_id = :restaurantId', { restaurantId: restaurant.id })
         .execute();
 
-      return ok({ payload: messages.default.successfullyUpdated, lang, response });
+      return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
 

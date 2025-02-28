@@ -1,3 +1,4 @@
+import { finishedAt } from '@application/helper';
 import { userFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import type { UserTokenInput } from '@domain/token';
@@ -6,7 +7,6 @@ import { errorLogger, removeBearer, unauthorized } from '@main/utils';
 import { userRepository } from '@repository/user';
 import type { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
-import { IsNull } from 'typeorm';
 
 export const validateUserMiddleware: Controller =
   () => async (request: Request, response: Response, next: NextFunction) => {
@@ -28,24 +28,20 @@ export const validateUserMiddleware: Controller =
 
       if (
         typeof id === 'undefined' ||
-        typeof companyId === 'undefined' ||
-        typeof firebaseId === 'undefined' ||
         typeof email === 'undefined' ||
-        typeof role === 'undefined'
+        typeof role === 'undefined' ||
+        typeof companyId === 'undefined' ||
+        typeof firebaseId === 'undefined'
       )
         return unauthorized({ lang, response });
 
       const user = await userRepository.findOne({
         select: {
           ...userFindParams,
-          company: {
-            id: true,
-            name: true,
-            companyUrl: true
-          }
+          company: { id: true }
         },
         relations: { company: true },
-        where: { email, firebaseId, id, role, company: { id: companyId }, finishedAt: IsNull() }
+        where: { email, firebaseId, id, role, companyId, finishedAt }
       });
 
       if (user === null) return unauthorized({ lang, response });

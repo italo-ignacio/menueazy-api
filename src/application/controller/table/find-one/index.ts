@@ -14,11 +14,10 @@ import type { Request, Response } from 'express';
  */
 
 /**
- * GET /restaurant/{restaurantUrl}/table/{id}
+ * GET /restaurant/{restaurantId}/table/{id}
  * @summary Find One Table
  * @tags Table
- * @security BearerAuth
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @param {integer} id.path.required
  * @return {FindOneTableResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
@@ -27,11 +26,11 @@ import type { Request, Response } from 'express';
  */
 export const findOneTableController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       const payload = await tableRepository.findOne({
         select: tableFindParams,
-        where: { id: Number(request.params.id), restaurantId: request.restaurant.id, finishedAt }
+        where: { id: Number(request.params.id), restaurantId: restaurant.id, finishedAt }
       });
 
       if (payload === null)

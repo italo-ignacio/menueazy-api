@@ -24,23 +24,24 @@ interface Body {
  */
 
 /**
- * POST /restaurant/{restaurantUrl}/category
+ * POST /restaurant/{restaurantId}/category
  * @summary Insert Category
  * @tags Category
  * @security BearerAuth
+ * @param {integer} restaurantId.path.required
  * @param {InsertCategoryBody} request.body.required - application/json
  * @return {InsertCategoryResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertCategoryController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       await insertCategorySchema.validate(request, { abortEarly: false });
 
       const { name, description } = request.body as Body;
 
-      await categoryRepository.insert({ description, name, restaurantId: request.restaurant.id });
+      await categoryRepository.insert({ description, name, restaurantId: restaurant.id });
 
       return created({ lang, response });
     } catch (error) {

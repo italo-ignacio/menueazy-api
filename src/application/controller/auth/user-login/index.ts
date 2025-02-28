@@ -58,12 +58,9 @@ export const userLoginController: Controller =
       const user = await userRepository.findOne({
         select: {
           ...userFindParams,
-          company: {
-            id: true,
-            name: true,
-            companyUrl: true
-          }
+          company: { id: true }
         },
+        relations: { company: true },
         where: { email, firebaseId, finishedAt }
       });
 

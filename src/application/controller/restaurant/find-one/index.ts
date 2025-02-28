@@ -14,11 +14,11 @@ import type { Request, Response } from 'express';
  */
 
 /**
- * GET /restaurant/{restaurantUrl}
+ * GET /restaurant/{restaurantId}
  * @summary Find One Restaurant
  * @tags Restaurant
  * @security BearerAuth
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @return {FindOneRestaurantResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
@@ -26,11 +26,11 @@ import type { Request, Response } from 'express';
  */
 export const findOneRestaurantController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant }: Request, response: Response) => {
     try {
       const payload = await restaurantRepository.findOne({
         select: restaurantFindParams,
-        where: { restaurantUrl: request.params.restaurantUrl, finishedAt }
+        where: { id: restaurant.id, finishedAt }
       });
 
       if (payload === null)

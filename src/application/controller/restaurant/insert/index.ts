@@ -1,6 +1,8 @@
 import { insertRestaurantSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
 import { RestaurantEntity } from '@entity/restaurant';
+import { StyleEntity } from '@entity/style';
+import { UserRestaurantEntity } from '@entity/user-restaurant';
 import { DataSource } from '@infra/database';
 import { created, errorLogger, messageErrorResponse, validationErrorResponse } from '@main/utils';
 import type { Request, Response } from 'express';
@@ -26,7 +28,6 @@ interface Body {
  * @property {string} restaurantUrl.required
  * @property {boolean} hasDelivery.required
  * @property {number} minimumOrderPrice.required
- * @property {integer} styleId.required
  * @property {string} contactLink
  * @property {string} description
  * @property {number} maxDeliveryDistanceInKm
@@ -69,12 +70,14 @@ export const insertRestaurantController: Controller =
         priceByKmInDelivery
       } = request.body as Body;
 
-      await DataSource.createQueryBuilder()
-        .insert()
-        .into(RestaurantEntity)
-        .values({
+      await DataSource.transaction(async (manager) => {
+        const style = await manager.findOne(StyleEntity, { where: { generic: true } });
+
+        if (!style) throw new Error();
+
+        const restaurant = manager.create(RestaurantEntity, {
           name,
-          company: { id: request.user.company.id },
+          companyId: request.user.company.id,
           contactLink,
           description,
           hasDelivery,
@@ -85,9 +88,18 @@ export const insertRestaurantController: Controller =
           phone,
           priceByKmInDelivery,
           restaurantUrl,
-          style: () => `(SELECT id FROM style WHERE generic = true LIMIT 1)`
-        })
-        .execute();
+          style
+        });
+
+        await manager.save(restaurant);
+
+        const userRestaurant = manager.create(UserRestaurantEntity, {
+          restaurant,
+          userId: request.user.id
+        });
+
+        await manager.save(userRestaurant);
+      });
 
       return created({ lang, response });
     } catch (error) {

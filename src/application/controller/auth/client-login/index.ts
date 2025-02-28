@@ -1,7 +1,7 @@
 import { userFindParams } from '@data/search';
 import { authenticateSchema } from '@data/validation';
-import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
+import { messages } from '@i18n/index';
 import {
   badRequest,
   errorLogger,
@@ -58,7 +58,8 @@ export const clientLoginController: Controller =
         where: { email }
       });
 
-      if (user === null) return badRequest({ lang, message: messages.auth.notFound, response });
+      if (user === null)
+        return badRequest({ lang, message: messages[lang].error.notFound, response });
 
       return ok({
         payload: user,

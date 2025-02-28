@@ -13,12 +13,12 @@ import {
 import { OrderStatus, OrderType } from '../../domain/enum';
 import { ClientEntity } from '../client';
 import { ClientReportEntity } from '../client-report';
+import { DeliveryPersonEntity } from '../delivery-person';
 import { OrderAddressEntity } from '../order-address';
 import { OrderProductEntity } from '../order-product';
 import { RestaurantEntity } from '../restaurant';
 import { ReviewEntity } from '../review';
 import { TableEntity } from '../table';
-import { UserEntity } from '../user';
 
 @Index('order_status_type_idx', ['status', 'type'])
 @Entity('order')
@@ -63,13 +63,13 @@ export class OrderEntity {
   @Column({ type: 'integer', name: 'delivery_person_id', nullable: true })
   public deliveryPersonId: number | null;
 
-  @ManyToOne(() => UserEntity, (user) => user.orderList, {
+  @ManyToOne(() => DeliveryPersonEntity, (deliveryPerson) => deliveryPerson.orderList, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
     nullable: true
   })
   @JoinColumn([{ name: 'delivery_person_id', referencedColumnName: 'id' }])
-  public deliveryPerson: UserEntity | null;
+  public deliveryPerson: DeliveryPersonEntity | null;
 
   @Column({ type: 'integer', name: 'restaurant_id' })
   public restaurantId: number;

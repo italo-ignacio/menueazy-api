@@ -1,12 +1,15 @@
 export enum Role {
   ADMIN = 'ADMIN',
-  MANAGER = 'MANAGER',
   OWNER = 'OWNER',
-  EMPLOYEE = 'EMPLOYEE',
-  DELIVERY_PERSON = 'DELIVERY_PERSON'
+  MANAGER = 'MANAGER',
+  SUPERVISOR = 'SUPERVISOR',
+  EMPLOYEE = 'EMPLOYEE'
 }
 
-export enum RestaurantRole {
-  EDIT = 'EDIT',
-  VIEW = 'VIEW'
-}
+export const getRoles = {
+  [Role.ADMIN]: [Role.ADMIN],
+  [Role.OWNER]: [Role.ADMIN, Role.OWNER],
+  [Role.MANAGER]: [Role.ADMIN, Role.OWNER, Role.MANAGER],
+  [Role.SUPERVISOR]: [Role.ADMIN, Role.OWNER, Role.MANAGER, Role.SUPERVISOR],
+  [Role.EMPLOYEE]: [Role.ADMIN, Role.OWNER, Role.MANAGER, Role.SUPERVISOR, Role.EMPLOYEE]
+};

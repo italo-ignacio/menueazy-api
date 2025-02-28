@@ -1,11 +1,9 @@
+import { getRoles, Role } from '@domain/enum';
 import { api } from '@domain/helpers';
-import { langMiddleware } from '@main/middleware';
+import { langMiddleware, publicRestaurantMiddleware, restaurantMiddleware } from '@main/middleware';
 import {
-  validateAdminMiddleware,
   validateClientMiddleware,
-  validateOwnerMiddleware,
-  validatePrivateEditMiddleware,
-  validatePrivateViewMiddleware,
+  validateRoleMiddleware,
   validateUserMiddleware
 } from '@main/middleware/validation';
 import type { Express } from 'express';
@@ -16,71 +14,58 @@ import { join } from 'path';
 export const setupRoutes = (app: Express): void => {
   const publicRouter = Router();
   const clientRouter = Router();
-  const privateViewRouter = Router();
-  const privateEditRouter = Router();
-  const adminRouter = Router();
+
+  const employeeRouter = Router();
+  const supervisorRouter = Router();
+  const managerRouter = Router();
   const ownerRouter = Router();
+  const adminRouter = Router();
 
-  readdirSync(join(__dirname, '..', '..', 'routes', 'public')).map(async (file) =>
-    (await import(`../../routes/public/${file}`)).default(publicRouter)
-  );
+  readdirSync(join(__dirname, '..', '..', 'routes', 'public')).forEach(async (file) => {
+    (await import(`../../routes/public/${file}`)).default(publicRouter);
+  });
 
-  readdirSync(join(__dirname, '..', '..', 'routes', 'client')).map(async (file) =>
+  readdirSync(join(__dirname, '..', '..', 'routes', 'client')).forEach(async (file) =>
     (await import(`../../routes/client/${file}`)).default(clientRouter)
   );
 
-  readdirSync(join(__dirname, '..', '..', 'routes', 'private-view')).map(async (file) =>
-    (await import(`../../routes/private-view/${file}`)).default(privateViewRouter)
+  readdirSync(join(__dirname, '..', '..', 'routes', 'employee')).forEach(async (file) =>
+    (await import(`../../routes/employee/${file}`)).default(employeeRouter)
   );
 
-  readdirSync(join(__dirname, '..', '..', 'routes', 'private-edit')).map(async (file) =>
-    (await import(`../../routes/private-edit/${file}`)).default(privateEditRouter)
+  readdirSync(join(__dirname, '..', '..', 'routes', 'supervisor')).forEach(async (file) =>
+    (await import(`../../routes/supervisor/${file}`)).default(supervisorRouter)
   );
 
-  readdirSync(join(__dirname, '..', '..', 'routes', 'owner')).map(async (file) =>
+  readdirSync(join(__dirname, '..', '..', 'routes', 'manager')).forEach(async (file) =>
+    (await import(`../../routes/manager/${file}`)).default(managerRouter)
+  );
+
+  readdirSync(join(__dirname, '..', '..', 'routes', 'owner')).forEach(async (file) =>
     (await import(`../../routes/owner/${file}`)).default(ownerRouter)
   );
 
-  readdirSync(join(__dirname, '..', '..', 'routes', 'admin')).map(async (file) =>
+  readdirSync(join(__dirname, '..', '..', 'routes', 'admin')).forEach(async (file) =>
     (await import(`../../routes/admin/${file}`)).default(adminRouter)
   );
 
-  app.use(api.baseUrl, langMiddleware(), publicRouter);
-  app.use(api.baseUrl, langMiddleware(), validateClientMiddleware(), clientRouter);
+  app.use(langMiddleware());
 
-  app.use(
-    api.baseUrl,
-    langMiddleware(),
-    validateUserMiddleware(),
-    validatePrivateViewMiddleware(),
-    privateViewRouter
-  );
+  app.use(`${api.baseUrl}/restaurant/:restaurantId`, publicRestaurantMiddleware());
+  app.use(api.baseUrl, publicRouter);
+  app.use(`${api.baseUrl}/client`, validateClientMiddleware(), clientRouter);
 
-  app.use(
-    api.baseUrl,
-    langMiddleware(),
-    validateUserMiddleware(),
-    validatePrivateEditMiddleware(),
-    privateEditRouter
-  );
+  app.use(api.baseUrl, validateUserMiddleware());
+  app.use(`${api.baseUrl}/restaurant/:restaurantId`, restaurantMiddleware());
+  app.use(api.baseUrl, employeeRouter);
+  app.use(api.baseUrl, validateRoleMiddleware(getRoles[Role.SUPERVISOR]), supervisorRouter);
+  app.use(api.baseUrl, validateRoleMiddleware(getRoles[Role.MANAGER]), managerRouter);
+  app.use(api.baseUrl, validateRoleMiddleware(getRoles[Role.OWNER]), ownerRouter);
+  app.use(api.baseUrl, validateRoleMiddleware(getRoles[Role.ADMIN]), adminRouter);
 
-  app.use(
-    api.baseUrl,
-    langMiddleware(),
-    validateUserMiddleware(),
-    validateOwnerMiddleware(),
-    ownerRouter
-  );
-
-  app.use(
-    api.baseUrl,
-    langMiddleware(),
-    validateUserMiddleware(),
-    validateAdminMiddleware(),
-    adminRouter
-  );
-
-  app.get('*', (_, res) => {
-    res.send(``);
+  app.get('*', (req, res) => {
+    res.json({
+      message: 'Api running successfully (◡‿◡)'
+    });
   });
 };

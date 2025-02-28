@@ -4,7 +4,7 @@ import { DaysOfWeek } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import { errorLogger, messageErrorResponse, ok } from '@main/utils';
 import { openingHourRepository } from '@repository/opening-hour';
-import { request, type Request, type Response } from 'express';
+import { type Request, type Response } from 'express';
 
 /**
  * @typedef {object} FindOpeningHourResponse
@@ -14,11 +14,10 @@ import { request, type Request, type Response } from 'express';
  */
 
 /**
- * GET /restaurant/{restaurantUrl}/opening-hour
+ * GET /restaurant/{restaurantId}/opening-hour
  * @summary Find Opening Hour
  * @tags Opening Hour
- * @security BearerAuth
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @return {FindOpeningHourResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
@@ -26,7 +25,7 @@ import { request, type Request, type Response } from 'express';
  */
 export const findOpeningHourController: Controller =
   () =>
-  async ({ lang }: Request, response: Response) => {
+  async ({ lang, restaurant }: Request, response: Response) => {
     try {
       const orderMap: Record<DaysOfWeek, number> = {
         SUNDAY: 1,
@@ -40,18 +39,14 @@ export const findOpeningHourController: Controller =
 
       const openingHours = await openingHourRepository.find({
         select: openingHourFindParams,
-        where: { restaurantId: Number(request.restaurant.id), finishedAt }
+        where: { restaurantId: restaurant.id, finishedAt }
       });
 
       const sortedOpeningHours = openingHours.sort(
         (a, b) => orderMap[a.dayOfWeek] - orderMap[b.dayOfWeek]
       );
 
-      return ok({
-        payload: sortedOpeningHours,
-        lang,
-        response
-      });
+      return ok({ payload: sortedOpeningHours, lang, response });
     } catch (error) {
       errorLogger(error);
 

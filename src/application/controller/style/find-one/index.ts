@@ -1,3 +1,4 @@
+import { finishedAt } from '@application/helper';
 import { styleFindParams } from '@data/search';
 import { Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
@@ -5,7 +6,6 @@ import { messages } from '@i18n/index';
 import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
 import { styleRepository } from '@repository/style';
 import type { Request, Response } from 'express';
-import { IsNull } from 'typeorm';
 
 /**
  * @typedef {object} FindOneStyleResponse
@@ -36,7 +36,7 @@ export const findOneStyleController: Controller =
 
       const payload = await styleRepository.findOne({
         select: styleFindParams,
-        where: { id: Number(request.params.id), finishedAt: IsNull(), ...where }
+        where: { id: Number(request.params.id), finishedAt, ...where }
       });
 
       if (payload === null)

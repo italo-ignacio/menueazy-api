@@ -33,6 +33,7 @@ interface Body {
  * POST /subscription
  * @summary Insert Subscription
  * @tags Subscription
+ * @security BearerAuth
  * @param {InsertSubscriptionBody} request.body.required - application/json
  * @return {InsertSubscriptionResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json

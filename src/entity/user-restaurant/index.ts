@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
-import { RestaurantRole } from '../../domain/enum';
 import { RestaurantEntity } from '../restaurant';
 import { UserEntity } from '../user';
 
@@ -15,12 +14,6 @@ import { UserEntity } from '../user';
 export class UserRestaurantEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
   public id: number;
-
-  @Column('enum', {
-    name: 'restaurant_role',
-    enum: RestaurantRole
-  })
-  public restaurantRole: RestaurantRole;
 
   @Column({ type: 'integer', name: 'restaurant_id' })
   public restaurantId: number;

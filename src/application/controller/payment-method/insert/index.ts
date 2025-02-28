@@ -33,18 +33,18 @@ interface Body {
  */
 
 /**
- * POST /restaurant/{restaurantUrl}/payment-method
+ * POST /restaurant/{restaurantId}/payment-method
  * @summary Insert Payment Method
  * @tags Payment Method
  * @security BearerAuth
- * @param {string} restaurantUrl.path.required
+ * @param {integer} restaurantId.path.required
  * @param {InsertPaymentMethodBody} request.body.required - application/json
  * @return {InsertPaymentMethodResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertPaymentMethodController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       await insertPaymentMethodSchema.validate(request, { abortEarly: false });
 
@@ -54,7 +54,7 @@ export const insertPaymentMethodController: Controller =
         description: item.description,
         logoUrl: item.logoUrl,
         title: item.title,
-        restaurantId: request.restaurant.id
+        restaurantId: restaurant.id
       }));
 
       await paymentMethodRepository.insert(data);

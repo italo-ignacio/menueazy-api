@@ -27,10 +27,10 @@ import type { Request, Response } from 'express';
  */
 
 /**
- * GET /restaurant/{restaurantUrl}/category
+ * GET /restaurant/{restaurantId}/category
  * @summary Find Category
  * @tags Category
- * @security BearerAuth
+ * @param {integer} restaurantId.path.required
  * @param {string} name.query
  * @param {integer} page.query
  * @param {integer} limit.query

@@ -1,8 +1,8 @@
-import { canChangeStyle } from '@application/helper';
-import { messages } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
-import { badRequest, errorLogger, forbidden, ok } from '@main/utils';
-import { styleRepository } from '@repository/style';
+import { StyleEntity } from '@entity/style';
+import { messages } from '@i18n/index';
+import { DataSource } from '@infra/database';
+import { badRequest, errorLogger, ok } from '@main/utils';
 import type { Request, Response } from 'express';
 
 /**
@@ -18,15 +18,18 @@ import type { Request, Response } from 'express';
  */
 export const deleteStyleController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, user, ...request }: Request, response: Response) => {
     try {
-      if (!(await canChangeStyle(request as Request))) return forbidden({ lang, response });
+      await DataSource.createQueryBuilder()
+        .update(StyleEntity)
+        .set({ finishedAt: new Date() })
+        .where('id = :id', { id: Number(request.params.id) })
+        .andWhere('company_id = :companyId', { companyId: user.company.id })
+        .execute();
 
-      await styleRepository.update({ id: Number(request.params.id) }, { finishedAt: new Date() });
-
-      return ok({ payload: messages.default.successfullyDeleted, lang, response });
+      return ok({ payload: messages[lang].default.successfullyDeleted, lang, response });
     } catch (error) {
       errorLogger(error);
-      return badRequest({ message: messages.auth.notFound, lang, response });
+      return badRequest({ message: messages[lang].error.notFound, lang, response });
     }
   };

@@ -1,10 +1,10 @@
-import { canChangeStyle } from '@application/helper';
 import { styleFindParams } from '@data/search';
 import { updateStyleSchema } from '@data/validation';
-import { messages } from '@domain/helpers';
+import { Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import { ColorEntity } from '@entity/color';
 import { StyleEntity } from '@entity/style';
+import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
 import {
   errorLogger,
@@ -58,10 +58,10 @@ interface Body {
  */
 export const updateStyleController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
-    try {
-      if (!(await canChangeStyle(request as Request))) return forbidden({ lang, response });
+  async ({ lang, user, ...request }: Request, response: Response) => {
+    let err = false;
 
+    try {
       await updateStyleSchema.validate(request, { abortEarly: false });
 
       const {
@@ -71,16 +71,18 @@ export const updateStyleController: Controller =
 
       await DataSource.transaction(async (manager) => {
         const style = await manager.findOne(StyleEntity, {
-          select: { ...styleFindParams, company: { id: true } },
-          relations: { company: true },
+          select: { ...styleFindParams, companyId: true },
           where: { id: Number(request.params.id) }
         });
 
-        if (!style) throw new Error();
+        if (!style || (style.companyId !== user.company.id && user.role !== Role.ADMIN)) {
+          err = true;
+          throw new Error();
+        }
 
         style.name = name;
 
-        const color = manager.update(
+        await manager.update(
           ColorEntity,
           { id: style.color.id },
           {
@@ -94,12 +96,13 @@ export const updateStyleController: Controller =
         );
 
         await manager.save(style);
-        await manager.save(color);
       });
 
-      return ok({ payload: messages.default.successfullyUpdated, lang, response });
+      return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
+
+      if (err) return forbidden({ lang, response });
 
       if (error instanceof ValidationError)
         return validationErrorResponse({ error, lang, response });

@@ -21,6 +21,8 @@ declare global {
       };
       restaurant: {
         id: number;
+        style: { id: number };
+        address: { id: number };
       };
       client: ClientTokenInput;
       lang: Langs;

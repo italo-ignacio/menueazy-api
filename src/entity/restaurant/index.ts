@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
+import { AddressEntity } from '../address';
 import { CategoryEntity } from '../category';
 import { ClientReportEntity } from '../client-report';
 import { CompanyEntity } from '../company';
@@ -16,7 +17,6 @@ import { OpeningHourEntity } from '../opening-hour';
 import { OrderEntity } from '../order';
 import { PaymentMethodEntity } from '../payment-method';
 import { ProductEntity } from '../product';
-import { RestaurantAddressEntity } from '../restaurant-address';
 import { ReviewEntity } from '../review';
 import { StyleEntity } from '../style';
 import { TableEntity } from '../table';
@@ -46,7 +46,7 @@ export class RestaurantEntity {
   @Column({ type: 'text', name: 'logo_url', nullable: true })
   public logoUrl: string | null;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   public open: boolean;
 
   @Column({ type: 'boolean', name: 'open_for_delivery', nullable: true })
@@ -78,43 +78,52 @@ export class RestaurantEntity {
   @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
   public company: CompanyEntity;
 
-  @Column({ type: 'integer', name: 'style_id' })
-  public styleId: number;
+  @Column({ type: 'integer', name: 'style_id', nullable: true })
+  public styleId: number | null;
 
   @ManyToOne(() => StyleEntity, (style) => style.restaurantList, {
     onUpdate: 'CASCADE',
-    nullable: false,
+    nullable: true,
     eager: true
   })
   @JoinColumn([{ name: 'style_id', referencedColumnName: 'id' }])
-  public style: StyleEntity;
+  public style: StyleEntity | null;
+
+  @Column({ type: 'integer', name: 'address_id', nullable: true })
+  public addressId: number | null;
+
+  @ManyToOne(() => AddressEntity, (address) => address.restaurantList, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    nullable: true,
+    eager: true
+  })
+  @JoinColumn([{ name: 'address_id', referencedColumnName: 'id' }])
+  public address: AddressEntity | null;
 
   @OneToMany(() => CategoryEntity, (category) => category.restaurant)
   public categoryList: CategoryEntity[];
 
-  @OneToMany(() => ClientReportEntity, (clientReport) => clientReport.restaurant)
-  public clientReportList: ClientReportEntity[];
-
   @OneToMany(() => OpeningHourEntity, (openingHour) => openingHour.restaurant)
   public openingHourList: OpeningHourEntity[];
-
-  @OneToMany(() => OrderEntity, (order) => order.restaurant)
-  public orderList: OrderEntity[];
 
   @OneToMany(() => PaymentMethodEntity, (paymentMethod) => paymentMethod.restaurant)
   public paymentMethodList: PaymentMethodEntity[];
 
+  @OneToMany(() => TableEntity, (table) => table.restaurant)
+  public tableList: TableEntity[];
+
   @OneToMany(() => ProductEntity, (product) => product.restaurant)
   public productList: ProductEntity[];
 
-  @OneToMany(() => RestaurantAddressEntity, (restaurantAddress) => restaurantAddress.restaurant)
-  public restaurantAddressList: RestaurantAddressEntity[];
+  @OneToMany(() => OrderEntity, (order) => order.restaurant)
+  public orderList: OrderEntity[];
 
   @OneToMany(() => ReviewEntity, (review) => review.restaurant)
   public reviewList: ReviewEntity[];
 
-  @OneToMany(() => TableEntity, (table) => table.restaurant)
-  public tableList: TableEntity[];
+  @OneToMany(() => ClientReportEntity, (clientReport) => clientReport.restaurant)
+  public clientReportList: ClientReportEntity[];
 
   @OneToMany(() => UserRestaurantEntity, (userRestaurant) => userRestaurant.restaurant)
   public userRestaurantList: UserRestaurantEntity[];

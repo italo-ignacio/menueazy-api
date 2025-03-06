@@ -7,8 +7,8 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { ClientAddressEntity } from '../client-address';
-import { OrderAddressEntity } from '../order-address';
-import { RestaurantAddressEntity } from '../restaurant-address';
+import { OrderEntity } from '../order';
+import { RestaurantEntity } from '../restaurant';
 
 @Entity('address')
 export class AddressEntity {
@@ -45,11 +45,11 @@ export class AddressEntity {
   @OneToMany(() => ClientAddressEntity, (clientAddress) => clientAddress.address)
   public clientAddressList: ClientAddressEntity[];
 
-  @OneToMany(() => OrderAddressEntity, (orderAddress) => orderAddress.address)
-  public orderAddressList: OrderAddressEntity[];
+  @OneToMany(() => OrderEntity, (order) => order.address)
+  public orderList: OrderEntity[];
 
-  @OneToMany(() => RestaurantAddressEntity, (restaurantAddress) => restaurantAddress.address)
-  public restaurantAddressList: RestaurantAddressEntity[];
+  @OneToMany(() => RestaurantEntity, (restaurant) => restaurant.address)
+  public restaurantList: RestaurantEntity[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date;

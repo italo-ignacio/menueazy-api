@@ -10,6 +10,7 @@ import {
   errorLogger,
   forbidden,
   messageErrorResponse,
+  notFound,
   ok,
   validationErrorResponse
 } from '@main/utils';
@@ -59,7 +60,7 @@ interface Body {
 export const updateStyleController: Controller =
   () =>
   async ({ lang, user, ...request }: Request, response: Response) => {
-    let err = false;
+    let err = 0;
 
     try {
       await updateStyleSchema.validate(request, { abortEarly: false });
@@ -75,8 +76,13 @@ export const updateStyleController: Controller =
           where: { id: Number(request.params.id) }
         });
 
-        if (!style || (style.companyId !== user.company.id && user.role !== Role.ADMIN)) {
-          err = true;
+        if (!style) {
+          err = 1;
+          throw new Error();
+        }
+
+        if (style.companyId !== user.company.id && user.role !== Role.ADMIN) {
+          err = 2;
           throw new Error();
         }
 
@@ -102,7 +108,9 @@ export const updateStyleController: Controller =
     } catch (error) {
       errorLogger(error);
 
-      if (err) return forbidden({ lang, response });
+      if (err === 1) return notFound({ entity: messages[lang].entity.style, lang, response });
+
+      if (err === 2) return forbidden({ lang, response });
 
       if (error instanceof ValidationError)
         return validationErrorResponse({ error, lang, response });

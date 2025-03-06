@@ -11,10 +11,10 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { OrderStatus, OrderType } from '../../domain/enum';
+import { AddressEntity } from '../address';
 import { ClientEntity } from '../client';
 import { ClientReportEntity } from '../client-report';
 import { DeliveryPersonEntity } from '../delivery-person';
-import { OrderAddressEntity } from '../order-address';
 import { OrderProductEntity } from '../order-product';
 import { RestaurantEntity } from '../restaurant';
 import { ReviewEntity } from '../review';
@@ -93,8 +93,16 @@ export class OrderEntity {
   @JoinColumn([{ name: 'table_id', referencedColumnName: 'id' }])
   public table: TableEntity | null;
 
-  @OneToMany(() => OrderAddressEntity, (orderAddress) => orderAddress.order)
-  public orderAddressList: OrderAddressEntity[];
+  @Column({ type: 'integer', name: 'address_id' })
+  public addressId: number;
+
+  @ManyToOne(() => AddressEntity, (address) => address.orderList, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    nullable: false
+  })
+  @JoinColumn([{ name: 'address_id', referencedColumnName: 'id' }])
+  public address: AddressEntity;
 
   @OneToMany(() => OrderProductEntity, (orderProduct) => orderProduct.order)
   public orderProductList: OrderProductEntity[];

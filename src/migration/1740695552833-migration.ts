@@ -28,12 +28,6 @@ export class Migration1740695552833 implements MigrationInterface {
     );
     await queryRunner.query(`CREATE UNIQUE INDEX "currency_code_key" ON "currency" ("code") `);
     await queryRunner.query(
-      `CREATE TABLE "order_address" ("id" SERIAL NOT NULL, "address_id" integer NOT NULL, "order_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_f07603e96b068aae820d4590270" PRIMARY KEY ("id"))`
-    );
-    await queryRunner.query(
-      `CREATE TABLE "restaurant_address" ("id" SERIAL NOT NULL, "address_id" integer NOT NULL, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_109960073e718523582b9440353" PRIMARY KEY ("id"))`
-    );
-    await queryRunner.query(
       `CREATE TABLE "address" ("id" SERIAL NOT NULL, "street" character varying(255) NOT NULL, "city" character varying(255) NOT NULL, "state" character varying(255) NOT NULL, "zip_code" character varying(25) NOT NULL, "country" character varying(255) NOT NULL, "complement" character varying(255), "number" character varying(30) NOT NULL, "latitude" numeric(10,8) NOT NULL, "longitude" numeric(11,8) NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_d92de1f82754668b5f5f5dd4fd5" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
@@ -169,18 +163,6 @@ export class Migration1740695552833 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "plan_price" ADD CONSTRAINT "FK_2cf5de8b517154bf3e8133bbc35" FOREIGN KEY ("plan_id") REFERENCES "plan"("id") ON DELETE CASCADE ON UPDATE CASCADE`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "order_address" ADD CONSTRAINT "FK_80aa0894c299459b2a6d0d39e01" FOREIGN KEY ("address_id") REFERENCES "address"("id") ON DELETE CASCADE ON UPDATE CASCADE`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "order_address" ADD CONSTRAINT "FK_bd8424734e4ed6b3113b2b9dd19" FOREIGN KEY ("order_id") REFERENCES "order"("id") ON DELETE CASCADE ON UPDATE CASCADE`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "restaurant_address" ADD CONSTRAINT "FK_963cd1d8d237d7110f5110f13fa" FOREIGN KEY ("address_id") REFERENCES "address"("id") ON DELETE NO ACTION ON UPDATE CASCADE`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "restaurant_address" ADD CONSTRAINT "FK_1acf4f27c6b48851a36a0fe851e" FOREIGN KEY ("restaurant_id") REFERENCES "restaurant"("id") ON DELETE NO ACTION ON UPDATE CASCADE`
     );
     await queryRunner.query(
       `ALTER TABLE "client_address" ADD CONSTRAINT "FK_5d748613d45a8988c741592de72" FOREIGN KEY ("address_id") REFERENCES "address"("id") ON DELETE CASCADE ON UPDATE CASCADE`
@@ -428,18 +410,6 @@ export class Migration1740695552833 implements MigrationInterface {
       `ALTER TABLE "client_address" DROP CONSTRAINT "FK_5d748613d45a8988c741592de72"`
     );
     await queryRunner.query(
-      `ALTER TABLE "restaurant_address" DROP CONSTRAINT "FK_1acf4f27c6b48851a36a0fe851e"`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "restaurant_address" DROP CONSTRAINT "FK_963cd1d8d237d7110f5110f13fa"`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "order_address" DROP CONSTRAINT "FK_bd8424734e4ed6b3113b2b9dd19"`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "order_address" DROP CONSTRAINT "FK_80aa0894c299459b2a6d0d39e01"`
-    );
-    await queryRunner.query(
       `ALTER TABLE "plan_price" DROP CONSTRAINT "FK_2cf5de8b517154bf3e8133bbc35"`
     );
     await queryRunner.query(
@@ -496,8 +466,6 @@ export class Migration1740695552833 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "device"`);
     await queryRunner.query(`DROP TABLE "client_address"`);
     await queryRunner.query(`DROP TABLE "address"`);
-    await queryRunner.query(`DROP TABLE "restaurant_address"`);
-    await queryRunner.query(`DROP TABLE "order_address"`);
     await queryRunner.query(`DROP INDEX "public"."currency_code_key"`);
     await queryRunner.query(`DROP TABLE "currency"`);
     await queryRunner.query(`DROP INDEX "public"."plan_price_currency_plan_period_idx"`);

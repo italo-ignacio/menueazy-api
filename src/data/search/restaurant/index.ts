@@ -1,5 +1,6 @@
 import type { RestaurantEntity } from '@entity/restaurant';
 import type { FindOptionsSelect } from 'typeorm';
+import { addressFindParams } from '../address';
 import { styleFindParams } from '../style';
 
 export const restaurantFindParams: FindOptionsSelect<RestaurantEntity> = {
@@ -18,6 +19,7 @@ export const restaurantFindParams: FindOptionsSelect<RestaurantEntity> = {
   priceByKmInDelivery: true,
   restaurantUrl: true,
   style: styleFindParams,
+  address: addressFindParams,
 
   createdAt: true,
   updatedAt: true,

@@ -14,7 +14,8 @@
  * @property {number} minimumDeliveryPrice
  * @property {number} minimumOrderPrice
  * @property {number} priceByKmInDelivery
- * @property {Style} style
+ * @property {Style|null} style
+ * @property {Address|null} address
  * @property {string} createdAt
  * @property {string} updatedAt
  * @property {string|null} finishedAt

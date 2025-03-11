@@ -18,17 +18,14 @@ export class SubscriptionEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
   public id: number;
 
-  @Column({ precision: 10, scale: 2, type: 'numeric' })
-  public price: string;
+  @Column({ type: 'float4' })
+  public price: number;
 
   @Column({ type: 'integer', name: 'restaurant_limit' })
   public restaurantLimit: number;
 
   @Column({ type: 'integer', name: 'product_limit' })
   public productLimit: number;
-
-  @Column({ type: 'uuid', unique: true })
-  public code: string;
 
   @Column({ type: 'integer', name: 'plan_id' })
   public planId: number;

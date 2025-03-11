@@ -23,7 +23,6 @@ export const env = {
   },
   ADMIN: {
     email: process.env.ADMIN_EMAIL ?? '',
-    phone: process.env.ADMIN_PHONE ?? '',
-    firebaseId: process.env.ADMIN_FIREBASE_ID ?? ''
+    phone: process.env.ADMIN_PHONE ?? ''
   }
 };

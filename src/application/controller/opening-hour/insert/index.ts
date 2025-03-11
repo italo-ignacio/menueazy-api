@@ -1,10 +1,9 @@
 import { insertOpeningHourSchema } from '@data/validation';
 import { DaysOfWeek } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
-import { created, errorLogger, messageErrorResponse, validationErrorResponse } from '@main/utils';
+import { created, errorLogger, messageErrorResponse } from '@main/utils';
 import { openingHourRepository } from '@repository/opening-hour';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   daysOfWeek: {
@@ -63,9 +62,6 @@ export const insertOpeningHourController: Controller =
       return created({ lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

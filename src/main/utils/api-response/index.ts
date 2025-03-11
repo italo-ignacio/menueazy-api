@@ -4,7 +4,7 @@ import { messages } from '@i18n/index';
 import { formatYupError } from '@main/utils/yup-resolver-errors';
 import type { Response } from 'express';
 import { QueryFailedError } from 'typeorm';
-import type { ValidationError } from 'yup';
+import { ValidationError } from 'yup';
 
 export const created = ({
   response,
@@ -150,16 +150,26 @@ export const messageErrorResponse = ({
   lang: Langs;
   response: Response;
 }): Response => {
-  if (error instanceof QueryFailedError) {
-    const err = error as unknown as { code?: string };
+  if (error instanceof ValidationError) return validationErrorResponse({ error, lang, response });
 
-    if (err?.code === '23505')
+  if (error instanceof QueryFailedError) {
+    const err = error as unknown as { code?: string; constraint?: 'none' };
+
+    if (err?.code === '23505') {
+      const errorMessage = error?.driverError?.detail ?? '';
+
+      const match = errorMessage?.match(/\(([^)]+)\)/);
+      let key = match ? match[1] : 'none';
+
+      if (messages[lang].key[key as 'none']) key = messages[lang].key[key as 'none'];
+
       return badRequest({
-        message: messages[lang].error.duplicateKey,
+        message: `${messages[lang].error.duplicateKey} ${key} ${messages[lang].error.isAlreadyInUse}`,
         response,
         lang,
         errors: error
       });
+    }
   }
 
   return badRequest({

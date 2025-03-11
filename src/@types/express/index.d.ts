@@ -8,7 +8,6 @@ declare global {
         id: number;
         email: string;
         avatarUrl: string;
-        firebaseId: string;
         name: string;
         phone: string;
         role: Role;

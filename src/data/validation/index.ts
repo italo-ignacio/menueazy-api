@@ -5,6 +5,7 @@ export * from './currency';
 export * from './opening-hour';
 export * from './payment-method';
 export * from './plan';
+export * from './product';
 export * from './restaurant';
 export * from './style';
 export * from './subscription';

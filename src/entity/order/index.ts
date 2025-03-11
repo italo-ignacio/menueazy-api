@@ -26,14 +26,14 @@ export class OrderEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
   public id: number;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public price: string;
+  @Column({ type: 'float4' })
+  public price: number;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public total: string;
+  @Column({ type: 'float4' })
+  public total: number;
 
-  @Column({ type: 'numeric', name: 'delivery_price', nullable: true, precision: 10, scale: 2 })
-  public deliveryPrice: string | null;
+  @Column({ type: 'float4', name: 'delivery_price', nullable: true })
+  public deliveryPrice: number | null;
 
   @Column({ type: 'text', nullable: true })
   public observation: string | null;

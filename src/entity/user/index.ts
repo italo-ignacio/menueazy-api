@@ -16,18 +16,17 @@ import { DeviceEntity } from '../device';
 import { OrderEntity } from '../order';
 import { UserRestaurantEntity } from '../user-restaurant';
 
-@Index('user_firebase_id_key', ['firebaseId'], { unique: true })
 @Index('user_email_key', ['email'], { unique: true })
 @Entity('user')
 export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
   public id: number;
 
-  @Column({ length: 128, type: 'varchar', name: 'firebase_id' })
-  public firebaseId: string;
-
   @Column({ length: 255, type: 'varchar' })
   public email: string;
+
+  @Column({ type: 'text' })
+  public password: string;
 
   @Column({ length: 255, type: 'varchar', nullable: true })
   public name: string | null;

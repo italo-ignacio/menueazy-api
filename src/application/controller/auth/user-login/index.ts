@@ -1,17 +1,22 @@
 import { finishedAt } from '@application/helper';
 import { userFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
-import { LoginToken } from '@domain/token';
 import { messages } from '@i18n/index';
-import { env } from '@main/config';
 import { badRequest, errorLogger, generateToken, messageErrorResponse, ok } from '@main/utils';
 import { userRepository } from '@repository/user';
+import { compare } from 'bcrypt';
 import type { Request, Response } from 'express';
-import { decode } from 'jsonwebtoken';
 
 interface Body {
-  userIdToken: string;
+  email: string;
+  password: string;
 }
+
+/**
+ * @typedef {object} UserLoginBody
+ * @property {string} email.required
+ * @property {string} password.required
+ */
 
 /**
  * @typedef {object} UserLoginPayload
@@ -30,7 +35,7 @@ interface Body {
  * POST /auth/user/login
  * @summary User Login
  * @tags A Auth
- * @param {object} request.body.required - application/json
+ * @param {UserLoginBody} request.body.required - application/json
  * @return {UserLoginResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
@@ -38,42 +43,31 @@ export const userLoginController: Controller =
   () =>
   async ({ lang, ...request }: Request, response: Response) => {
     try {
-      const { userIdToken } = request.body as Body;
+      const { email, password } = request.body as Body;
 
-      const { aud, email, email_verified, iss, user_id } = decode(userIdToken ?? ``) as LoginToken;
-
-      if (!email || !user_id || aud !== env.FIREBASE.AUD || iss !== env.FIREBASE.ISS)
+      if (!email || !password)
         return badRequest({ message: messages[lang].error.badCredentials, lang, response });
-
-      if (!email_verified)
-        return badRequest({
-          message: messages[lang].error.checkYourEmail,
-          lang,
-          response,
-          errors: { sendEmailToVerification: true }
-        });
-
-      const firebaseId = email === env.ADMIN.email ? undefined : user_id;
 
       const user = await userRepository.findOne({
         select: {
           ...userFindParams,
+          password: true,
           company: { id: true }
         },
         relations: { company: true },
-        where: { email, firebaseId, finishedAt }
+        where: { email, finishedAt }
       });
 
       if (user === null)
         return badRequest({ message: messages[lang].error.badLoginCredentials, lang, response });
 
-      if (email === env.ADMIN.email && user.firebaseId === env.ADMIN.firebaseId) {
-        await userRepository.update({ firebaseId: env.ADMIN.firebaseId }, { firebaseId: user_id });
-      }
+      const isCorrectPassword = await compare(password, user.password);
+
+      if (!isCorrectPassword)
+        return badRequest({ message: messages[lang].error.badLoginCredentials, lang, response });
 
       const { accessToken } = generateToken({
         id: user.id,
-        firebaseId: user.firebaseId,
         email: user.email,
         role: user.role,
         companyId: user.company.id
@@ -84,7 +78,6 @@ export const userLoginController: Controller =
           accessToken,
           user: {
             id: user.id,
-            firebaseId: user.firebaseId,
             name: user.name,
             email: user.email,
             phone: user.phone,

@@ -30,11 +30,11 @@ export class OrderProductEntity {
   @Column({ type: 'integer' })
   public quantity: number;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public price: string;
+  @Column({ type: 'float4' })
+  public price: number;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public subtotal: string;
+  @Column({ type: 'float4' })
+  public subtotal: number;
 
   @Column({
     type: 'enum',

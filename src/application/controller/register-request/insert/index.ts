@@ -1,9 +1,8 @@
 import { insertRegisterRequestSchema } from '@data/validation/auth';
 import type { Controller } from '@domain/protocols';
-import { created, errorLogger, messageErrorResponse, validationErrorResponse } from '@main/utils';
+import { created, errorLogger, messageErrorResponse } from '@main/utils';
 import { registerRequestRepository } from '@repository/register-request';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   email: string;
@@ -78,9 +77,6 @@ export const insertRegisterRequestController: Controller =
       return created({ lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

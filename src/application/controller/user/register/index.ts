@@ -1,24 +1,41 @@
-import { finishedAt } from '@application/helper';
-import { registerRequestFindParams, subscriptionFindParams } from '@data/search';
+import { planFindParams, planPriceFindParams } from '@data/search';
+import { registerUserSchema } from '@data/validation';
 import { Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
-import { LoginToken } from '@domain/token';
 import { CompanyEntity } from '@entity/company';
+import { PlanEntity } from '@entity/plan';
+import { PlanPriceEntity } from '@entity/plan-price';
+import { SubscriptionEntity } from '@entity/subscription';
 import { UserEntity } from '@entity/user';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
 import { env } from '@main/config';
-import { badRequest, created, errorLogger, isUuid, messageErrorResponse } from '@main/utils';
-import { registerRequestRepository } from '@repository/register-request';
-import { subscriptionRepository } from '@repository/subscription';
+import { created, errorLogger, messageErrorResponse, notFound } from '@main/utils';
+import { hash } from 'bcrypt';
 import type { Request, Response } from 'express';
-import { decode } from 'jsonwebtoken';
 
 interface Body {
-  userIdToken: string;
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  companyName: string;
   companyUrl: string;
-  code: string;
+  currencyId: number;
+  planId: number;
 }
+
+/**
+ * @typedef {object} UserRegisterBody
+ * @property {string} name.required
+ * @property {string} email.required
+ * @property {string} password.required
+ * @property {string} phone.required
+ * @property {string} companyName.required
+ * @property {string} companyUrl.required
+ * @property {number} currencyId.required
+ * @property {number} planId.required
+ */
 
 /**
  * @typedef {object} UserRegisterResponse
@@ -31,73 +48,80 @@ interface Body {
  * POST /user/register
  * @summary Register User
  * @tags User
- * @param {object} request.body.required - application/json
+ * @param {UserRegisterBody} request.body.required - application/json
  * @return {UserRegisterResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const userRegisterController: Controller =
   () =>
   async ({ lang, ...request }: Request, response: Response) => {
+    let err = 0;
+
     try {
-      const { userIdToken, code, companyUrl } = request.body as Body;
+      await registerUserSchema.validate(request, { abortEarly: false });
 
-      if (!userIdToken || !isUuid(code) || !companyUrl)
-        return badRequest({ message: messages[lang].error.badCredentials, lang, response });
-
-      const { aud, email, iss, user_id } = decode(userIdToken ?? ``) as LoginToken;
-
-      if (!email || !user_id || aud !== env.FIREBASE.AUD || iss !== env.FIREBASE.ISS)
-        return badRequest({ message: messages[lang].error.badCredentials, lang, response });
-
-      const firebaseId = user_id;
-
-      const registerRequest = await registerRequestRepository.findOne({
-        select: registerRequestFindParams,
-        where: { code, finishedAt }
-      });
-
-      if (registerRequest === null)
-        return badRequest({ message: messages[lang].error.badCredentials, lang, response });
-
-      if (!registerRequest.canRegister)
-        return badRequest({ message: messages[lang].error.underReview, lang, response });
-
-      const subscription = await subscriptionRepository.findOne({
-        select: subscriptionFindParams,
-        where: { code, finishedAt }
-      });
-
-      if (subscription === null)
-        return badRequest({ message: messages[lang].error.badCredentials, lang, response });
+      const { companyName, companyUrl, password, currencyId, email, name, phone, planId } =
+        request.body as Body;
 
       await DataSource.transaction(async (manager) => {
+        const plan = await manager.findOne(PlanEntity, {
+          select: planFindParams,
+          where: { id: planId }
+        });
+
+        if (!plan) {
+          err = 1;
+          throw new Error();
+        }
+
+        const planPrice = await manager.findOne(PlanPriceEntity, {
+          select: planPriceFindParams,
+          where: { planId: plan.id, currencyId }
+        });
+
+        if (!planPrice) {
+          err = 1;
+          throw new Error();
+        }
+
+        const subscription = manager.create(SubscriptionEntity, {
+          price: planPrice.monthlyPrice,
+          productLimit: plan.minimumOfProduct,
+          restaurantLimit: plan.minimumOfRestaurant,
+          expiresAt: new Date(new Date().setDate(new Date().getDate() + 15)),
+          plan
+        });
+
+        await manager.save(subscription);
+
         const company = manager.create(CompanyEntity, {
           companyUrl,
-          currency: { id: registerRequest.currency.id },
-          name: registerRequest.companyName,
-          subscription: { id: subscription.id }
+          currency: { id: currencyId },
+          name: companyName,
+          subscription
         });
 
         await manager.save(company);
 
+        const hashPassword = await hash(password, env.HASH_SALT);
+
         const user = manager.create(UserEntity, {
-          name: registerRequest.name,
-          email: registerRequest.email,
-          firebaseId,
-          phone: registerRequest.phone,
+          name,
+          email,
+          phone,
+          password: hashPassword,
           role: Role.OWNER,
           company
         });
 
         await manager.save(user);
-
-        registerRequest.finishedAt = new Date();
-        await manager.save(registerRequest);
       });
 
       return created({ lang, response });
     } catch (error) {
       errorLogger(error);
+
+      if (err === 1) return notFound({ entity: messages[lang].entity.plan, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

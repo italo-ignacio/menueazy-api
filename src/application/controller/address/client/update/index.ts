@@ -1,10 +1,9 @@
 import { updateRestaurantSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { errorLogger, messageErrorResponse, ok, validationErrorResponse } from '@main/utils';
+import { errorLogger, messageErrorResponse, ok } from '@main/utils';
 import { restaurantRepository } from '@repository/restaurant';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   name?: string;
@@ -87,9 +86,6 @@ export const updateRestaurantController: Controller =
       return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

@@ -21,17 +21,13 @@ export const validateUserMiddleware: Controller =
       if (accessToken === null) return unauthorized({ lang, response });
 
       const { SECRET } = env.JWT;
-      const { companyId, email, firebaseId, id, role } = verify(
-        accessToken,
-        SECRET
-      ) as UserTokenInput;
+      const { companyId, email, id, role } = verify(accessToken, SECRET) as UserTokenInput;
 
       if (
         typeof id === 'undefined' ||
         typeof email === 'undefined' ||
         typeof role === 'undefined' ||
-        typeof companyId === 'undefined' ||
-        typeof firebaseId === 'undefined'
+        typeof companyId === 'undefined'
       )
         return unauthorized({ lang, response });
 
@@ -41,7 +37,7 @@ export const validateUserMiddleware: Controller =
           company: { id: true }
         },
         relations: { company: true },
-        where: { email, firebaseId, id, role, companyId, finishedAt }
+        where: { email, id, role, companyId, finishedAt }
       });
 
       if (user === null) return unauthorized({ lang, response });

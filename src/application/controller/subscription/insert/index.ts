@@ -1,15 +1,13 @@
 import { insertSubscriptionSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
-import { created, errorLogger, messageErrorResponse, validationErrorResponse } from '@main/utils';
+import { created, errorLogger, messageErrorResponse } from '@main/utils';
 import { subscriptionRepository } from '@repository/subscription';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   price: number;
   restaurantLimit: number;
   productLimit: number;
-  code: string;
   planId: number;
 }
 
@@ -18,7 +16,6 @@ interface Body {
  * @property {number} price.required
  * @property {number} restaurantLimit.required
  * @property {number} productLimit.required
- * @property {string} code.required
  * @property {integer} planId.required
  */
 
@@ -44,11 +41,10 @@ export const insertSubscriptionRequestController: Controller =
     try {
       await insertSubscriptionSchema.validate(request, { abortEarly: false });
 
-      const { code, price, productLimit, restaurantLimit, planId } = request.body as Body;
+      const { price, productLimit, restaurantLimit, planId } = request.body as Body;
 
       await subscriptionRepository.insert({
-        code,
-        price: String(price?.toFixed(2)),
+        price,
         productLimit,
         restaurantLimit,
         expiresAt: new Date(),
@@ -58,9 +54,6 @@ export const insertSubscriptionRequestController: Controller =
       return created({ lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

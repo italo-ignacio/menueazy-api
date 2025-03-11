@@ -1,15 +1,8 @@
 import { finishedAt } from '@application/helper';
 import type { Controller } from '@domain/protocols';
-import {
-  errorLogger,
-  forbidden,
-  messageErrorResponse,
-  ok,
-  validationErrorResponse
-} from '@main/utils';
+import { errorLogger, forbidden, messageErrorResponse, ok } from '@main/utils';
 import { restaurantRepository } from '@repository/restaurant';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   restaurantUrl: string;
@@ -57,9 +50,6 @@ export const checkRestaurantUrlController: Controller =
       return ok({ payload: { canUseUrl: restaurant === null }, lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

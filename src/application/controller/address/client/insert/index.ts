@@ -4,9 +4,8 @@ import { RestaurantEntity } from '@entity/restaurant';
 import { StyleEntity } from '@entity/style';
 import { UserRestaurantEntity } from '@entity/user-restaurant';
 import { DataSource } from '@infra/database';
-import { created, errorLogger, messageErrorResponse, validationErrorResponse } from '@main/utils';
+import { created, errorLogger, messageErrorResponse } from '@main/utils';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   name: string;
@@ -104,9 +103,6 @@ export const insertRestaurantController: Controller =
       return created({ lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

@@ -2,17 +2,9 @@ import { hasUserByEmail, userIsOwner } from '@application/helper';
 import { updateUserSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import {
-  badRequest,
-  errorLogger,
-  forbidden,
-  messageErrorResponse,
-  ok,
-  validationErrorResponse
-} from '@main/utils';
+import { badRequest, errorLogger, forbidden, messageErrorResponse, ok } from '@main/utils';
 import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   password?: string;
@@ -71,9 +63,6 @@ export const updateUserController: Controller =
       return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

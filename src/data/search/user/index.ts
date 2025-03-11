@@ -5,7 +5,6 @@ export const userFindParams: FindOptionsSelect<UserEntity> = {
   id: true,
   email: true,
   avatarUrl: true,
-  firebaseId: true,
   name: true,
   phone: true,
   role: true,

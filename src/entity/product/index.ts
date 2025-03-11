@@ -27,17 +27,11 @@ export class ProductEntity {
   @Column({ nullable: true, type: 'text' })
   public description: string | null;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2 })
-  public price: string;
+  @Column({ type: 'float4' })
+  public price: number;
 
   @Column({ type: 'boolean', name: 'out_of_stock', default: false })
   public outOfStock: boolean;
-
-  @Column({ name: 'start_sell_at', type: 'timestamptz' })
-  public startSellAt: Date;
-
-  @Column({ name: 'finish_sell_at', type: 'timestamptz', nullable: true })
-  public finishSellAt: Date | null;
 
   @Column({ type: 'float4', nullable: true })
   public discount: number | null;
@@ -51,8 +45,17 @@ export class ProductEntity {
   @Column({ name: 'only_in_restaurant', type: 'boolean', default: false })
   public onlyInRestaurant: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  public published: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  public highlight: boolean;
+
   @Column({ type: 'float4', name: 'price_by_km_in_delivery', nullable: true })
   public priceByKmInDelivery: number | null;
+
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.productList, {
     onDelete: 'CASCADE',
@@ -68,7 +71,7 @@ export class ProductEntity {
   @OneToMany(() => ProductCategoryEntity, (productCategory) => productCategory.product)
   public productCategoryList: ProductCategoryEntity[];
 
-  @OneToMany(() => ProductImageEntity, (productImage) => productImage.product)
+  @OneToMany(() => ProductImageEntity, (productImage) => productImage.product, { eager: true })
   public productImageList: ProductImageEntity[];
 
   @OneToMany(() => ProductOptionGroupEntity, (productOptionGroup) => productOptionGroup.product)

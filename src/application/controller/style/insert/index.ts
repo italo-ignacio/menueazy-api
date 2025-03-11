@@ -4,9 +4,8 @@ import type { Controller } from '@domain/protocols';
 import { ColorEntity } from '@entity/color';
 import { StyleEntity } from '@entity/style';
 import { DataSource } from '@infra/database';
-import { created, errorLogger, messageErrorResponse, validationErrorResponse } from '@main/utils';
+import { created, errorLogger, messageErrorResponse } from '@main/utils';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   name: string;
@@ -88,9 +87,6 @@ export const insertStyleController: Controller =
       return created({ lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

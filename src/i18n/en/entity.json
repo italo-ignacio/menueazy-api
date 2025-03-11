@@ -5,6 +5,9 @@
   "restaurant": "Restaurant",
   "style": "Style",
   "table": "Table",
+  "product": "Product",
+  "productOptionGroup": "product option group",
+  "plan": "Plan",
   "address": "Address",
   "category": "Category"
 }

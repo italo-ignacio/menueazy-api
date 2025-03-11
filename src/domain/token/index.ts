@@ -3,7 +3,6 @@ import type { Role } from '@domain/enum';
 export interface UserTokenInput {
   id: number;
   email: string;
-  firebaseId: string;
   role: Role;
   companyId: number;
 }

@@ -19,7 +19,7 @@ export class CouponEntity {
   public code: string;
 
   @Column({ type: 'float4' })
-  public discount: string;
+  public discount: number;
 
   @Column({ type: 'integer' })
   public duration: number;

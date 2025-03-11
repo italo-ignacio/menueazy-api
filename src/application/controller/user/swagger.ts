@@ -1,7 +1,6 @@
 /**
  * @typedef {object} User
  * @property {integer} id.required
- * @property {string} firebaseId
  * @property {string} name
  * @property {string} email
  * @property {string} phone

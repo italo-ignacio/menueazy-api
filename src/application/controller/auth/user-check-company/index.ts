@@ -1,16 +1,9 @@
 import { finishedAt } from '@application/helper';
 import { userFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
-import {
-  errorLogger,
-  forbidden,
-  messageErrorResponse,
-  ok,
-  validationErrorResponse
-} from '@main/utils';
+import { errorLogger, forbidden, messageErrorResponse, ok } from '@main/utils';
 import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   companyUrl: string;
@@ -70,9 +63,6 @@ export const checkUserCompanyController: Controller =
       return ok({ payload: { canAccess: true, user: userDb }, lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

@@ -1,17 +1,10 @@
 import { updateAddressSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import {
-  errorLogger,
-  messageErrorResponse,
-  notFound,
-  ok,
-  validationErrorResponse
-} from '@main/utils';
+import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
 import { addressRepository } from '@repository/address';
 import { restaurantRepository } from '@repository/restaurant';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   city?: string;
@@ -80,9 +73,6 @@ export const updateRestaurantAddressController: Controller =
       return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

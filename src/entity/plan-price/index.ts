@@ -34,7 +34,7 @@ export class PlanPriceEntity {
   public priceOfProduct: number;
 
   @Column({ type: 'float4' })
-  public discount: string;
+  public discount: number;
 
   @Column({
     type: 'enum',

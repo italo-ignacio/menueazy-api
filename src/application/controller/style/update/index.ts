@@ -6,16 +6,8 @@ import { ColorEntity } from '@entity/color';
 import { StyleEntity } from '@entity/style';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
-import {
-  errorLogger,
-  forbidden,
-  messageErrorResponse,
-  notFound,
-  ok,
-  validationErrorResponse
-} from '@main/utils';
+import { errorLogger, forbidden, messageErrorResponse, notFound, ok } from '@main/utils';
 import type { Request, Response } from 'express';
-import { ValidationError } from 'yup';
 
 interface Body {
   name: string;
@@ -111,9 +103,6 @@ export const updateStyleController: Controller =
       if (err === 1) return notFound({ entity: messages[lang].entity.style, lang, response });
 
       if (err === 2) return forbidden({ lang, response });
-
-      if (error instanceof ValidationError)
-        return validationErrorResponse({ error, lang, response });
 
       return messageErrorResponse({ error, lang, response });
     }

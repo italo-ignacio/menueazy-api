@@ -6,7 +6,8 @@
   "style": "Style",
   "table": "Table",
   "product": "Product",
-  "productOptionGroup": "product option group",
+  "productOptionGroup": "Product options group",
+  "productOptionItem": "Item of options group",
   "plan": "Plan",
   "address": "Address",
   "category": "Category"

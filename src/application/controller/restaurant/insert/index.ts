@@ -1,7 +1,9 @@
 import { insertRestaurantSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
+import { CategoryEntity } from '@entity/category';
 import { RestaurantEntity } from '@entity/restaurant';
 import { UserRestaurantEntity } from '@entity/user-restaurant';
+import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
 import { created, errorLogger, messageErrorResponse } from '@main/utils';
 import type { Request, Response } from 'express';
@@ -91,6 +93,13 @@ export const insertRestaurantController: Controller =
         });
 
         await manager.save(userRestaurant);
+
+        const category = manager.create(CategoryEntity, {
+          name: messages[lang].default.other,
+          restaurant
+        });
+
+        await manager.save(category);
       });
 
       return created({ lang, response });

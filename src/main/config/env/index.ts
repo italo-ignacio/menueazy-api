@@ -21,6 +21,10 @@ export const env = {
     ISS: process.env.FIREBASE_ISS ?? '',
     AUD: process.env.FIREBASE_AUD ?? ''
   },
+  REDIS: {
+    HOST: process.env.REDIS_HOST || 'localhost',
+    PORT: Number(process.env.REDIS_PORT ?? 6379)
+  },
   ADMIN: {
     email: process.env.ADMIN_EMAIL ?? '',
     phone: process.env.ADMIN_PHONE ?? ''

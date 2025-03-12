@@ -1,6 +1,8 @@
+import { finishedAt } from '@application/helper';
 import { insertCategorySchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
-import { created, errorLogger, messageErrorResponse } from '@main/utils';
+import { messages } from '@i18n/index';
+import { badRequest, created, errorLogger, messageErrorResponse } from '@main/utils';
 import { categoryRepository } from '@repository/category';
 import type { Request, Response } from 'express';
 
@@ -40,7 +42,19 @@ export const insertCategoryController: Controller =
 
       const { name, description } = request.body as Body;
 
-      await categoryRepository.insert({ description, name, restaurantId: restaurant.id });
+      const count = await categoryRepository.count({
+        where: { finishedAt, restaurantId: restaurant.id }
+      });
+
+      if (count === 20)
+        return badRequest({ lang, response, message: `${messages[lang].error.maxCategories} 20` });
+
+      await categoryRepository.insert({
+        description,
+        order: count + 1,
+        name,
+        restaurantId: restaurant.id
+      });
 
       return created({ lang, response });
     } catch (error) {

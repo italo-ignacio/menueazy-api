@@ -1,19 +1,72 @@
 import type { ProductEntity } from '@entity/product';
 import type { FindOptionsSelect } from 'typeorm';
 
+export const findProductQueryParams = [
+  'c.id',
+  'c.name',
+  'c.description',
+  'c.createdAt',
+  'c.updatedAt',
+  'c.finishedAt',
+
+  'p.id',
+  'p.name',
+  'p.description',
+  'p.price',
+  'p.outOfStock',
+  'p.published',
+  'p.highlight',
+  'p.discount',
+  'p.startDiscountAt',
+  'p.finishDiscountAt',
+  'p.onlyInRestaurant',
+  'p.priceByKmInDelivery',
+
+  'pil.id',
+  'pil.primary',
+  'pil.url',
+  'pil.createdAt',
+  'pil.updatedAt',
+  'pil.finishedAt',
+
+  'pcl.id',
+  'pcl.createdAt',
+  'pcl.updatedAt',
+  'pcl.finishedAt',
+
+  'pogl.id',
+  'pogl.description',
+  'pogl.maxSelection',
+  'pogl.minSelection',
+  'pogl.name',
+  'pogl.required',
+  'pogl.createdAt',
+  'pogl.updatedAt',
+  'pogl.finishedAt',
+
+  'poil.id',
+  'poil.description',
+  'poil.name',
+  'poil.imageUrl',
+  'poil.createdAt',
+  'poil.updatedAt',
+  'poil.finishedAt'
+];
+
 export const productFindParams: FindOptionsSelect<ProductEntity> = {
   id: true,
-  description: true,
-  discount: true,
-  finishDiscountAt: true,
   name: true,
-  onlyInRestaurant: true,
-  outOfStock: true,
+  description: true,
   price: true,
-  startDiscountAt: true,
+  outOfStock: true,
   published: true,
   highlight: true,
+  discount: true,
+  startDiscountAt: true,
+  finishDiscountAt: true,
+  onlyInRestaurant: true,
   priceByKmInDelivery: true,
+
   productImageList: {
     id: true,
     primary: true,

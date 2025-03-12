@@ -1,7 +1,9 @@
+import { cacheKeys } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
 import { ProductEntity } from '@entity/product';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
+import { cache } from '@infra/redis';
 import { badRequest, errorLogger, ok } from '@main/utils';
 import type { Request, Response } from 'express';
 
@@ -28,9 +30,11 @@ export const deleteProductController: Controller =
         .andWhere('restaurant_id = :restaurantId', { restaurantId: restaurant.id })
         .execute();
 
+      await cache.delete(cacheKeys.productsByRestaurant(restaurant.id));
+
       return ok({ payload: messages[lang].default.successfullyDeleted, lang, response });
     } catch (error) {
       errorLogger(error);
-      return badRequest({ message: messages[lang].error.notFound, lang, response });
+      return badRequest({ lang, response });
     }
   };

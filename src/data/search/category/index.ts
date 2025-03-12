@@ -5,6 +5,7 @@ export const categoryFindParams: FindOptionsSelect<CategoryEntity> = {
   id: true,
   name: true,
   description: true,
+  order: true,
 
   createdAt: true,
   updatedAt: true,

@@ -14,6 +14,7 @@ interface GetPageAndLimitInput<QueryType extends string> {
 }
 
 interface GetPageAndLimitOutput {
+  orderItem?: { value: string; sort: 'ASC' | 'DESC' };
   orderBy: object;
   where: object;
 }
@@ -52,6 +53,7 @@ export const getGenericFilter = <QueryType extends string>({
   list
 }: GetPageAndLimitInput<QueryType>): GetPageAndLimitOutput => {
   const orderBy = {};
+  const orderItem = {};
   const where: object = {};
 
   // if (String(query.history) !== 'true')
@@ -69,8 +71,10 @@ export const getGenericFilter = <QueryType extends string>({
   else if (endDate !== null) Object.assign(where, { createdAt: LessThanOrEqual(endDate) });
   else if (startDate !== null) Object.assign(where, { createdAt: MoreThanOrEqual(startDate) });
 
-  if (typeof query.orderBy === 'string' && checkOrder(query as queryProps, list))
+  if (typeof query.orderBy === 'string' && checkOrder(query as queryProps, list)) {
     Object.assign(orderBy, { [query.orderBy]: query.sort });
+    Object.assign(orderItem, { value: query.orderBy, sort: query.sort?.toUpperCase() });
+  }
 
   for (const item of list)
     if (typeof query[item] === 'string')
@@ -94,5 +98,5 @@ export const getGenericFilter = <QueryType extends string>({
 
   if (isObjectEmpty(orderBy)) Object.assign(orderBy, { createdAt: 'desc' });
 
-  return { orderBy, where };
+  return { orderBy, where, orderItem };
 };

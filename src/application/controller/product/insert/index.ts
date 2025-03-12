@@ -1,6 +1,10 @@
+import { finishedAt } from '@application/helper';
 import type { Controller } from '@domain/protocols';
+import { CategoryEntity } from '@entity/category';
+import { ProductEntity } from '@entity/product';
+import { ProductCategoryEntity } from '@entity/product-category';
+import { DataSource } from '@infra/database';
 import { created, errorLogger, messageErrorResponse } from '@main/utils';
-import { productRepository } from '@repository/product';
 import type { Request, Response } from 'express';
 
 /**
@@ -28,21 +32,31 @@ export const insertProductController: Controller =
   () =>
   async ({ lang, restaurant }: Request, response: Response) => {
     try {
-      const names = {
-        pt: `Produto`,
-        es: `Producto`,
-        en: `Product`
-      };
+      let payload = {};
 
-      const name = names[lang];
+      await DataSource.transaction(async (manager) => {
+        const { identifiers } = await manager.insert(ProductEntity, {
+          name: '',
+          price: 0,
+          restaurantId: restaurant.id
+        });
 
-      const { identifiers } = await productRepository.insert({
-        name,
-        price: 0,
-        restaurantId: restaurant.id
+        payload = identifiers;
+
+        const category = await manager.findOne(CategoryEntity, {
+          select: { id: true },
+          where: { restaurantId: restaurant.id, finishedAt },
+          order: { createdAt: 'ASC' }
+        });
+
+        if (category)
+          await manager.insert(ProductCategoryEntity, {
+            category,
+            product: { id: identifiers[0].id }
+          });
       });
 
-      return created({ lang, response, payload: identifiers[0] });
+      return created({ lang, response, payload });
     } catch (error) {
       errorLogger(error);
 

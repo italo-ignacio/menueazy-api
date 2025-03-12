@@ -31,6 +31,6 @@ export const deletePaymentMethodController: Controller =
       return ok({ payload: messages[lang].default.successfullyDeleted, lang, response });
     } catch (error) {
       errorLogger(error);
-      return badRequest({ message: messages[lang].error.notFound, lang, response });
+      return badRequest({ lang, response });
     }
   };

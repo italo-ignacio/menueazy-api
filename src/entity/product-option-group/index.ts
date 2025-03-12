@@ -44,7 +44,8 @@ export class ProductOptionGroupEntity {
 
   @OneToMany(
     () => ProductOptionItemEntity,
-    (productOptionItem) => productOptionItem.productOptionGroup
+    (productOptionItem) => productOptionItem.productOptionGroup,
+    { eager: true }
   )
   public productOptionItemList: ProductOptionItemEntity[];
 

@@ -39,4 +39,4 @@ alterar branch
 
 - `git checkout "nome-branch"`
 
-npm i bcrypt cors date-fns dotenv env-cmd express express-jsdoc-swagger jsonwebtoken module-alias multer pg typeorm typeorm-ts-node-commonjs yup
+Rodar Redis: docker run --name redis -p 6379:6379 -d redis:7.4.2-alpine

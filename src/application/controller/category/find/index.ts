@@ -32,12 +32,6 @@ import type { Request, Response } from 'express';
  * @tags Category
  * @param {integer} restaurantId.path.required
  * @param {string} name.query
- * @param {integer} page.query
- * @param {integer} limit.query
- * @param {string} startDate.query (Ex: 2024-01-01).
- * @param {string} endDate.query (Ex: 2024-01-01).
- * @param {string} orderBy.query - enum:id,name,createdAt,updatedAt
- * @param {string} sort.query - enum:asc,desc
  * @return {FindCategoryResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
@@ -49,30 +43,22 @@ export const findCategoryController: Controller =
     try {
       const { skip, take } = getPagination({ query });
 
-      const { orderBy: order, where } = getGenericFilter<categoryQueryFields>({
+      const { where } = getGenericFilter<categoryQueryFields>({
         list: categoryListQueryFields,
         query
       });
 
       Object.assign(where, { restaurantId: restaurant.id });
 
-      const [content, totalElements] = await categoryRepository.findAndCount({
-        order,
+      const payload = await categoryRepository.find({
+        order: { order: 'ASC' },
         select: categoryFindParams,
         skip,
         take,
         where
       });
 
-      return ok({
-        payload: {
-          content,
-          totalElements,
-          totalPages: Math.ceil(totalElements / take)
-        },
-        lang,
-        response
-      });
+      return ok({ payload, lang, response });
     } catch (error) {
       errorLogger(error);
 

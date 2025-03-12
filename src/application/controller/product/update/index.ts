@@ -1,8 +1,10 @@
 import { updateProductSchema } from '@data/validation';
+import { cacheKeys } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
 import { ProductEntity } from '@entity/product';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
+import { cache } from '@infra/redis';
 import { errorLogger, messageErrorResponse, ok } from '@main/utils';
 import type { Request, Response } from 'express';
 
@@ -44,6 +46,8 @@ export const updateProductController: Controller =
         .where('id = :id', { id: Number(request.params.id) })
         .andWhere('restaurant_id = :restaurantId', { restaurantId: restaurant.id })
         .execute();
+
+      await cache.delete(cacheKeys.productsByRestaurant(restaurant.id));
 
       return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {

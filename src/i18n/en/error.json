@@ -11,8 +11,10 @@
   "duplicateKey": "Duplicate value,",
   "isAlreadyInUse": "is already in use",
   "notPermission": "Permission denied",
+  "oneCategoryIsRequired": "Having a category is required",
   "timeout": "Request timed out. Please try again later",
   "internalServerError": "Internal server error",
   "checkYourEmail": "Check your email before logging in",
+  "maxCategories": "Max of categories is",
   "selectAValidCurrencyType": "Select a valid currency type"
 }

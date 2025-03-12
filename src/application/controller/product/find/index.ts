@@ -1,4 +1,4 @@
-import { productFindParams } from '@data/search';
+import { findProductQueryParams } from '@data/search';
 import type { productQueryFields } from '@data/validation';
 import { productListQueryFields } from '@data/validation';
 import type { Controller } from '@domain/protocols';
@@ -49,20 +49,37 @@ export const findProductController: Controller =
     try {
       const { skip, take } = getPagination({ query });
 
-      const { orderBy: order, where } = getGenericFilter<productQueryFields>({
+      const { orderItem } = getGenericFilter<productQueryFields>({
         list: productListQueryFields,
         query
       });
 
-      Object.assign(where, { restaurantId: restaurant.id });
+      console.log(skip, take);
 
-      const [content, totalElements] = await productRepository.findAndCount({
-        order,
-        select: productFindParams,
-        skip,
-        take,
-        where
-      });
+      const queryBuilder = productRepository
+        .createQueryBuilder('p')
+        .innerJoin('p.productCategoryList', 'pcl')
+        .leftJoin('pcl.category', 'c')
+        .leftJoin('p.productImageList', 'pil')
+        .leftJoin('p.productOptionGroupList', 'pogl')
+        .leftJoin('pogl.productOptionItemList', 'poil')
+        .where('p.finishedAt IS NULL')
+        .andWhere('p.restaurantId = :restaurantId', { restaurantId: restaurant.id })
+        .andWhere('pcl.finishedAt IS NULL')
+        .andWhere('pil.finishedAt IS NULL')
+        .andWhere('pogl.finishedAt IS NULL')
+        .andWhere('poil.finishedAt IS NULL')
+        .orderBy(`p.${orderItem?.value || 'id'}`, orderItem?.sort ?? 'ASC')
+        .addOrderBy('pogl.id', 'ASC')
+        .addOrderBy('poil.id', 'ASC')
+        .addOrderBy('pil.primary', 'DESC')
+        .skip(skip)
+        .take(take)
+        .select(findProductQueryParams);
+
+      // n ta funcionando a paginacao
+
+      const [content, totalElements] = await queryBuilder.getManyAndCount();
 
       return ok({
         payload: {

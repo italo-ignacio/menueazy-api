@@ -7,6 +7,7 @@
   "table": "Mesa",
   "product": "Produto",
   "productOptionGroup": "Grupo de opções de produto",
+  "productOptionItem": "Item do grupo do produto",
   "address": "Endereço",
   "plan": "Plano",
   "category": "Categoria"

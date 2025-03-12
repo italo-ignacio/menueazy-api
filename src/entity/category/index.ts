@@ -25,6 +25,9 @@ export class CategoryEntity {
   @Column({ type: 'integer', name: 'restaurant_id' })
   public restaurantId: number;
 
+  @Column({ type: 'integer', default: 1 })
+  public order: number;
+
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.categoryList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

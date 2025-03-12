@@ -81,5 +81,14 @@
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.iconTheme": "material-icon-theme",
-  "cSpell.words": ["cnpj", "menueazy", "NOTCHECKED", "VEHICLESIZE", "VEHICLETYPE"]
+  "cSpell.words": [
+    "cnpj",
+    "menueazy",
+    "NOTCHECKED",
+    "pogl",
+    "poil",
+    "uncategorized",
+    "VEHICLESIZE",
+    "VEHICLETYPE"
+  ]
 }

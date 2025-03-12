@@ -2,12 +2,13 @@ import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import { badRequest, errorLogger, notFound, ok } from '@main/utils';
 import { productOptionGroupRepository } from '@repository/product-option-group';
+import { productOptionItemRepository } from '@repository/product-option-item';
 import type { Request, Response } from 'express';
 
 /**
- * DELETE /restaurant/{restaurantId}/product-option-group/{id}
- * @summary Delete Product Option Group
- * @tags Product Option Group
+ * DELETE /restaurant/{restaurantId}/product-option-item/{id}
+ * @summary Delete Product Option Item
+ * @tags Product Option Item
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
  * @param {integer} id.path.required
@@ -16,21 +17,24 @@ import type { Request, Response } from 'express';
  * @return {UnauthorizedRequest} 401 - Unauthorized response - application/json
  * @return {ForbiddenRequest} 403 - Forbidden response - application/json
  */
-export const deleteProductOptionGroupController: Controller =
+export const deleteProductOptionItemController: Controller =
   () =>
   async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
       const productOptionGroup = await productOptionGroupRepository.findOne({
-        select: { id: true, product: { restaurantId: true } },
-        where: { id: Number(request.params.id), product: { restaurantId: restaurant.id } },
-        relations: { product: true }
+        select: { id: true },
+        where: {
+          productOptionItemList: { id: Number(request.params.id) },
+          product: { restaurantId: restaurant.id }
+        },
+        relations: { product: true, productOptionItemList: true }
       });
 
       if (!productOptionGroup)
-        return notFound({ entity: messages[lang].entity.productOptionGroup, lang, response });
+        return notFound({ entity: messages[lang].entity.productOptionItem, lang, response });
 
-      await productOptionGroupRepository.update(
-        { id: productOptionGroup.id },
+      await productOptionItemRepository.update(
+        { id: Number(request.params.id) },
         { finishedAt: new Date() }
       );
 

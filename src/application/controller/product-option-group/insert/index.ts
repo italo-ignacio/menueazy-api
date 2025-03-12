@@ -1,46 +1,57 @@
-import { insertTableSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
-import { created, errorLogger, messageErrorResponse } from '@main/utils';
-import { tableRepository } from '@repository/table';
+import { messages } from '@i18n/index';
+import { created, errorLogger, messageErrorResponse, notFound } from '@main/utils';
+import { productRepository } from '@repository/product';
+import { productOptionGroupRepository } from '@repository/product-option-group';
 import type { Request, Response } from 'express';
 
 interface Body {
-  name: string;
-  description?: string;
+  productId: number;
 }
 
 /**
- * @typedef {object} InsertTableBody
- * @property {string} name.required
- * @property {string} description
+ * @typedef {object} InsertProductOptionGroupBody
+ * @property {integer} productId.required
  */
 
 /**
- * @typedef {object} InsertTableResponse
+ * @typedef {object} InsertProductOptionGroupResponse
  * @property {string} message
  * @property {string} status
  * @property {string} payload
  */
 
 /**
- * POST /restaurant/{restaurantId}/table
- * @summary Insert Table
- * @tags Table
+ * POST /restaurant/{restaurantId}/product-option-group
+ * @summary Delete Product Option Group
+ * @tags Product Option Group
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
- * @param {InsertTableBody} request.body.required - application/json
- * @return {InsertTableResponse} 200 - Successful response - application/json
+ * @param {InsertProductOptionGroupBody} request.body.required - application/json
+ * @return {InsertProductOptionGroupResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
-export const insertTableController: Controller =
+export const insertProductOptionGroupController: Controller =
   () =>
   async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
-      await insertTableSchema.validate(request, { abortEarly: false });
+      const { productId } = request.body as Body;
 
-      const { name, description } = request.body as Body;
+      if (typeof productId !== 'number')
+        return notFound({ entity: messages[lang].entity.product, lang, response });
 
-      await tableRepository.insert({ description, name, restaurantId: restaurant.id });
+      const product = await productRepository.findOne({
+        select: { id: true },
+        where: { id: productId, restaurantId: restaurant.id }
+      });
+
+      if (!product) return notFound({ entity: messages[lang].entity.product, lang, response });
+
+      await productOptionGroupRepository.insert({
+        name: '',
+        product,
+        required: false
+      });
 
       return created({ lang, response });
     } catch (error) {

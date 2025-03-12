@@ -1,9 +1,9 @@
+import { finishedAt } from '@application/helper';
 import { currencyFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { errorLogger, messageErrorResponse, ok } from '@main/utils';
 import { currencyRepository } from '@repository/currency';
 import type { Request, Response } from 'express';
-import { IsNull } from 'typeorm';
 
 /**
  * @typedef {object} FindCurrencyPayload
@@ -33,7 +33,7 @@ export const findCurrencyController: Controller =
     try {
       const content = await currencyRepository.find({
         select: currencyFindParams,
-        where: { finishedAt: IsNull() }
+        where: { finishedAt }
       });
 
       return ok({

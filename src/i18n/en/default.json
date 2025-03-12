@@ -2,5 +2,6 @@
   "ok": "Request successful",
   "successfullyCreated": "Successfully created",
   "successfullyDeleted": "Successfully deleted",
-  "successfullyUpdated": "Updated successfully"
+  "successfullyUpdated": "Updated successfully",
+  "other": "Others"
 }

@@ -2,6 +2,10 @@ export const api = {
   baseUrl: '/api/v1'
 };
 
+export const cacheKeys = {
+  productsByRestaurant: (id: number): string => `products_by_restaurant_${id}`
+};
+
 export enum statusCodeList {
   BAD_REQUEST = 400,
   INTERNAL_SERVER_ERROR = 500,

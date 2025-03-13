@@ -51,6 +51,7 @@ export const findProductQueryParams = [
   'poil.id',
   'poil.description',
   'poil.name',
+  'poil.additionalPrice',
   'poil.imageUrl',
   'poil.createdAt',
   'poil.updatedAt',

@@ -53,6 +53,19 @@ export const findProductController: Controller =
         query
       });
 
+      const productIdsQuery = productRepository
+        .createQueryBuilder('p')
+        .select('p.id')
+        .where('p.finishedAt IS NULL')
+        .andWhere('p.restaurantId = :restaurantId', { restaurantId: restaurant.id })
+        .orderBy(`p.${orderItem?.value || 'id'}`, orderItem?.sort || 'ASC')
+        .skip(skip)
+        .take(take);
+
+      const [productList, totalElements] = await productIdsQuery.getManyAndCount();
+
+      const productIds = productList.map((item) => item.id);
+
       const queryBuilder = productRepository
         .createQueryBuilder('p')
         .select(findProductQueryParams)
@@ -61,21 +74,28 @@ export const findProductController: Controller =
         .leftJoin('p.productImageList', 'pil')
         .leftJoin('p.productOptionGroupList', 'pogl')
         .leftJoin('pogl.productOptionItemList', 'poil')
-        .where('p.finishedAt IS NULL')
-        .andWhere('p.restaurantId = :restaurantId', { restaurantId: restaurant.id })
+        .where('p.id IN (:...productIds)', { productIds })
         .andWhere('pcl.finishedAt IS NULL')
+        .andWhere('c.finishedAt IS NULL')
         .andWhere('pil.finishedAt IS NULL')
         .andWhere('pogl.finishedAt IS NULL')
         .andWhere('poil.finishedAt IS NULL')
-        .andWhere('c.finishedAt IS NULL')
         .orderBy(`p.${orderItem?.value || 'id'}`, orderItem?.sort || 'ASC')
+        .addOrderBy('c.order', 'ASC')
         .addOrderBy('pogl.id', 'ASC')
         .addOrderBy('poil.id', 'ASC')
-        .addOrderBy('pil.primary', 'DESC')
-        .skip(skip)
-        .take(take);
+        .addOrderBy('pil.primary', 'DESC');
 
-      const [content, totalElements] = await queryBuilder.getManyAndCount();
+      const data = await queryBuilder.getMany();
+
+      const content = data.map((item) => {
+        const { productCategoryList, ...values } = item;
+
+        return {
+          ...values,
+          categoryList: productCategoryList.map((itemCategory) => ({ ...itemCategory.category }))
+        };
+      });
 
       return ok({
         payload: {

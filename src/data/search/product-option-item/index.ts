@@ -6,6 +6,7 @@ export const productOptionItemFindParams: FindOptionsSelect<ProductOptionItemEnt
   name: true,
   description: true,
   imageUrl: true,
+  additionalPrice: true,
 
   createdAt: true,
   updatedAt: true,

@@ -1,8 +1,7 @@
-import { findProductQueryParams } from '@data/search';
+import { findOneFullProduct } from '@application/helper';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
-import { productRepository } from '@repository/product';
 import type { Request, Response } from 'express';
 
 /**
@@ -27,28 +26,7 @@ export const findOneProductController: Controller =
   () =>
   async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
-      const queryBuilder = productRepository
-        .createQueryBuilder('p')
-        .select(findProductQueryParams)
-        .innerJoin('p.productCategoryList', 'pcl')
-        .leftJoin('pcl.category', 'c')
-        .leftJoin('p.productImageList', 'pil')
-        .leftJoin('p.productOptionGroupList', 'pogl')
-        .leftJoin('pogl.productOptionItemList', 'poil')
-        .where('p.id = :id', { id: Number(request.params.id) })
-        .andWhere('p.restaurantId = :restaurantId', { restaurantId: restaurant.id })
-        .andWhere('pcl.finishedAt IS NULL')
-        .andWhere('p.finishedAt IS NULL')
-        .andWhere('pil.finishedAt IS NULL')
-        .andWhere('pogl.finishedAt IS NULL')
-        .andWhere('poil.finishedAt IS NULL')
-        .andWhere('c.finishedAt IS NULL')
-        .orderBy('p.id', 'ASC')
-        .addOrderBy('pogl.id', 'ASC')
-        .addOrderBy('poil.id', 'ASC')
-        .addOrderBy('pil.primary', 'DESC');
-
-      const payload = await queryBuilder.getOne();
+      const payload = await findOneFullProduct(Number(request.params.id), restaurant.id);
 
       if (payload === null)
         return notFound({ entity: messages[lang].entity.product, lang, response });

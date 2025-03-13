@@ -1,5 +1,3 @@
-import { finishedAt } from '@application/helper';
-import { categoryFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
@@ -28,10 +26,28 @@ export const findOneCategoryController: Controller =
   () =>
   async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
-      const payload = await categoryRepository.findOne({
-        select: categoryFindParams,
-        where: { id: Number(request.params.id), restaurantId: restaurant.id, finishedAt }
-      });
+      const selectValues = [
+        'c.id',
+        'c.name',
+        'c.description',
+        'c.order',
+        'c.createdAt',
+        'c.updatedAt',
+        'c.finishedAt'
+      ];
+
+      const payload = await categoryRepository
+        .createQueryBuilder('c')
+        .select(selectValues)
+        .leftJoin('c.productCategoryList', 'pcl')
+        .leftJoin('pcl.product', 'product')
+        .loadRelationCountAndMap('c.productCount', 'c.productCategoryList', 'rp', (qb) =>
+          qb.innerJoin('rp.product', 'p').where('p.finishedAt IS NULL')
+        )
+        .where('c.restaurantId = :restaurantId', { restaurantId: restaurant.id })
+        .andWhere('c.id = :id', { id: Number(request.params.id) })
+        .andWhere('c.finishedAt IS NULL')
+        .getOne();
 
       if (payload === null)
         return notFound({ entity: messages[lang].entity.category, lang, response });

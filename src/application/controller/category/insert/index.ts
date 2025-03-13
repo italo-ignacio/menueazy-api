@@ -46,7 +46,7 @@ export const insertCategoryController: Controller =
         where: { finishedAt, restaurantId: restaurant.id }
       });
 
-      if (count === 20)
+      if (count >= 20)
         return badRequest({ lang, response, message: `${messages[lang].error.maxCategories} 20` });
 
       await categoryRepository.insert({

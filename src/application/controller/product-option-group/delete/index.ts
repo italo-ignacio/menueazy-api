@@ -1,5 +1,7 @@
+import { cacheKeys } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
+import { cache } from '@infra/redis';
 import { badRequest, errorLogger, notFound, ok } from '@main/utils';
 import { productOptionGroupRepository } from '@repository/product-option-group';
 import type { Request, Response } from 'express';
@@ -33,6 +35,8 @@ export const deleteProductOptionGroupController: Controller =
         { id: productOptionGroup.id },
         { finishedAt: new Date() }
       );
+
+      await cache.delete(cacheKeys.productsByRestaurant(restaurant.id));
 
       return ok({ payload: messages[lang].default.successfullyDeleted, lang, response });
     } catch (error) {

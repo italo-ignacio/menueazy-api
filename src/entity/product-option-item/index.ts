@@ -29,11 +29,14 @@ export class ProductOptionItemEntity {
   @Column({ type: 'integer', name: 'product_id', nullable: true })
   public productId: number | null;
 
+  @Column({ type: 'float4', name: 'additional_price', nullable: true })
+  public additionalPrice: number | null;
+
   @Column({ type: 'integer', name: 'product_option_group_id' })
   public productOptionGroupId: number;
 
   @ManyToOne(() => ProductEntity, (product) => product.productOptionItemList, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
     nullable: true
   })

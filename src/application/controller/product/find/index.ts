@@ -31,7 +31,6 @@ import type { Request, Response } from 'express';
  * @summary Find Product
  * @tags Product
  * @param {integer} restaurantId.path.required
- * @param {string} name.query
  * @param {integer} page.query
  * @param {integer} limit.query
  * @param {string} startDate.query (Ex: 2024-01-01).
@@ -54,10 +53,9 @@ export const findProductController: Controller =
         query
       });
 
-      console.log(skip, take);
-
       const queryBuilder = productRepository
         .createQueryBuilder('p')
+        .select(findProductQueryParams)
         .innerJoin('p.productCategoryList', 'pcl')
         .leftJoin('pcl.category', 'c')
         .leftJoin('p.productImageList', 'pil')
@@ -69,15 +67,13 @@ export const findProductController: Controller =
         .andWhere('pil.finishedAt IS NULL')
         .andWhere('pogl.finishedAt IS NULL')
         .andWhere('poil.finishedAt IS NULL')
-        .orderBy(`p.${orderItem?.value || 'id'}`, orderItem?.sort ?? 'ASC')
+        .andWhere('c.finishedAt IS NULL')
+        .orderBy(`p.${orderItem?.value || 'id'}`, orderItem?.sort || 'ASC')
         .addOrderBy('pogl.id', 'ASC')
         .addOrderBy('poil.id', 'ASC')
         .addOrderBy('pil.primary', 'DESC')
         .skip(skip)
-        .take(take)
-        .select(findProductQueryParams);
-
-      // n ta funcionando a paginacao
+        .take(take);
 
       const [content, totalElements] = await queryBuilder.getManyAndCount();
 

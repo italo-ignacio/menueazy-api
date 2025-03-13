@@ -13,8 +13,10 @@ interface GetPageAndLimitInput<QueryType extends string> {
   list: QueryType[];
 }
 
+type OrderItem = { value: string; sort: 'ASC' | 'DESC' };
+
 interface GetPageAndLimitOutput {
-  orderItem?: { value: string; sort: 'ASC' | 'DESC' };
+  orderItem?: OrderItem;
   orderBy: object;
   where: object;
 }
@@ -53,7 +55,7 @@ export const getGenericFilter = <QueryType extends string>({
   list
 }: GetPageAndLimitInput<QueryType>): GetPageAndLimitOutput => {
   const orderBy = {};
-  const orderItem = {};
+  const orderItem = {} as OrderItem;
   const where: object = {};
 
   // if (String(query.history) !== 'true')

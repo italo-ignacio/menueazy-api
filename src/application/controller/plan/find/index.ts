@@ -65,13 +65,13 @@ export const findPlanController: Controller =
 
       const queryBuilder = planRepository
         .createQueryBuilder('p')
+        .select(planFindParams)
         .leftJoin('p.planPriceList', 'ppl')
         .leftJoin('ppl.currency', 'c')
         .where('c.code = :code', { code })
         .orWhere('ppl.id IS NULL AND p.name = :premiumPlan', {
           premiumPlan: 'Premium'
-        })
-        .select(planFindParams);
+        });
 
       const content = await queryBuilder.getMany();
 

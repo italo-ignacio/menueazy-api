@@ -29,6 +29,7 @@ export const findOneProductController: Controller =
     try {
       const queryBuilder = productRepository
         .createQueryBuilder('p')
+        .select(findProductQueryParams)
         .innerJoin('p.productCategoryList', 'pcl')
         .leftJoin('pcl.category', 'c')
         .leftJoin('p.productImageList', 'pil')
@@ -41,11 +42,11 @@ export const findOneProductController: Controller =
         .andWhere('pil.finishedAt IS NULL')
         .andWhere('pogl.finishedAt IS NULL')
         .andWhere('poil.finishedAt IS NULL')
+        .andWhere('c.finishedAt IS NULL')
         .orderBy('p.id', 'ASC')
         .addOrderBy('pogl.id', 'ASC')
         .addOrderBy('poil.id', 'ASC')
-        .addOrderBy('pil.primary', 'DESC')
-        .select(findProductQueryParams);
+        .addOrderBy('pil.primary', 'DESC');
 
       const payload = await queryBuilder.getOne();
 

@@ -5,6 +5,7 @@ export const findProductQueryParams = [
   'c.id',
   'c.name',
   'c.description',
+  'c.order',
   'c.createdAt',
   'c.updatedAt',
   'c.finishedAt',
@@ -21,6 +22,9 @@ export const findProductQueryParams = [
   'p.finishDiscountAt',
   'p.onlyInRestaurant',
   'p.priceByKmInDelivery',
+  'p.createdAt',
+  'p.updatedAt',
+  'p.finishedAt',
 
   'pil.id',
   'pil.primary',

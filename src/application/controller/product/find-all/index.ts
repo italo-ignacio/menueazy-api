@@ -44,6 +44,7 @@ export const findAllProductController: Controller =
 
       const queryBuilder = categoryRepository
         .createQueryBuilder('c')
+        .select(findProductQueryParams)
         .innerJoin('c.productCategoryList', 'pcl')
         .leftJoin('pcl.product', 'p')
         .leftJoin('p.productImageList', 'pil')
@@ -61,8 +62,7 @@ export const findAllProductController: Controller =
         .addOrderBy('p.id', 'ASC')
         .addOrderBy('pogl.id', 'ASC')
         .addOrderBy('poil.id', 'ASC')
-        .addOrderBy('pil.primary', 'DESC')
-        .select(findProductQueryParams);
+        .addOrderBy('pil.primary', 'DESC');
 
       const data = await queryBuilder.getMany();
 

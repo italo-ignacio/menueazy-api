@@ -1,20 +1,23 @@
-import { categoryFindParams } from '@data/search';
-import type { categoryQueryFields } from '@data/validation';
-import { categoryListQueryFields } from '@data/validation';
 import type { Controller } from '@domain/protocols';
-import {
-  errorLogger,
-  getGenericFilter,
-  getPagination,
-  messageErrorResponse,
-  ok
-} from '@main/utils';
+import { errorLogger, messageErrorResponse, ok } from '@main/utils';
 import { categoryRepository } from '@repository/category';
 import type { Request, Response } from 'express';
 
 /**
+ * @typedef {object} CategoryContent
+ * @property {integer} id
+ * @property {string} name
+ * @property {string|null} description
+ * @property {integer} order
+ * @property {integer} productCount
+ * @property {string} createdAt
+ * @property {string} updatedAt
+ * @property {string|null} finishedAt
+ */
+
+/**
  * @typedef {object} FindCategoryPayload
- * @property {array<Category>} content
+ * @property {array<CategoryContent>} content
  * @property {number} totalElements
  * @property {number} totalPages
  */
@@ -41,22 +44,31 @@ export const findCategoryController: Controller =
   () =>
   async ({ query, lang, restaurant }: Request, response: Response) => {
     try {
-      const { skip, take } = getPagination({ query });
+      const name = `%${query.name ?? ''}%`;
 
-      const { where } = getGenericFilter<categoryQueryFields>({
-        list: categoryListQueryFields,
-        query
-      });
+      const selectValues = [
+        'c.id',
+        'c.name',
+        'c.description',
+        'c.order',
+        'c.createdAt',
+        'c.updatedAt',
+        'c.finishedAt'
+      ];
 
-      Object.assign(where, { restaurantId: restaurant.id });
-
-      const payload = await categoryRepository.find({
-        order: { order: 'ASC' },
-        select: categoryFindParams,
-        skip,
-        take,
-        where
-      });
+      const payload = await categoryRepository
+        .createQueryBuilder('c')
+        .select(selectValues)
+        .leftJoin('c.productCategoryList', 'pcl')
+        .leftJoin('pcl.product', 'product')
+        .loadRelationCountAndMap('c.productCount', 'c.productCategoryList', 'rp', (qb) =>
+          qb.innerJoin('rp.product', 'p').where('p.finishedAt IS NULL')
+        )
+        .orderBy('c.order', 'ASC')
+        .where('c.restaurantId = :restaurantId', { restaurantId: restaurant.id })
+        .andWhere('c.finishedAt IS NULL')
+        .andWhere('c.name ILIKE :name', { name })
+        .getMany();
 
       return ok({ payload, lang, response });
     } catch (error) {

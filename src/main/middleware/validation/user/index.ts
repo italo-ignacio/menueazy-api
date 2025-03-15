@@ -34,7 +34,7 @@ export const validateUserMiddleware: Controller =
       const user = await userRepository.findOne({
         select: {
           ...userFindParams,
-          company: { id: true }
+          company: { id: true, name: true, companyUrl: true }
         },
         relations: { company: true },
         where: { email, id, role, companyId, finishedAt }

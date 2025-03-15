@@ -5,7 +5,7 @@ import { CategoryEntity } from '@entity/category';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
 import { cache } from '@infra/redis';
-import { badRequest, errorLogger, ok } from '@main/utils';
+import { badRequest, errorLogger, ok, toNumber } from '@main/utils';
 import { categoryRepository } from '@repository/category';
 import type { Request, Response } from 'express';
 import { Not } from 'typeorm';
@@ -42,7 +42,7 @@ export const deleteCategoryController: Controller =
       await DataSource.createQueryBuilder()
         .update(CategoryEntity)
         .set({ finishedAt: new Date(), order: 0 })
-        .where('id = :id', { id: Number(request.params.id) })
+        .where('id = :id', { id: toNumber(request.params.id) })
         .andWhere('restaurant_id = :restaurantId', { restaurantId: restaurant.id })
         .execute();
 

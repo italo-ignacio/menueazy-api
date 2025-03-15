@@ -40,7 +40,7 @@
  */
 
 /**
- * @typedef {object} InsertResponse
+ * @typedef {object} CreatedResponse
  * @property {string} message
  * @property {string} payload
  * @property {string} status

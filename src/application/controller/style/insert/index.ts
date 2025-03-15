@@ -36,19 +36,12 @@ interface Body {
  */
 
 /**
- * @typedef {object} InsertStyleResponse
- * @property {string} message
- * @property {string} status
- * @property {string} payload
- */
-
-/**
  * POST /style
  * @summary Insert Style
  * @tags Style
  * @security BearerAuth
  * @param {InsertStyleBody} request.body.required - application/json
- * @return {InsertStyleResponse} 200 - Successful response - application/json
+ * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertStyleController: Controller =

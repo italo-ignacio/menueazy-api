@@ -2,7 +2,7 @@ import { finishedAt } from '@application/helper';
 import { tableFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
+import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import { tableRepository } from '@repository/table';
 import type { Request, Response } from 'express';
 
@@ -30,7 +30,7 @@ export const findOneTableController: Controller =
     try {
       const payload = await tableRepository.findOne({
         select: tableFindParams,
-        where: { id: Number(request.params.id), restaurantId: restaurant.id, finishedAt }
+        where: { id: toNumber(request.params.id), restaurantId: restaurant.id, finishedAt }
       });
 
       if (payload === null)

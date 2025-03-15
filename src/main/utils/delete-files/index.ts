@@ -1,8 +1,12 @@
-import { defaultFolder } from '../default-folder';
 import fs from 'fs';
+import { defaultFolder } from '../default-folder';
 
 export const deleteFiles = (files: string[]): void => {
-  files.forEach((file) => {
-    fs.unlinkSync(defaultFolder(file));
-  });
+  try {
+    files.forEach((file) => {
+      fs.unlinkSync(defaultFolder(file));
+    });
+  } catch {
+    /* */
+  }
 };

@@ -6,7 +6,7 @@ import { ColorEntity } from '@entity/color';
 import { StyleEntity } from '@entity/style';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
-import { errorLogger, forbidden, messageErrorResponse, notFound, ok } from '@main/utils';
+import { errorLogger, forbidden, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import type { Request, Response } from 'express';
 
 interface Body {
@@ -65,7 +65,7 @@ export const updateStyleController: Controller =
       await DataSource.transaction(async (manager) => {
         const style = await manager.findOne(StyleEntity, {
           select: { ...styleFindParams, companyId: true },
-          where: { id: Number(request.params.id) }
+          where: { id: toNumber(request.params.id) }
         });
 
         if (!style) {

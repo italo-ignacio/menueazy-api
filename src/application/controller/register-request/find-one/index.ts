@@ -1,10 +1,10 @@
+import { finishedAt } from '@application/helper';
 import { registerRequestFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
+import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import { registerRequestRepository } from '@repository/register-request';
 import type { Request, Response } from 'express';
-import { IsNull } from 'typeorm';
 
 /**
  * @typedef {object} FindOneRegisterRequestResponse
@@ -30,7 +30,7 @@ export const findOneRegisterRequestController: Controller =
     try {
       const payload = await registerRequestRepository.findOne({
         select: registerRequestFindParams,
-        where: { id: Number(request.params.id), finishedAt: IsNull() }
+        where: { id: toNumber(request.params.id), finishedAt }
       });
 
       if (payload === null)

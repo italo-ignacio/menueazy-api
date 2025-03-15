@@ -2,7 +2,7 @@ import type { Controller } from '@domain/protocols';
 import { OpeningHourEntity } from '@entity/opening-hour';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
-import { badRequest, errorLogger, ok } from '@main/utils';
+import { badRequest, errorLogger, ok, toNumber } from '@main/utils';
 import type { Request, Response } from 'express';
 
 /**
@@ -24,7 +24,7 @@ export const deleteOpeningHourController: Controller =
       await DataSource.createQueryBuilder()
         .update(OpeningHourEntity)
         .set({ finishedAt: new Date() })
-        .where('id = :id', { id: Number(request.params.id) })
+        .where('id = :id', { id: toNumber(request.params.id) })
         .andWhere('restaurant_id = :restaurantId', { restaurantId: restaurant.id })
         .execute();
 

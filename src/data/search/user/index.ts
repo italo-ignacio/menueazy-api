@@ -4,7 +4,6 @@ import type { FindOptionsSelect } from 'typeorm';
 export const userFindParams: FindOptionsSelect<UserEntity> = {
   id: true,
   email: true,
-  avatarUrl: true,
   name: true,
   phone: true,
   role: true,

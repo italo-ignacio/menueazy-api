@@ -30,18 +30,11 @@ interface Body {
  */
 
 /**
- * @typedef {object} InsertRegisterResponse
- * @property {string} message
- * @property {string} status
- * @property {string} payload
- */
-
-/**
  * POST /register-request
  * @summary Insert Register Request
  * @tags Register Request
  * @param {InsertRegisterBody} request.body.required - application/json
- * @return {InsertRegisterResponse} 200 - Successful response - application/json
+ * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertRegisterRequestController: Controller =

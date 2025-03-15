@@ -2,7 +2,7 @@ import type { Controller } from '@domain/protocols';
 import { TableEntity } from '@entity/table';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
-import { badRequest, errorLogger, ok } from '@main/utils';
+import { badRequest, errorLogger, ok, toNumber } from '@main/utils';
 import type { Request, Response } from 'express';
 
 /**
@@ -24,7 +24,7 @@ export const deleteTableController: Controller =
       await DataSource.createQueryBuilder()
         .update(TableEntity)
         .set({ finishedAt: new Date() })
-        .where('id = :id', { id: Number(request.params.id) })
+        .where('id = :id', { id: toNumber(request.params.id) })
         .andWhere('restaurant_id = :restaurantId', { restaurantId: restaurant.id })
         .execute();
 

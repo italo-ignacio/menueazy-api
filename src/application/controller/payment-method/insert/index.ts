@@ -25,20 +25,13 @@ interface Body {
  */
 
 /**
- * @typedef {object} InsertPaymentMethodResponse
- * @property {string} message
- * @property {string} status
- * @property {string} payload
- */
-
-/**
  * POST /restaurant/{restaurantId}/payment-method
  * @summary Insert Payment Method
  * @tags Payment Method
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
  * @param {InsertPaymentMethodBody} request.body.required - application/json
- * @return {InsertPaymentMethodResponse} 200 - Successful response - application/json
+ * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertPaymentMethodController: Controller =

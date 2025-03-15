@@ -2,7 +2,7 @@ import { finishedAt } from '@application/helper';
 import { userFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
+import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
 
@@ -30,7 +30,7 @@ export const findOneUserController: Controller =
     try {
       const payload = await userRepository.findOne({
         select: userFindParams,
-        where: { id: Number(request.params.id), finishedAt }
+        where: { id: toNumber(request.params.id), finishedAt }
       });
 
       if (payload === null) return notFound({ entity: messages[lang].entity.user, lang, response });

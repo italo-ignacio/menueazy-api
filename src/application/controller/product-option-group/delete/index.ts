@@ -2,7 +2,7 @@ import { cacheKeys } from '@domain/helpers';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import { cache } from '@infra/redis';
-import { badRequest, errorLogger, notFound, ok } from '@main/utils';
+import { badRequest, errorLogger, notFound, ok, toNumber } from '@main/utils';
 import { productOptionGroupRepository } from '@repository/product-option-group';
 import type { Request, Response } from 'express';
 
@@ -24,7 +24,7 @@ export const deleteProductOptionGroupController: Controller =
     try {
       const productOptionGroup = await productOptionGroupRepository.findOne({
         select: { id: true, product: { restaurantId: true } },
-        where: { id: Number(request.params.id), product: { restaurantId: restaurant.id } },
+        where: { id: toNumber(request.params.id), product: { restaurantId: restaurant.id } },
         relations: { product: true }
       });
 

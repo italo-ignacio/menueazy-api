@@ -9,10 +9,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
-import { CompanyEntity } from '../company';
 import { OrderEntity } from '../order';
+import { RestaurantEntity } from '../restaurant';
 
-@Index('delivery_person_name_company_id_key', ['name', 'company'], { unique: true })
+@Index('delivery_person_name_restaurant_id_key', ['name', 'restaurant'], { unique: true })
 @Entity('delivery_person')
 export class DeliveryPersonEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
@@ -24,19 +24,19 @@ export class DeliveryPersonEntity {
   @Column({ length: 25, type: 'varchar', nullable: true })
   public phone: string | null;
 
-  @Column({ type: 'integer', name: 'company_id' })
-  public companyId: number;
+  @Column({ type: 'integer', name: 'restaurant_id' })
+  public restaurantId: number;
 
   @OneToMany(() => OrderEntity, (order) => order.deliveryPerson)
   public orderList: OrderEntity[];
 
-  @ManyToOne(() => CompanyEntity, (company) => company.userList, {
+  @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.deliveryPersonList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
     nullable: false
   })
-  @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
-  public company: CompanyEntity;
+  @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
+  public restaurant: RestaurantEntity;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date;

@@ -2,7 +2,14 @@ import { hasUserByEmail, userIsOwner } from '@application/helper';
 import { updateUserSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { badRequest, errorLogger, forbidden, messageErrorResponse, ok } from '@main/utils';
+import {
+  badRequest,
+  errorLogger,
+  forbidden,
+  messageErrorResponse,
+  ok,
+  toNumber
+} from '@main/utils';
 import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
 
@@ -56,7 +63,7 @@ export const updateUserController: Controller =
       if (typeof phone === 'string') newPhone = phone.replace(/\D/gu, '');
 
       await userRepository.update(
-        { id: Number(request.params.id) },
+        { id: toNumber(request.params.id) },
         { email, name, phone: newPhone }
       );
 

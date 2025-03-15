@@ -26,20 +26,13 @@ interface Body {
  */
 
 /**
- * @typedef {object} InsertOpeningHourResponse
- * @property {string} message
- * @property {string} status
- * @property {string} payload
- */
-
-/**
  * POST /restaurant/{restaurantId}/opening-hour
  * @summary Insert Opening Hour
  * @tags Opening Hour
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
  * @param {InsertOpeningHourBody} request.body.required - application/json
- * @return {InsertOpeningHourResponse} 200 - Successful response - application/json
+ * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertOpeningHourController: Controller =

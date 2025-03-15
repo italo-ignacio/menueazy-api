@@ -1,3 +1,4 @@
+import { finishedAt } from '@application/helper';
 import { updateAddressSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
@@ -52,12 +53,10 @@ export const updateRestaurantAddressController: Controller =
       const { city, complement, country, latitude, longitude, number, state, street, zipCode } =
         request.body as Body;
 
-      const queryBuilder = restaurantRepository
-        .createQueryBuilder('r')
-        .where('r.id = :id', { id: request.restaurant.id })
-        .select(['r.id', 'r.addressId']);
-
-      const restaurant = await queryBuilder.getOne();
+      const restaurant = await restaurantRepository.findOne({
+        select: { id: true, addressId: true },
+        where: { id: request.restaurant.id, finishedAt }
+      });
 
       if (!restaurant)
         return notFound({ lang, entity: messages[lang].entity.restaurant, response });

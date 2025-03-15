@@ -39,11 +39,11 @@ const fileFilter = (req: any, file: any, cb: any): void => {
 
 const MB = 10;
 
-export const uploadOneFileMiddleware = multer({
+export const uploadFilesMiddleware = multer({
   fileFilter,
   limits: { fileSize: MB * 1024 * 1024 },
   storage
-}).single('image');
+}).array('images');
 
 export const handleMulterError = (
   err: Error,
@@ -52,27 +52,28 @@ export const handleMulterError = (
   next: NextFunction
 ) => {
   if (err instanceof MulterError)
-    return badRequest({
+    badRequest({
       response,
       lang: req.lang
     });
-
-  next();
+  else next();
 };
 
 export const insertImage: Controller =
   () => (request: Request, response: Response, next: NextFunction) => {
     try {
-      let filename: string | undefined;
-      const req = request as unknown as { file: { filename: string } };
+      const imageList: string[] = [];
 
-      if (req.file?.filename)
-        filename = `${request.protocol}://${request.get('host') ?? ''}/static/uploads/${
-          req.file.filename
-        }`;
+      if (Array.isArray(request?.files)) {
+        request.files.forEach((item) => {
+          imageList.push(
+            `${request.protocol}://${request.get('host') ?? ''}/static/uploads/${item.filename}`
+          );
+        });
+      }
 
-      if (typeof filename === 'string')
-        Object.assign(request, { body: { ...request.body, image: filename } });
+      if (imageList?.length)
+        Object.assign(request, { body: { ...request.body, images: imageList } });
 
       next();
     } catch (error) {

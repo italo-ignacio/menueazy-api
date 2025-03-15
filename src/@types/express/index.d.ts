@@ -7,7 +7,6 @@ declare global {
       user: {
         id: number;
         email: string;
-        avatarUrl: string;
         name: string;
         phone: string;
         role: Role;
@@ -16,10 +15,14 @@ declare global {
         finishedAt: Date | null;
         company: {
           id: number;
+          name: string;
+          companyUrl: string;
         };
       };
       restaurant: {
         id: number;
+        name: string;
+        restaurantUrl: string;
         style: { id: number };
         address: { id: number };
       };

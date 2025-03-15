@@ -18,20 +18,13 @@ interface Body {
  */
 
 /**
- * @typedef {object} InsertCategoryResponse
- * @property {string} message
- * @property {string} status
- * @property {string} payload
- */
-
-/**
  * POST /restaurant/{restaurantId}/category
  * @summary Insert Category
  * @tags Category
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
  * @param {InsertCategoryBody} request.body.required - application/json
- * @return {InsertCategoryResponse} 200 - Successful response - application/json
+ * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertCategoryController: Controller =

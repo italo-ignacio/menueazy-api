@@ -1,3 +1,5 @@
+export * from './check-company';
+export * from './check-restaurant';
 export * from './delete';
 export * from './find';
 export * from './find-one';

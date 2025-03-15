@@ -9,6 +9,8 @@
   "productOptionGroup": "Grupo de opções de produto",
   "productOptionItem": "Item do grupo do produto",
   "address": "Endereço",
+  "deliveryPerson": "Entregador",
   "plan": "Plano",
+  "productImage": "Imagem do produto",
   "category": "Categoria"
 }

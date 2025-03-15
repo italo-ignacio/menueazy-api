@@ -1,7 +1,7 @@
 import { findOneFullProduct } from '@application/helper';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
+import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import type { Request, Response } from 'express';
 
 /**
@@ -26,7 +26,7 @@ export const findOneProductController: Controller =
   () =>
   async ({ lang, restaurant, ...request }: Request, response: Response) => {
     try {
-      const payload = await findOneFullProduct(Number(request.params.id), restaurant.id);
+      const payload = await findOneFullProduct(toNumber(request.params.id), restaurant.id);
 
       if (payload === null)
         return notFound({ entity: messages[lang].entity.product, lang, response });

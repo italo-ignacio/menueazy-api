@@ -1,7 +1,7 @@
 import { updateRegisterRequestSchema } from '@data/validation/auth';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { errorLogger, messageErrorResponse, ok } from '@main/utils';
+import { errorLogger, messageErrorResponse, ok, toNumber } from '@main/utils';
 import { registerRequestRepository } from '@repository/register-request';
 import type { Request, Response } from 'express';
 
@@ -40,7 +40,7 @@ export const patchRegisterRequestController: Controller =
 
       const { canRegister } = request.body as Body;
 
-      await registerRequestRepository.update({ id: Number(request.params.id) }, { canRegister });
+      await registerRequestRepository.update({ id: toNumber(request.params.id) }, { canRegister });
 
       return ok({ lang, payload: messages[lang].default.successfullyUpdated, response });
     } catch (error) {

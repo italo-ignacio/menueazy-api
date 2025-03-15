@@ -38,7 +38,7 @@ interface Body {
  *   "password": "Senai@127"
  * }
  * @param {InsertUserBody} request.body.required
- * @return {InsertResponse} 200 - Successful response - application/json
+ * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertUserController: Controller =

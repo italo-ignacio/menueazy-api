@@ -3,7 +3,7 @@ import type { Controller } from '@domain/protocols';
 import { PaymentMethodEntity } from '@entity/payment-method';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
-import { errorLogger, messageErrorResponse, ok } from '@main/utils';
+import { errorLogger, messageErrorResponse, ok, toNumber } from '@main/utils';
 import type { Request, Response } from 'express';
 
 interface Body {
@@ -43,7 +43,7 @@ export const updatePaymentMethodController: Controller =
       await DataSource.createQueryBuilder()
         .update(PaymentMethodEntity)
         .set({ title, description, logoUrl })
-        .where('id = :id', { id: Number(request.params.id) })
+        .where('id = :id', { id: toNumber(request.params.id) })
         .andWhere('restaurant_id = :restaurantId', { restaurantId: restaurant.id })
         .execute();
 

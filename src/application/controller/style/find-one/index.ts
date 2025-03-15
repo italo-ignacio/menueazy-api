@@ -3,7 +3,7 @@ import { styleFindParams } from '@data/search';
 import { Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
+import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import { styleRepository } from '@repository/style';
 import type { Request, Response } from 'express';
 
@@ -36,7 +36,7 @@ export const findOneStyleController: Controller =
 
       const payload = await styleRepository.findOne({
         select: styleFindParams,
-        where: { id: Number(request.params.id), finishedAt, ...where }
+        where: { id: toNumber(request.params.id), finishedAt, ...where }
       });
 
       if (payload === null)

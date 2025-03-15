@@ -15,20 +15,13 @@ interface Body {
  */
 
 /**
- * @typedef {object} InsertProductOptionGroupResponse
- * @property {string} message
- * @property {string} status
- * @property {string} payload
- */
-
-/**
  * POST /restaurant/{restaurantId}/product-option-group
  * @summary Delete Product Option Group
  * @tags Product Option Group
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
  * @param {InsertProductOptionGroupBody} request.body.required - application/json
- * @return {InsertProductOptionGroupResponse} 200 - Successful response - application/json
+ * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertProductOptionGroupController: Controller =

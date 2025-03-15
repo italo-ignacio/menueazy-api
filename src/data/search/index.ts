@@ -7,6 +7,7 @@ export * from './color';
 export * from './company';
 export * from './coupon';
 export * from './currency';
+export * from './delivery-person';
 export * from './device';
 export * from './opening-hour';
 export * from './order';

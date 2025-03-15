@@ -2,6 +2,7 @@ export * from './address';
 export * from './auth';
 export * from './category';
 export * from './currency';
+export * from './delivery-person';
 export * from './opening-hour';
 export * from './payment-method';
 export * from './plan';

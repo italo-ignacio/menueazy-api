@@ -36,19 +36,12 @@ interface Body {
  */
 
 /**
- * @typedef {object} InsertRestaurantResponse
- * @property {string} message
- * @property {string} status
- * @property {string} payload
- */
-
-/**
  * POST /restaurant
  * @summary Insert Restaurant
  * @tags Restaurant
  * @security BearerAuth
  * @param {InsertRestaurantBody} request.body.required - application/json
- * @return {InsertRestaurantResponse} 200 - Successful response - application/json
+ * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
 export const insertRestaurantController: Controller =

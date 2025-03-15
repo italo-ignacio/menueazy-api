@@ -1,6 +1,6 @@
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { errorLogger, messageErrorResponse, notFound, ok } from '@main/utils';
+import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import { categoryRepository } from '@repository/category';
 import type { Request, Response } from 'express';
 
@@ -45,7 +45,7 @@ export const findOneCategoryController: Controller =
           qb.innerJoin('rp.product', 'p').where('p.finishedAt IS NULL')
         )
         .where('c.restaurantId = :restaurantId', { restaurantId: restaurant.id })
-        .andWhere('c.id = :id', { id: Number(request.params.id) })
+        .andWhere('c.id = :id', { id: toNumber(request.params.id) })
         .andWhere('c.finishedAt IS NULL')
         .getOne();
 

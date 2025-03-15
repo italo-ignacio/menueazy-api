@@ -38,6 +38,7 @@ interface Body {
 export const checkUserCompanyController: Controller =
   () =>
   async ({ lang, user, body }: Request, response: Response) => {
+    console.log(`aaaaaaaaaaaaaaaa`, { user });
     try {
       const { companyUrl } = body as Body;
 
@@ -59,6 +60,8 @@ export const checkUserCompanyController: Controller =
           finishedAt
         }
       });
+
+      if (!userDb) return forbidden({ lang, response });
 
       return ok({ payload: { canAccess: true, user: userDb }, lang, response });
     } catch (error) {

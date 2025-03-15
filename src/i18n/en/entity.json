@@ -9,6 +9,8 @@
   "productOptionGroup": "Product options group",
   "productOptionItem": "Item of options group",
   "plan": "Plan",
+  "productImage": "Product image",
+  "deliveryPerson": "Delivery person",
   "address": "Address",
   "category": "Category"
 }

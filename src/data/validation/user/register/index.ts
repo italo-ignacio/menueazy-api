@@ -5,7 +5,7 @@ export const registerUserSchema = yup.object().shape({
   body: yup.object().shape({
     email: emailRequired(),
     name: stringRequired(255),
-    password: stringRequired(),
+    password: stringRequired().min(8),
     phone: stringRequired(25),
     companyName: stringRequired(255),
     companyUrl: stringRequired(255),

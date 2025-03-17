@@ -1,6 +1,5 @@
 import { finishedAt } from '@application/helper';
 import { styleFindParams } from '@data/search';
-import { Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
@@ -29,14 +28,14 @@ export const findOneStyleController: Controller =
   () =>
   async ({ lang, user, ...request }: Request, response: Response) => {
     try {
-      const where = {};
-
-      if (user.role !== Role.ADMIN)
-        Object.assign(where, { generic: true, company: { id: user.company.id } });
+      const where = { id: toNumber(request.params.id), finishedAt };
 
       const payload = await styleRepository.findOne({
         select: styleFindParams,
-        where: { id: toNumber(request.params.id), finishedAt, ...where }
+        where: [
+          { ...where, generic: true },
+          { ...where, companyId: user.company.id }
+        ]
       });
 
       if (payload === null)

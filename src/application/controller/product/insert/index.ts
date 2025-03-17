@@ -3,8 +3,11 @@ import type { Controller } from '@domain/protocols';
 import { CategoryEntity } from '@entity/category';
 import { ProductEntity } from '@entity/product';
 import { ProductCategoryEntity } from '@entity/product-category';
+import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
-import { created, errorLogger, messageErrorResponse } from '@main/utils';
+import { badRequest, created, errorLogger, messageErrorResponse } from '@main/utils';
+import { productRepository } from '@repository/product';
+import { subscriptionRepository } from '@repository/subscription';
 import type { Request, Response } from 'express';
 
 /**
@@ -30,9 +33,23 @@ import type { Request, Response } from 'express';
  */
 export const insertProductController: Controller =
   () =>
-  async ({ lang, restaurant }: Request, response: Response) => {
+  async ({ lang, user, restaurant }: Request, response: Response) => {
     try {
       let payload = {};
+
+      const subscription = await subscriptionRepository.findOne({
+        select: { id: true, productLimit: true },
+        where: { company: { id: user.company.id } }
+      });
+
+      if (!subscription) return badRequest({ lang, response });
+
+      const productCount = await productRepository.count({
+        where: { restaurantId: restaurant.id, finishedAt }
+      });
+
+      if (subscription.productLimit > productCount)
+        return badRequest({ message: messages[lang].error.maxRestaurant, lang, response });
 
       await DataSource.transaction(async (manager) => {
         const { identifiers } = await manager.insert(ProductEntity, {
@@ -41,7 +58,7 @@ export const insertProductController: Controller =
           restaurantId: restaurant.id
         });
 
-        payload = identifiers;
+        payload = identifiers[0];
 
         const category = await manager.findOne(CategoryEntity, {
           select: { id: true },

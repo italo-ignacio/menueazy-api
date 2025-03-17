@@ -1,11 +1,14 @@
+import { Role } from '@domain/enum';
 import { yup } from '@infra/yup';
-import { emailRequired, stringRequired } from '@main/utils';
+import { emailRequired, enumTypeRequired, numberNotRequired, stringRequired } from '@main/utils';
 
 export const insertUserSchema = yup.object().shape({
   body: yup.object().shape({
     email: emailRequired(),
-    name: stringRequired(),
-    password: stringRequired(),
-    phone: stringRequired()
+    name: stringRequired(255),
+    password: stringRequired().min(8),
+    phone: stringRequired(25),
+    role: enumTypeRequired({ data: Role }),
+    restaurantId: numberNotRequired().integer()
   })
 });

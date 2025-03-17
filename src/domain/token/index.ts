@@ -1,5 +1,21 @@
 import type { Role } from '@domain/enum';
 
+export interface RequestUser {
+  id: number;
+  email: string;
+  name: string;
+  phone: string;
+  role: Role;
+  createdAt: Date;
+  updatedAt: Date;
+  finishedAt: Date | null;
+  company: {
+    id: number;
+    name: string;
+    companyUrl: string;
+  };
+}
+
 export interface UserTokenInput {
   id: number;
   email: string;

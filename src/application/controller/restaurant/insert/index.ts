@@ -1,11 +1,16 @@
+import { finishedAt } from '@application/helper';
 import { insertRestaurantSchema } from '@data/validation';
+import { Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import { CategoryEntity } from '@entity/category';
 import { RestaurantEntity } from '@entity/restaurant';
+import { UserEntity } from '@entity/user';
 import { UserRestaurantEntity } from '@entity/user-restaurant';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
-import { created, errorLogger, messageErrorResponse } from '@main/utils';
+import { badRequest, created, errorLogger, messageErrorResponse } from '@main/utils';
+import { restaurantRepository } from '@repository/restaurant';
+import { subscriptionRepository } from '@repository/subscription';
 import type { Request, Response } from 'express';
 
 interface Body {
@@ -63,6 +68,20 @@ export const insertRestaurantController: Controller =
         priceByKmInDelivery
       } = request.body as Body;
 
+      const subscription = await subscriptionRepository.findOne({
+        select: { id: true, restaurantLimit: true },
+        where: { company: { id: user.company.id } }
+      });
+
+      if (!subscription) return badRequest({ lang, response });
+
+      const restaurantCount = await restaurantRepository.count({
+        where: { companyId: user.company.id, finishedAt }
+      });
+
+      if (subscription.restaurantLimit > restaurantCount)
+        return badRequest({ message: messages[lang].error.maxRestaurant, lang, response });
+
       await DataSource.transaction(async (manager) => {
         const restaurant = manager.create(RestaurantEntity, {
           name,
@@ -80,19 +99,20 @@ export const insertRestaurantController: Controller =
 
         await manager.save(restaurant);
 
-        const userRestaurant = manager.create(UserRestaurantEntity, {
-          restaurant,
-          userId: user.id
+        const usersOwner = await manager.find(UserEntity, {
+          select: { id: true },
+          where: { finishedAt, role: Role.OWNER, companyId: user.company.id }
         });
 
-        await manager.save(userRestaurant);
+        await manager.insert(
+          UserRestaurantEntity,
+          usersOwner.map((user) => ({ restaurant, user }))
+        );
 
-        const category = manager.create(CategoryEntity, {
+        await manager.insert(CategoryEntity, {
           name: messages[lang].default.other,
           restaurant
         });
-
-        await manager.save(category);
       });
 
       return created({ lang, response });

@@ -1,22 +1,18 @@
-import { hasUserByEmail, userIsOwner } from '@application/helper';
 import { updateUserSchema } from '@data/validation';
+import { canChangeRoles, Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import {
-  badRequest,
-  errorLogger,
-  forbidden,
-  messageErrorResponse,
-  ok,
-  toNumber
-} from '@main/utils';
+import { env } from '@main/config';
+import { errorLogger, forbidden, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import { userRepository } from '@repository/user';
+import { hash } from 'bcrypt';
 import type { Request, Response } from 'express';
 
 interface Body {
-  password?: string;
-  email?: string;
   name?: string;
+  email?: string;
+  password?: string;
+  role?: Role;
   phone?: string;
 }
 
@@ -26,6 +22,7 @@ interface Body {
  * @property {string} email
  * @property {string} password
  * @property {string} phone
+ * @property {string} role
  */
 
 /**
@@ -42,29 +39,55 @@ interface Body {
  */
 export const updateUserController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, user, ...request }: Request, response: Response) => {
     try {
-      if (!userIsOwner(request as Request))
-        return forbidden({
-          message: { english: 'update this user', portuguese: 'atualizar este usuário' },
-          lang,
-          response
-        });
-
       await updateUserSchema.validate(request, { abortEarly: false });
 
-      const { email, name, phone } = request.body as Body;
+      const { email, name, phone, password, role } = request.body as Body;
 
-      if (typeof email === 'string' && (await hasUserByEmail(email)) !== false)
-        return badRequest({ message: messages[lang].error.duplicateKey, lang, response });
+      const userData = await userRepository.findOne({
+        select: { id: true, role: true },
+        where: { companyId: user.company.id, id: toNumber(request.params.id) }
+      });
 
+      if (!userData) return notFound({ entity: messages[lang].entity.user, lang, response });
+
+      const isEditingOwnAccount = user.id === userData.id;
+
+      const isAllowedToEdit =
+        !isEditingOwnAccount && canChangeRoles[user.role]?.includes(userData.role);
+
+      if (!isAllowedToEdit) {
+        return forbidden({ lang, response });
+      }
+
+      let newName: string | undefined;
       let newPhone: string | undefined;
+      let newRole: Role | undefined;
+      let newPassword: string | undefined;
+      let newEmail: string | undefined;
 
-      if (typeof phone === 'string') newPhone = phone.replace(/\D/gu, '');
+      if (typeof name === 'string' && name.length >= 1) newName = name;
+      if (typeof phone === 'string' && phone.length >= 1) newPhone = phone.replace(/\D/gu, '');
+      if (typeof password === 'string' && password.length >= 8)
+        newPassword = await hash(password, env.HASH_SALT);
+
+      if (!isEditingOwnAccount && typeof email === 'string' && email.length > 1) {
+        newEmail = email;
+      }
+
+      if (!isEditingOwnAccount && typeof role === 'string') {
+        if (
+          Object.values(Role).includes(role as Role) &&
+          canChangeRoles[user.role]?.includes(role as Role)
+        ) {
+          newRole = role as Role;
+        }
+      }
 
       await userRepository.update(
-        { id: toNumber(request.params.id) },
-        { email, name, phone: newPhone }
+        { id: userData.id },
+        { email: newEmail, name: newName, phone: newPhone, role: newRole, password: newPassword }
       );
 
       return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });

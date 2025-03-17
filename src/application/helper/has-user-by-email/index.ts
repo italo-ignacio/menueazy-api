@@ -1,6 +1,6 @@
-import { IsNull } from 'typeorm';
-import { userRepository } from '@repository/user';
 import type { UserEntity } from '@entity/user';
+import { userRepository } from '@repository/user';
+import { finishedAt } from '../finished-at';
 
 export const hasUserByEmail = async (
   email: string
@@ -17,7 +17,7 @@ export const hasUserByEmail = async (
         phone: true,
         role: true
       },
-      where: { email, finishedAt: IsNull() }
+      where: { email, finishedAt }
     })) ?? false
   );
 };

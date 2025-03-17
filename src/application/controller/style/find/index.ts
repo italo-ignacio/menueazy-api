@@ -1,7 +1,6 @@
 import { styleFindParams } from '@data/search';
 import type { styleQueryFields } from '@data/validation';
 import { styleListQueryFields } from '@data/validation';
-import { Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import {
   errorLogger,
@@ -55,15 +54,15 @@ export const findStyleController: Controller =
         query
       });
 
-      if (user.role !== Role.ADMIN)
-        Object.assign(where, { generic: true, company: { id: user.company.id } });
-
       const [content, totalElements] = await styleRepository.findAndCount({
         order,
         select: styleFindParams,
         skip,
         take,
-        where
+        where: [
+          { ...where, generic: true },
+          { ...where, companyId: user.company.id }
+        ]
       });
 
       return ok({

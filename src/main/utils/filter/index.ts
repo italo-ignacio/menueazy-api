@@ -94,6 +94,8 @@ export const getGenericFilter = <QueryType extends string>({
         });
       else if (item.endsWith('Id'))
         Object.assign(where, { [item.replace('Id', '')]: { id: query[item] } });
+      else if (item.endsWith('Enum'))
+        Object.assign(where, { [item.replace('Enum', '')]: query[item] });
       else if (item === 'zipCode' || item === 'phone')
         Object.assign(where, { [item]: ILike(`%${query[item]?.replace(/\D/gu, '') ?? ''}%`) });
       else Object.assign(where, { [item]: ILike(`%${query[item] ?? ''}%`) });

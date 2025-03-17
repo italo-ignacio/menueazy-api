@@ -1,3 +1,3 @@
-export type userQueryFields = 'email' | 'id' | 'name' | 'phone';
+export type userQueryFields = 'email' | 'id' | 'name' | 'phone' | 'roleEnum';
 
-export const userListQueryFields: userQueryFields[] = ['name', 'id', 'email', 'phone'];
+export const userListQueryFields: userQueryFields[] = ['name', 'id', 'email', 'phone', 'roleEnum'];

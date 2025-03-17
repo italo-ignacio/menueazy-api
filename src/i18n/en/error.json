@@ -17,5 +17,7 @@
   "internalServerError": "Internal server error",
   "checkYourEmail": "Check your email before logging in",
   "maxCategories": "Max of categories is",
+  "maxRestaurant": "You have reached the maximum number of restaurants in your plan",
+  "maxProduct": "You have reached the maximum number of products in your plan",
   "selectAValidCurrencyType": "Select a valid currency type"
 }

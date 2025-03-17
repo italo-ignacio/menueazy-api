@@ -17,5 +17,6 @@
   "invalidOrderValue": "Valor da ordem invalido",
   "checkYourEmail": "Verifique seu e-mail antes de realizar login",
   "maxCategories": "O maximo de categorias e",
+  "maxRestaurant": "Você atingiu o número máximo de restaurantes do seu plano",
   "selectAValidCurrencyType": "Selecione um tipo de moeda válido"
 }

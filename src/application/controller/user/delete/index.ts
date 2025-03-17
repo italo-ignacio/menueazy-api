@@ -1,7 +1,7 @@
-import { userIsOwner } from '@application/helper';
+import { canChangeUser } from '@application/helper';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
-import { badRequest, errorLogger, forbidden, ok, toNumber } from '@main/utils';
+import { badRequest, errorLogger, forbidden, notFound, ok, toNumber } from '@main/utils';
 import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
 
@@ -20,12 +20,12 @@ export const deleteUserController: Controller =
   () =>
   async ({ lang, ...request }: Request, response: Response) => {
     try {
-      if (!userIsOwner(request as Request))
-        return forbidden({
-          message: { english: 'delete this user', portuguese: 'deletar este usuário' },
-          lang,
-          response
-        });
+      const canChange = await canChangeUser(request.user, request.params.id);
+
+      if (canChange === null)
+        return notFound({ entity: messages[lang].entity.user, lang, response });
+
+      if (canChange === false) return forbidden({ lang, response });
 
       await userRepository.update({ id: toNumber(request.params.id) }, { finishedAt: new Date() });
 

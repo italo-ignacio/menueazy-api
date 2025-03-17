@@ -1,7 +1,6 @@
 import { restaurantFindParams } from '@data/search';
 import type { restaurantQueryFields } from '@data/validation';
 import { restaurantListQueryFields } from '@data/validation';
-import { Role } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import {
   errorLogger,
@@ -57,7 +56,7 @@ export const findRestaurantController: Controller =
         query
       });
 
-      if (user.role !== Role.ADMIN) Object.assign(where, { company: { id: user.company.id } });
+      Object.assign(where, { companyId: user.company.id });
 
       const [content, totalElements] = await restaurantRepository.findAndCount({
         order,

@@ -1,5 +1,3 @@
-import { finishedAt } from '@application/helper';
-import { userFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
 import { messages } from '@i18n/index';
 import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
@@ -26,17 +24,41 @@ import type { Request, Response } from 'express';
  */
 export const findOneUserController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, user, ...request }: Request, response: Response) => {
     try {
-      const payload = await userRepository.findOne({
-        select: userFindParams,
-        where: { id: toNumber(request.params.id), finishedAt }
-      });
+      const findParams = [
+        'u.id',
+        'u.name',
+        'u.email',
+        'u.phone',
+        'u.role',
+        'u.createdAt',
+        'u.updatedAt',
+        'u.finishedAt',
 
-      if (payload === null) return notFound({ entity: messages[lang].entity.user, lang, response });
+        'url.id',
+
+        'r.id',
+        'r.name',
+        'r.restaurantUrl'
+      ];
+
+      const data = await userRepository
+        .createQueryBuilder('u')
+        .select(findParams)
+        .leftJoin('u.userRestaurantList', 'url')
+        .innerJoin('url.restaurant', 'r')
+        .where('u.id = :id', { id: toNumber(request.params.id) })
+        .andWhere('u.companyId = :companyId', { companyId: user.company.id })
+        .andWhere('u.finishedAt IS NULL')
+        .getOne();
+
+      if (data === null) return notFound({ entity: messages[lang].entity.user, lang, response });
+
+      const { userRestaurantList, ...rest } = data;
 
       return ok({
-        payload,
+        payload: { rest, restaurantList: userRestaurantList.map((item) => item.restaurant) },
         lang,
         response
       });

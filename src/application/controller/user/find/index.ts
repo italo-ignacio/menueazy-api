@@ -7,10 +7,12 @@ import {
   getGenericFilter,
   getPagination,
   messageErrorResponse,
-  ok
+  ok,
+  toNumber
 } from '@main/utils';
 import { userRepository } from '@repository/user';
 import type { Request, Response } from 'express';
+import { Not } from 'typeorm';
 
 /**
  * @typedef {object} FindUserPayload
@@ -34,11 +36,14 @@ import type { Request, Response } from 'express';
  * @param {string} name.query
  * @param {string} email.query
  * @param {string} phone.query
+ * @param {integer} restaurantId.query
+ * @param {integer} notRestaurantId.query
+ * @param {string} roleEnum.query - enum:OWNER,MANAGER,SUPERVISOR,EMPLOYEE
  * @param {integer} page.query
  * @param {integer} limit.query
  * @param {string} startDate.query (Ex: 2024-01-01).
  * @param {string} endDate.query (Ex: 2024-01-01).
- * @param {string} orderBy.query - enum:id,name,phone,email,createdAt,updatedAt
+ * @param {string} orderBy.query - enum:id,name,phone,email,role,createdAt,updatedAt
  * @param {string} sort.query - enum:asc,desc
  * @return {FindUserResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
@@ -46,7 +51,7 @@ import type { Request, Response } from 'express';
  */
 export const findUserController: Controller =
   () =>
-  async ({ query, lang }: Request, response: Response) => {
+  async ({ query, user, lang }: Request, response: Response) => {
     try {
       const { skip, take } = getPagination({ query });
 
@@ -54,6 +59,18 @@ export const findUserController: Controller =
         list: userListQueryFields,
         query
       });
+
+      Object.assign(where, { companyId: user.company.id });
+
+      if (toNumber(query.restaurantId) !== -1)
+        Object.assign(where, {
+          userRestaurantList: { restaurantId: toNumber(query.restaurantId) }
+        });
+
+      if (toNumber(query.notRestaurantId) !== -1)
+        Object.assign(where, {
+          userRestaurantList: { restaurantId: Not(toNumber(query.notRestaurantId)) }
+        });
 
       const [content, totalElements] = await userRepository.findAndCount({
         order,

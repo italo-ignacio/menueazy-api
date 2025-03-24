@@ -21,12 +21,6 @@ export class OrderProductEntity {
   @Column({ type: 'text', nullable: true })
   public observation: string | null;
 
-  @Column({ type: 'integer', name: 'order_id' })
-  public orderId: number;
-
-  @Column({ type: 'integer', name: 'product_id' })
-  public productId: number;
-
   @Column({ type: 'integer' })
   public quantity: number;
 
@@ -44,6 +38,9 @@ export class OrderProductEntity {
   })
   public status: ProductStatus;
 
+  @Column({ type: 'integer', name: 'order_id' })
+  public orderId: number;
+
   @ManyToOne(() => OrderEntity, (order) => order.orderProductList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -51,6 +48,9 @@ export class OrderProductEntity {
   })
   @JoinColumn([{ name: 'order_id', referencedColumnName: 'id' }])
   public order: OrderEntity;
+
+  @Column({ type: 'integer', name: 'product_id' })
+  public productId: number;
 
   @ManyToOne(() => ProductEntity, (product) => product.orderProductList, {
     onDelete: 'CASCADE',

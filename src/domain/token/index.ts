@@ -26,7 +26,8 @@ export interface UserTokenInput {
 export interface ClientTokenInput {
   id: number;
   email: string;
-  firebaseId: string | null;
+  firebaseId: string;
+  isBlocked: boolean;
 }
 
 export interface LoginToken {

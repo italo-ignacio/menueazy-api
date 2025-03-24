@@ -1,10 +1,10 @@
 import { finishedAt } from '@application/helper';
-import { userFindParams } from '@data/search';
+import { clientFindParams } from '@data/search';
 import type { Controller } from '@domain/protocols';
-import type { UserTokenInput } from '@domain/token';
+import type { ClientTokenInput } from '@domain/token';
 import { env } from '@main/config/env';
 import { errorLogger, removeBearer, unauthorized } from '@main/utils';
-import { userRepository } from '@repository/user';
+import { clientRepository } from '@repository/client';
 import type { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 
@@ -21,34 +21,24 @@ export const validateClientMiddleware: Controller =
       if (accessToken === null) return unauthorized({ lang, response });
 
       const { SECRET } = env.JWT;
-      const {
-        user: { companyId, email, id, role }
-      } = verify(accessToken, SECRET) as { user: UserTokenInput };
+      const { email, firebaseId, id, isBlocked } = verify(accessToken, SECRET) as ClientTokenInput;
 
       if (
         typeof id === 'undefined' ||
         typeof email === 'undefined' ||
-        typeof role === 'undefined' ||
-        typeof companyId === 'undefined'
+        typeof firebaseId === 'undefined' ||
+        typeof isBlocked === 'undefined'
       )
         return unauthorized({ lang, response });
 
-      const user = await userRepository.findOne({
-        select: {
-          ...userFindParams,
-          company: {
-            id: true,
-            name: true,
-            companyUrl: true
-          }
-        },
-        relations: { company: true },
-        where: { email, id, role, companyId, finishedAt }
+      const client = await clientRepository.findOne({
+        select: clientFindParams,
+        where: { email, id, firebaseId, isBlocked, finishedAt }
       });
 
-      if (user === null) return unauthorized({ lang, response });
+      if (client === null || client.isBlocked) return unauthorized({ lang, response });
 
-      Object.assign(request, { user });
+      Object.assign(request, { client });
       next();
     } catch (error) {
       errorLogger(error);

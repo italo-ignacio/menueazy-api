@@ -10,5 +10,6 @@ export enum OrderStatus {
 
 export enum OrderType {
   RESTAURANT = 'RESTAURANT',
-  DELIVERY = 'DELIVERY'
+  DELIVERY = 'DELIVERY',
+  PICKUP = 'PICKUP'
 }

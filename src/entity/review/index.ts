@@ -2,9 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
@@ -14,9 +14,6 @@ import { OrderEntity } from '../order';
 import { ProductEntity } from '../product';
 import { RestaurantEntity } from '../restaurant';
 
-@Index('review_client_id_order_id_idx', ['client', 'order'], {
-  unique: true
-})
 @Entity('review')
 export class ReviewEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })
@@ -39,15 +36,7 @@ export class ReviewEntity {
   @JoinColumn([{ name: 'client_id', referencedColumnName: 'id' }])
   public client: ClientEntity;
 
-  @Column({ type: 'integer', name: 'order_id', nullable: true })
-  public orderId: number | null;
-
-  @ManyToOne(() => OrderEntity, (order) => order.reviewList, {
-    onDelete: 'SET NULL',
-    onUpdate: 'CASCADE',
-    nullable: true
-  })
-  @JoinColumn([{ name: 'order_id', referencedColumnName: 'id' }])
+  @OneToOne(() => OrderEntity, (order) => order.review, { nullable: true })
   public order: OrderEntity | null;
 
   @Column({ type: 'integer', name: 'product_id', nullable: true })

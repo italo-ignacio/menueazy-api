@@ -93,22 +93,30 @@ export class OrderEntity {
   @JoinColumn([{ name: 'table_id', referencedColumnName: 'id' }])
   public table: TableEntity | null;
 
-  @Column({ type: 'integer', name: 'address_id' })
-  public addressId: number;
+  @Column({ type: 'integer', name: 'address_id', nullable: true })
+  public addressId: number | null;
 
   @ManyToOne(() => AddressEntity, (address) => address.orderList, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
-    nullable: false
+    nullable: true
   })
   @JoinColumn([{ name: 'address_id', referencedColumnName: 'id' }])
-  public address: AddressEntity;
+  public address: AddressEntity | null;
 
   @OneToMany(() => OrderProductEntity, (orderProduct) => orderProduct.order)
   public orderProductList: OrderProductEntity[];
 
-  @OneToMany(() => ReviewEntity, (review) => review.order)
-  public reviewList: ReviewEntity[];
+  @Column({ type: 'integer', name: 'review_id', nullable: true })
+  public reviewId: number | null;
+
+  @OneToOne(() => ReviewEntity, (review) => review.order, {
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+    nullable: true
+  })
+  @JoinColumn([{ name: 'review_id', referencedColumnName: 'id' }])
+  public review: ReviewEntity | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date;

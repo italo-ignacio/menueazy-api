@@ -1,4 +1,4 @@
-import type { UserTokenInput } from '@domain/token';
+import type { ClientTokenInput, UserTokenInput } from '@domain/token';
 import { env } from '@main/config/env';
 import { sign } from 'jsonwebtoken';
 
@@ -17,6 +17,12 @@ interface generateTokenOutput {
 }
 
 export const generateToken = (data: UserTokenInput): generateTokenOutput => {
+  const { EXPIRES_IN, SECRET } = env.JWT;
+
+  return { accessToken: sign(data, SECRET, { expiresIn: EXPIRES_IN }) };
+};
+
+export const generateClientToken = (data: ClientTokenInput): generateTokenOutput => {
   const { EXPIRES_IN, SECRET } = env.JWT;
 
   return { accessToken: sign(data, SECRET, { expiresIn: EXPIRES_IN }) };

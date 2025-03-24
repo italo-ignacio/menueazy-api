@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
+import { OrderProductOptionItemEntity } from '../order-product-option-item';
 import { ProductEntity } from '../product';
 import { ProductOptionItemEntity } from '../product-option-item';
 
@@ -48,6 +49,12 @@ export class ProductOptionGroupEntity {
     { eager: true }
   )
   public productOptionItemList: ProductOptionItemEntity[];
+
+  @OneToMany(
+    () => OrderProductOptionItemEntity,
+    (orderProductOptionItem) => orderProductOptionItem.productOptionGroup
+  )
+  public orderProductOptionItemList: OrderProductOptionItemEntity[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date;

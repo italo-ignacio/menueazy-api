@@ -34,7 +34,7 @@ interface Body {
 /**
  * POST /auth/user/login
  * @summary User Login
- * @tags A Auth
+ * @tags Auth
  * @param {UserLoginBody} request.body.required - application/json
  * @return {UserLoginResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json

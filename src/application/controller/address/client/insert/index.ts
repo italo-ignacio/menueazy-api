@@ -1,96 +1,70 @@
-import { insertRestaurantSchema } from '@data/validation';
+import { insertAddressSchema } from '@data/validation';
 import type { Controller } from '@domain/protocols';
-import { RestaurantEntity } from '@entity/restaurant';
-import { StyleEntity } from '@entity/style';
-import { UserRestaurantEntity } from '@entity/user-restaurant';
+import { AddressEntity } from '@entity/address';
+import { ClientAddressEntity } from '@entity/client-address';
 import { DataSource } from '@infra/database';
 import { created, errorLogger, messageErrorResponse } from '@main/utils';
 import type { Request, Response } from 'express';
 
 interface Body {
-  name: string;
-  phone: string;
-  restaurantUrl: string;
-  hasDelivery: boolean;
-  minimumOrderPrice: number;
-  contactLink?: string;
-  description?: string;
-  maxDeliveryDistanceInKm?: number;
-  minimumDeliveryPrice?: number;
-  priceByKmInDelivery?: number;
+  city: string;
+  country: string;
+  number: string;
+  state: string;
+  street: string;
+  zipCode: string;
+  latitude: string;
+  longitude: string;
+  complement?: string;
 }
 
 /**
- * @typedef {object} InsertRestaurantBody
- * @property {string} name.required
- * @property {string} phone.required
- * @property {string} restaurantUrl.required
- * @property {boolean} hasDelivery.required
- * @property {number} minimumOrderPrice.required
- * @property {string} contactLink
- * @property {string} description
- * @property {number} maxDeliveryDistanceInKm
- * @property {number} minimumDeliveryPrice
- * @property {number} priceByKmInDelivery
+ * @typedef {object} InsertClientAddressBody
+ * @property {string} city.required
+ * @property {string} country.required
+ * @property {string} number.required
+ * @property {string} state.required
+ * @property {string} street.required
+ * @property {string} zipCode.required
+ * @property {string} latitude.required
+ * @property {string} longitude.required
+ * @property {string} complement
  */
 
 /**
- * POST /restaurant
- * @summary Insert Restaurant
- * @tags Restaurant
+ * POST /client/address
+ * @summary Insert Client Address
+ * @tags Client Address
  * @security BearerAuth
- * @param {InsertRestaurantBody} request.body.required - application/json
+ * @param {InsertClientAddressBody} request.body.required - application/json
  * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
  */
-export const insertRestaurantController: Controller =
+export const insertClientAddressController: Controller =
   () =>
-  async ({ lang, ...request }: Request, response: Response) => {
+  async ({ lang, client, ...request }: Request, response: Response) => {
     try {
-      await insertRestaurantSchema.validate(request, { abortEarly: false });
+      await insertAddressSchema.validate(request, { abortEarly: false });
 
-      const {
-        name,
-        hasDelivery,
-        minimumOrderPrice,
-        phone,
-        restaurantUrl,
-        contactLink,
-        description,
-        maxDeliveryDistanceInKm,
-        minimumDeliveryPrice,
-        priceByKmInDelivery
-      } = request.body as Body;
+      const { city, country, latitude, longitude, number, state, street, zipCode, complement } =
+        request.body as Body;
 
       await DataSource.transaction(async (manager) => {
-        const style = await manager.findOne(StyleEntity, { where: { generic: true } });
-
-        if (!style) throw new Error();
-
-        const restaurant = manager.create(RestaurantEntity, {
-          name,
-          companyId: request.user.company.id,
-          contactLink,
-          description,
-          hasDelivery,
-          maxDeliveryDistanceInKm,
-          minimumDeliveryPrice,
-          minimumOrderPrice,
-          open: false,
-          phone,
-          priceByKmInDelivery,
-          restaurantUrl,
-          style
+        const address = manager.create(AddressEntity, {
+          city,
+          country,
+          latitude,
+          longitude,
+          number,
+          state,
+          street,
+          zipCode,
+          complement
         });
 
-        await manager.save(restaurant);
+        await manager.save(address);
 
-        const userRestaurant = manager.create(UserRestaurantEntity, {
-          restaurant,
-          userId: request.user.id
-        });
-
-        await manager.save(userRestaurant);
+        await manager.insert(ClientAddressEntity, { address, client: { id: client.id } });
       });
 
       return created({ lang, response });

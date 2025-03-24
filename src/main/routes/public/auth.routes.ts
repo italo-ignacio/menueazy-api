@@ -1,4 +1,4 @@
-import { userLoginController } from '@application/controller/auth';
+import { clientLoginController, userLoginController } from '@application/controller/auth';
 import { env } from '@main/config';
 import { hash } from 'bcrypt';
 import { Router } from 'express';
@@ -12,8 +12,8 @@ export default (inputRouter: Router): void => {
     res.json({ password });
   });
 
-  // User Login
   router.post('/user/login', userLoginController());
+  router.post('/client/login', clientLoginController());
 
   inputRouter.use('/auth', router);
 };

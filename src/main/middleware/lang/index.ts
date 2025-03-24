@@ -1,10 +1,16 @@
+import { Langs, LangsList } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import type { NextFunction, Request, Response } from 'express';
 
 export const langMiddleware: Controller =
   () => async (request: Request, response: Response, next: NextFunction) => {
-    const { Lang } = request.headers;
+    const { lang } = request.headers;
 
-    Object.assign(request, { lang: Lang ?? 'en' });
+    if (typeof lang === 'string') {
+      const newLang = LangsList.includes(lang as Langs) ? lang : 'en';
+
+      Object.assign(request, { lang: newLang });
+    }
+
     next();
   };

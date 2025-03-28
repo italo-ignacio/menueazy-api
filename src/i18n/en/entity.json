@@ -10,6 +10,10 @@
   "productOptionItem": "Item of options group",
   "plan": "Plan",
   "productImage": "Product image",
+  "ingredient": "Ingredient",
+  "ingredientData": "Ingredient data",
+  "productIngredient": "Product ingredient",
+  "company": "Company",
   "deliveryPerson": "Delivery person",
   "address": "Address",
   "category": "Category"

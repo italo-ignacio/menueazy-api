@@ -14,6 +14,7 @@ import { CategoryEntity } from '../category';
 import { ClientReportEntity } from '../client-report';
 import { CompanyEntity } from '../company';
 import { DeliveryPersonEntity } from '../delivery-person';
+import { IngredientEntity } from '../ingredient';
 import { OpeningHourEntity } from '../opening-hour';
 import { OrderEntity } from '../order';
 import { PaymentMethodEntity } from '../payment-method';
@@ -125,6 +126,9 @@ export class RestaurantEntity {
 
   @OneToMany(() => ClientReportEntity, (clientReport) => clientReport.restaurant)
   public clientReportList: ClientReportEntity[];
+
+  @OneToMany(() => IngredientEntity, (ingredient) => ingredient.restaurant)
+  public ingredientList: IngredientEntity[];
 
   @OneToMany(() => DeliveryPersonEntity, (deliveryPerson) => deliveryPerson.restaurant)
   public deliveryPersonList: DeliveryPersonEntity[];

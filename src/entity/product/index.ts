@@ -11,6 +11,7 @@ import {
 import { OrderProductEntity } from '../order-product';
 import { ProductCategoryEntity } from '../product-category';
 import { ProductImageEntity } from '../product-image';
+import { ProductIngredientEntity } from '../product-ingredient';
 import { ProductOptionGroupEntity } from '../product-option-group';
 import { ProductOptionItemEntity } from '../product-option-item';
 import { RestaurantEntity } from '../restaurant';
@@ -64,6 +65,12 @@ export class ProductEntity {
   })
   @JoinColumn([{ name: 'restaurant_id', referencedColumnName: 'id' }])
   public restaurant: RestaurantEntity;
+
+  @Column({ type: 'integer', name: 'max_additional_ingredient', default: 9 })
+  public maxAdditionalIngredient: number;
+
+  @OneToMany(() => ProductIngredientEntity, (productIngredient) => productIngredient.product)
+  public productIngredientList: ProductIngredientEntity[];
 
   @OneToMany(() => OrderProductEntity, (orderProduct) => orderProduct.product)
   public orderProductList: OrderProductEntity[];

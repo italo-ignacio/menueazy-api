@@ -88,6 +88,7 @@
     "NOTCHECKED",
     "pogl",
     "poil",
+    "timestamptz",
     "uncategorized",
     "VEHICLESIZE",
     "VEHICLETYPE"

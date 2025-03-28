@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { env } from '../main/config/env';
 
-export class Seed1742846501101 implements MigrationInterface {
+export class Seed1743182095550 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `INSERT INTO currency (code, "name", symbol) VALUES 

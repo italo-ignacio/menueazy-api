@@ -2,6 +2,10 @@ import {
   findCategoryController,
   findOneCategoryController
 } from '@application/controller/category';
+import {
+  findIngredientController,
+  findOneIngredientController
+} from '@application/controller/ingredient';
 import { findOpeningHourController } from '@application/controller/opening-hour';
 import { findPaymentMethodController } from '@application/controller/payment-method';
 import { findRestaurantByURLController } from '@application/controller/restaurant';
@@ -22,6 +26,9 @@ export default (inputRouter: Router): void => {
 
   router.get('/:restaurantId/table', findTableController());
   router.get('/:restaurantId/table/:id', findOneTableController());
+
+  router.get('/:restaurantId/ingredient', findIngredientController());
+  router.get('/:restaurantId/ingredient/:id', findOneIngredientController());
 
   inputRouter.use('/restaurant', router);
 };

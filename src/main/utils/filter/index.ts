@@ -1,4 +1,5 @@
-import { Between, ILike, IsNull, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Between, ILike, In, IsNull, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { toNumber } from '../to-number';
 
 interface GetPageAndLimitInput<QueryType extends string> {
   query: {
@@ -78,27 +79,35 @@ export const getGenericFilter = <QueryType extends string>({
     Object.assign(orderItem, { value: query.orderBy, sort: query.sort?.toUpperCase() });
   }
 
-  for (const item of list)
-    if (typeof query[item] === 'string')
+  for (const item of list) {
+    const value = query[item];
+
+    if (typeof value === 'string') {
       if (item.endsWith('MoreThan'))
         Object.assign(where, {
-          [item.replace('MoreThan', '')]: MoreThanOrEqual(Number(query[item]))
+          [item.replace('MoreThan', '')]: MoreThanOrEqual(Number(value))
         });
       else if (item.endsWith('LessThan'))
         Object.assign(where, {
-          [item.replace('LessThan', '')]: LessThanOrEqual(Number(query[item]))
+          [item.replace('LessThan', '')]: LessThanOrEqual(Number(value))
         });
       else if (item.endsWith('Boolean'))
         Object.assign(where, {
-          [item.replace('Boolean', '')]: Boolean(query[item])
+          [item.replace('Boolean', '')]: Boolean(value)
         });
-      else if (item.endsWith('Id'))
-        Object.assign(where, { [item.replace('Id', '')]: { id: query[item] } });
-      else if (item.endsWith('Enum'))
-        Object.assign(where, { [item.replace('Enum', '')]: query[item] });
+      else if (item.endsWith('Id')) {
+        if (toNumber(value) > 0) Object.assign(where, { [item]: toNumber(value) });
+      } else if (item.endsWith('Enum')) Object.assign(where, { [item.replace('Enum', '')]: value });
       else if (item === 'zipCode' || item === 'phone')
-        Object.assign(where, { [item]: ILike(`%${query[item]?.replace(/\D/gu, '') ?? ''}%`) });
-      else Object.assign(where, { [item]: ILike(`%${query[item] ?? ''}%`) });
+        Object.assign(where, { [item]: ILike(`%${value?.replace(/\D/gu, '') ?? ''}%`) });
+      else Object.assign(where, { [item]: ILike(`%${value ?? ''}%`) });
+    } else if (typeof value === 'object' && String(value)?.length > 0) {
+      const list = String(value).split(',') as unknown[];
+
+      if (item.endsWith('Id'))
+        Object.assign(where, { [item]: In(list.map((listItem) => toNumber(listItem))) });
+    }
+  }
 
   if (isObjectEmpty(orderBy)) Object.assign(orderBy, { createdAt: 'desc' });
 

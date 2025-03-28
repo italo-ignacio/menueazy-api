@@ -52,7 +52,7 @@ export const userLoginController: Controller =
         select: {
           ...userFindParams,
           password: true,
-          company: { id: true }
+          company: { id: true, name: true, companyUrl: true }
         },
         relations: { company: true },
         where: { email, finishedAt }

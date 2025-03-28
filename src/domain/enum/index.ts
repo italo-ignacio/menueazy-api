@@ -1,4 +1,5 @@
 export * from './day';
+export * from './ingredient';
 export * from './lang';
 export * from './order';
 export * from './plan';

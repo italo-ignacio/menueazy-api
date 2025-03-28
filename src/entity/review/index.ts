@@ -54,6 +54,7 @@ export class ReviewEntity {
   public restaurantId: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.reviewList, {
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
     nullable: false
   })

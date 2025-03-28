@@ -1,6 +1,6 @@
 {
   "registerRequest": "Solicitação de registro",
-  "subscription": "Inscrição",
+  "subscription": "Assinatura",
   "user": "Usuário",
   "restaurant": "Restaurante",
   "style": "Estilo",
@@ -10,7 +10,11 @@
   "productOptionItem": "Item do grupo do produto",
   "address": "Endereço",
   "deliveryPerson": "Entregador",
+  "ingredient": "Ingrediente",
+  "ingredientData": "Dados do ingrediente",
+  "productIngredient": "Ingrediente do produto",
   "plan": "Plano",
+  "company": "Empresa",
   "productImage": "Imagem do produto",
   "category": "Categoria"
 }

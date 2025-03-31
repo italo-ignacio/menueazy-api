@@ -56,7 +56,7 @@ export const findRestaurantController: Controller =
         query
       });
 
-      Object.assign(where, { companyId: user.company.id });
+      Object.assign(where, { companyId: user.company.id, userRestaurantList: { userId: user.id } });
 
       const [content, totalElements] = await restaurantRepository.findAndCount({
         order,

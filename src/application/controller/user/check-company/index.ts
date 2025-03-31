@@ -38,7 +38,6 @@ interface Body {
 export const checkUserCompanyController: Controller =
   () =>
   async ({ lang, user, body }: Request, response: Response) => {
-    console.log(`aaaaaaaaaaaaaaaa`, { user });
     try {
       const { companyUrl } = body as Body;
 

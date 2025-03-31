@@ -12,6 +12,7 @@ import { badRequest, created, errorLogger, messageErrorResponse } from '@main/ut
 import { restaurantRepository } from '@repository/restaurant';
 import { subscriptionRepository } from '@repository/subscription';
 import type { Request, Response } from 'express';
+import { In } from 'typeorm';
 
 interface Body {
   name: string;
@@ -79,7 +80,7 @@ export const insertRestaurantController: Controller =
         where: { companyId: user.company.id, finishedAt }
       });
 
-      if (subscription.restaurantLimit > restaurantCount)
+      if (restaurantCount > subscription.restaurantLimit)
         return badRequest({ message: messages[lang].error.maxRestaurant, lang, response });
 
       await DataSource.transaction(async (manager) => {
@@ -101,7 +102,7 @@ export const insertRestaurantController: Controller =
 
         const usersOwner = await manager.find(UserEntity, {
           select: { id: true },
-          where: { finishedAt, role: Role.OWNER, companyId: user.company.id }
+          where: { finishedAt, role: In([Role.OWNER, Role.ADMIN]), companyId: user.company.id }
         });
 
         await manager.insert(

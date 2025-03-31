@@ -7,7 +7,7 @@ export const DataSource = new TypeOrmDataSource({
   database: env.DATABASE.name,
   entities: [`${rootPath}/entity/**/*`],
   host: env.DATABASE.host,
-  logging: ['query'],
+  // logging: ['query'],
   password: env.DATABASE.password,
   port: Number(env.DATABASE.port),
   ssl: env.DATABASE.ssl,

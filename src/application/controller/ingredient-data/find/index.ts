@@ -29,11 +29,11 @@ import { request, type Request, type Response } from 'express';
  */
 
 /**
- * GET /restaurant/{restaurantId}/ingredient/{id}/data
+ * GET /restaurant/{restaurantId}/ingredient/{ingredientId}/data
  * @summary Find Ingredient Data
  * @tags Ingredient Data
  * @param {integer} restaurantId.path.required
- * @param {integer} id.path.required
+ * @param {integer} ingredientId.path.required
  * @param {string} name.query
  * @param {integer} page.query
  * @param {integer} limit.query
@@ -58,7 +58,11 @@ export const findIngredientDataController: Controller =
       });
 
       Object.assign(where, {
-        ingredient: { id: toNumber(request.params.id), restaurantId: restaurant.id, finishedAt }
+        ingredient: {
+          id: toNumber(request.params.ingredientId),
+          restaurantId: restaurant.id,
+          finishedAt
+        }
       });
 
       const [content, totalElements] = await ingredientDataRepository.findAndCount({

@@ -31,8 +31,8 @@ export class ProductEntity {
   @Column({ type: 'float4' })
   public price: number;
 
-  @Column({ type: 'boolean', name: 'out_of_stock', default: false })
-  public outOfStock: boolean;
+  @Column({ type: 'boolean', name: 'in_stock', default: true })
+  public inStock: boolean;
 
   @Column({ type: 'float4', nullable: true })
   public discount: number | null;

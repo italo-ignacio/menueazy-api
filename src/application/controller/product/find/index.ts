@@ -89,10 +89,11 @@ export const findProductController: Controller =
       const data = await queryBuilder.getMany();
 
       const content = data.map((item) => {
-        const { productCategoryList, ...values } = item;
+        const { productCategoryList, productImageList, ...values } = item;
 
         return {
           ...values,
+          imageList: productImageList.map((itemImage) => itemImage),
           categoryList: productCategoryList.map((itemCategory) => ({ ...itemCategory.category }))
         };
       });

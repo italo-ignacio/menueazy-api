@@ -4,7 +4,7 @@
  * @property {string} name
  * @property {string|null} description
  * @property {number} price
- * @property {boolean} outOfStock
+ * @property {boolean} inStock
  * @property {string} startSellAt
  * @property {string|null} finishSellAt
  * @property {number|null} discount

@@ -48,7 +48,7 @@ export const insertProductController: Controller =
         where: { restaurantId: restaurant.id, finishedAt }
       });
 
-      if (subscription.productLimit > productCount)
+      if (productCount > subscription.productLimit)
         return badRequest({ message: messages[lang].error.maxRestaurant, lang, response });
 
       await DataSource.transaction(async (manager) => {

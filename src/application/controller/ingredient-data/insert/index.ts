@@ -24,11 +24,12 @@ interface Body {
  */
 
 /**
- * POST /restaurant/{restaurantId}/ingredient/{id}/data
+ * POST /restaurant/{restaurantId}/ingredient/{ingredientId}/data
  * @summary Insert Ingredient Data
  * @tags Ingredient Data
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
+ * @param {integer} ingredientId.path.required
  * @param {InsertIngredientDataBody} request.body.required
  * @return {CreatedResponse} 200 - Successful response - application/json
  * @return {BadRequest} 400 - Bad request response - application/json
@@ -43,7 +44,11 @@ export const insertIngredientDataController: Controller =
 
       const ingredient = await ingredientRepository.findOne({
         select: { id: true },
-        where: { id: toNumber(request.params.id), finishedAt, restaurantId: restaurant.id }
+        where: {
+          id: toNumber(request.params.ingredientId),
+          finishedAt,
+          restaurantId: restaurant.id
+        }
       });
 
       if (!ingredient)

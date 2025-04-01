@@ -1,9 +1,11 @@
 import { yup } from '@infra/yup';
 import {
   arrayNotRequired,
+  arrayRequired,
   booleanNotRequired,
   dateNotRequired,
   numberNotRequired,
+  numberRequired,
   stringNotRequired
 } from '@main/utils';
 
@@ -34,7 +36,7 @@ export const updateProductSchema = yup.object().shape({
     name: stringNotRequired(100),
     description: stringNotRequired(),
     price: numberNotRequired(),
-    outOfStock: booleanNotRequired(),
+    inStock: booleanNotRequired(),
     published: booleanNotRequired(),
     highlight: booleanNotRequired(),
     discount: numberNotRequired(),
@@ -44,5 +46,15 @@ export const updateProductSchema = yup.object().shape({
     priceByKmInDelivery: numberNotRequired(),
     productOptionGroupList: arrayNotRequired(updateProductOptionGroupListSchema),
     categoryList: arrayNotRequired(updateProductCategoryListSchema)
+  })
+});
+
+export const updateMultipleProductSchema = yup.object().shape({
+  body: yup.object().shape({
+    inStock: booleanNotRequired(),
+    published: booleanNotRequired(),
+    delete: booleanNotRequired(),
+    highlight: booleanNotRequired(),
+    ids: arrayRequired(numberRequired())
   })
 });

@@ -18,7 +18,7 @@ interface Body {
   name?: string;
   description?: string;
   price?: number;
-  outOfStock?: boolean;
+  inStock?: boolean;
   published?: boolean;
   highlight?: boolean;
   discount?: number;
@@ -104,7 +104,7 @@ export const updateProductController: Controller =
         name,
         description,
         price,
-        outOfStock,
+        inStock,
         published,
         highlight,
         discount,
@@ -124,7 +124,7 @@ export const updateProductController: Controller =
             name,
             description,
             price,
-            outOfStock,
+            inStock,
             published,
             highlight,
             discount,

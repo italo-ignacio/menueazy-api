@@ -26,8 +26,8 @@ interface Body {
 
 /**
  * PUT /restaurant/{restaurantId}/ingredient/{ingredientId}/data/{id}
- * @summary Update IngredientData
- * @tags IngredientData
+ * @summary Update Ingredient Data
+ * @tags Ingredient Data
  * @security BearerAuth
  * @param {UpdateIngredientDataBody} request.body.required
  * @param {integer} restaurantId.path.required

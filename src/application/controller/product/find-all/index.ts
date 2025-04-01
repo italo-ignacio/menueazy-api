@@ -93,7 +93,7 @@ export const findAllProductController: Controller =
             name: row.p_name,
             description: row.p_description,
             price: row.p_price,
-            outOfStock: row.p_out_of_stock,
+            inStock: row.p_in_stock,
             published: row.p_published,
             highlight: row.p_highlight,
             discount: row.p_discount,

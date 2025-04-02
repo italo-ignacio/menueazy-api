@@ -1,3 +1,9 @@
-export type productQueryFields = 'name';
+export type productQueryFields = 'name' | 'price' | 'published' | 'highlight' | 'inStock';
 
-export const productListQueryFields: productQueryFields[] = ['name'];
+export const productListQueryFields: productQueryFields[] = [
+  'name',
+  'price',
+  'published',
+  'highlight',
+  'inStock'
+];

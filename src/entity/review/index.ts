@@ -22,7 +22,10 @@ export class ReviewEntity {
   @Column({ type: 'text' })
   public description: string;
 
-  @Column({ type: 'enum', name: 'rate', enum: Rate })
+  @Column({ type: 'float', name: 'rate_numeric' })
+  public rateNumeric: number;
+
+  @Column({ type: 'enum', enum: Rate })
   public rate: Rate;
 
   @Column({ type: 'integer', name: 'client_id' })

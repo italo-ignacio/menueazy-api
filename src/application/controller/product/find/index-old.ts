@@ -1,6 +1,7 @@
 import { findProductQueryParams } from '@data/search';
 import type { productQueryFields } from '@data/validation';
 import { productListQueryFields } from '@data/validation';
+import { ProductStatus } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
 import {
   errorLogger,
@@ -54,25 +55,51 @@ export const findProductController: Controller =
         query
       });
 
-      const order = `p.${orderItem?.value ?? 'createdAt'}`;
-      const sort = orderItem?.sort ?? 'DESC';
+      let order = 'p.createdAt';
+      let sort: 'ASC' | 'DESC' = 'DESC';
+
+      if (orderItem && typeof orderItem.value !== 'undefined') {
+        if (orderItem.value === 'orderTotal') {
+          order = `COALESCE("orderStatus"."totalOrder", 0)`;
+        } else if (orderItem.value === 'reviewAvg') {
+          order = `COALESCE("reviewStats"."avgRate", 0)`;
+        } else if (orderItem.value === 'reviewTotal') {
+          order = `COALESCE("reviewStats"."totalRate", 0)`;
+        } else {
+          order = `p.${orderItem.value}`;
+        }
+
+        sort = orderItem.sort;
+      }
+
       console.log(order, sort);
 
-      const productIdsQuery = productRepository
+      const subquery = productRepository
         .createQueryBuilder('p')
-        .select('p.id')
+        .select('p.id', 'id')
         .where('p.finishedAt IS NULL')
-        .andWhere('p.restaurantId = :restaurantId', { restaurantId: restaurant.id })
-        .orderBy(order, sort)
-        .skip(skip)
-        .take(take);
+        .andWhere('p.restaurantId = :restaurantId', { restaurantId: restaurant.id });
 
       if (typeof query.name === 'string')
-        productIdsQuery.andWhere('p.name ILIKE :name', { name: `%${query.name}%` });
+        subquery.andWhere('p.name ILIKE :name', { name: `%${query.name}%` });
 
-      const [productList, totalElements] = await productIdsQuery.getManyAndCount();
+      if (orderItem?.value === 'orderTotal')
+        subquery
+          .leftJoin('p.orderProductList', 'op')
+          .addSelect('COALESCE(SUM(op.quantity), 0)', 'sum_quantity')
+          .orderBy('sum_quantity', sort)
+          .groupBy('p.id');
 
-      const productIds = productList.map((item) => item.id);
+      const productIdsQuery = subquery.skip(skip).limit(take);
+
+      const productList = await productIdsQuery.getRawMany();
+      const totalElements = await productIdsQuery.getCount();
+
+      const productIds = productList.map((item) => {
+        console.log(item);
+
+        return item.id;
+      });
 
       if (productIds.length === 0)
         return ok({
@@ -81,14 +108,47 @@ export const findProductController: Controller =
           response
         });
 
+      const reviewSubquery = productRepository
+        .createQueryBuilder('p2')
+        .select('p2.id', 'productId')
+        .addSelect('AVG(rl.rateNumeric)', 'avgRate')
+        .addSelect('COUNT(rl.id)', 'totalRate')
+        .leftJoin('p2.reviewList', 'rl')
+        .where('rl.finishedAt IS NULL')
+        .groupBy('p2.id');
+
+      const orderSubquery = productRepository
+        .createQueryBuilder('p3')
+        .select('p3.id', 'productId')
+        .addSelect('SUM(opl.quantity)', 'totalOrder')
+        .leftJoin('p3.orderProductList', 'opl')
+        .where('opl.finishedAt IS NULL')
+        .andWhere('opl.status = :type', { type: ProductStatus.FINISHED })
+        .groupBy('p3.id');
+
       const queryBuilder = productRepository
         .createQueryBuilder('p')
-        .select(findProductQueryParams)
+        .select([
+          ...findProductQueryParams,
+          '"reviewStats"."avgRate"',
+          '"reviewStats"."totalRate"',
+          '"orderStatus"."totalOrder"'
+        ])
         .innerJoin('p.productCategoryList', 'pcl')
         .leftJoin('pcl.category', 'c')
         .leftJoin('p.productImageList', 'pil')
         .leftJoin('p.productOptionGroupList', 'pogl')
         .leftJoin('pogl.productOptionItemList', 'poil')
+        .leftJoin(
+          `(${orderSubquery.getQuery()})`,
+          'orderStatus',
+          '"orderStatus"."productId" = p.id'
+        )
+        .leftJoin(
+          `(${reviewSubquery.getQuery()})`,
+          'reviewStats',
+          '"reviewStats"."productId" = p.id'
+        )
         .where('p.id IN (:...productIds)', { productIds })
         .andWhere('pcl.finishedAt IS NULL')
         .andWhere('c.finishedAt IS NULL')
@@ -96,18 +156,23 @@ export const findProductController: Controller =
         .andWhere('pogl.finishedAt IS NULL')
         .andWhere('poil.finishedAt IS NULL')
         .orderBy(order, sort)
-        .addOrderBy('c.order', 'ASC')
-        .addOrderBy('pogl.id', 'ASC')
-        .addOrderBy('poil.id', 'ASC')
-        .addOrderBy('pil.primary', 'DESC');
+        .setParameters(reviewSubquery.getParameters())
+        .setParameters(orderSubquery.getParameters());
 
-      const data = await queryBuilder.getMany();
+      const { entities, raw } = await queryBuilder.getRawAndEntities();
 
-      const content = data.map((item) => {
+      const content = entities.map((item, index) => {
         const { productCategoryList, productImageList, ...values } = item;
+
+        const avgRate = parseFloat(raw[index].avgRate);
+        const totalRate = parseFloat(raw[index].totalRate);
+        const totalOrder = parseFloat(raw[index].totalOrder ?? 0);
 
         return {
           ...values,
+          avgRate,
+          totalOrder,
+          totalRate,
           imageList: productImageList.map((itemImage) => itemImage),
           categoryList: productCategoryList.map((itemCategory) => ({ ...itemCategory.category }))
         };

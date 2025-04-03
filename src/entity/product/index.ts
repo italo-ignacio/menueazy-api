@@ -58,6 +58,15 @@ export class ProductEntity {
   @Column({ type: 'integer', name: 'restaurant_id' })
   public restaurantId: number;
 
+  @Column({ type: 'int', default: 0, name: 'total_order' })
+  public totalOrder: number;
+
+  @Column({ type: 'int', default: 0, name: 'total_rate' })
+  public totalRate: number;
+
+  @Column({ type: 'float4', default: 0, name: 'avg_rate' })
+  public avgRate: number;
+
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.productList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

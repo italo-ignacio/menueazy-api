@@ -1,20 +1,20 @@
 export type productQueryFields =
   | 'name'
-  | 'price'
-  | 'published'
-  | 'highlight'
-  | 'inStock'
+  | 'priceNumber'
+  | 'publishedBoolean'
+  | 'highlightBoolean'
+  | 'inStockBoolean'
   | 'totalRate'
-  | 'avgRate'
-  | 'totalOrder';
+  | 'avgRateNumber'
+  | 'totalOrderNumber';
 
 export const productListQueryFields: productQueryFields[] = [
   'name',
-  'price',
-  'published',
+  'priceNumber',
+  'publishedBoolean',
   'totalRate',
-  'avgRate',
-  'totalOrder',
-  'highlight',
-  'inStock'
+  'avgRateNumber',
+  'totalOrderNumber',
+  'highlightBoolean',
+  'inStockBoolean'
 ];

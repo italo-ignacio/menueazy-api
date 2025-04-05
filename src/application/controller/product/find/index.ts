@@ -11,6 +11,7 @@ import {
 } from '@main/utils';
 import { productRepository } from '@repository/product';
 import type { Request, Response } from 'express';
+import { In } from 'typeorm';
 
 /**
  * @typedef {object} FindProductPayload
@@ -49,28 +50,53 @@ export const findProductController: Controller =
     try {
       const { skip, take } = getPagination({ query });
 
-      const { orderItem } = getGenericFilter<productQueryFields>({
+      const { orderItem, where, orderBy } = getGenericFilter<productQueryFields>({
         list: productListQueryFields,
         query
       });
 
       const order = `p.${orderItem?.value ?? 'createdAt'}`;
       const sort = orderItem?.sort ?? 'DESC';
-      console.log(order, sort);
 
-      const productIdsQuery = productRepository
-        .createQueryBuilder('p')
-        .select('p.id')
-        .where('p.finishedAt IS NULL')
-        .andWhere('p.restaurantId = :restaurantId', { restaurantId: restaurant.id })
-        .orderBy(order, sort)
-        .skip(skip)
-        .take(take);
+      Object.assign(where, { restaurantId: restaurant.id });
 
-      if (typeof query.name === 'string')
-        productIdsQuery.andWhere('p.name ILIKE :name', { name: `%${query.name}%` });
+      const category = query.categoryList as string | undefined;
+      const categoryList = category?.split(',');
 
-      const [productList, totalElements] = await productIdsQuery.getManyAndCount();
+      if (
+        category &&
+        Array.isArray(categoryList) &&
+        categoryList.filter((item) => item && !isNaN(Number(item)))?.length > 0
+      ) {
+        Object.assign(where, {
+          productCategoryList: {
+            categoryId: In(
+              categoryList
+                .filter((item) => item && !isNaN(Number(item)))
+                .map((item) => Number(item))
+            )
+          }
+        });
+      }
+
+      const [productList, totalElements] = await productRepository.findAndCount({
+        select: [
+          'id',
+          'name',
+          'price',
+          'published',
+          'highlight',
+          'inStock',
+          'totalRate',
+          'avgRate',
+          'totalOrder',
+          'createdAt'
+        ],
+        where,
+        order: orderBy,
+        skip,
+        take
+      });
 
       const productIds = productList.map((item) => item.id);
 
@@ -87,18 +113,17 @@ export const findProductController: Controller =
         .innerJoin('p.productCategoryList', 'pcl')
         .leftJoin('pcl.category', 'c')
         .leftJoin('p.productImageList', 'pil')
-        .leftJoin('p.productOptionGroupList', 'pogl')
-        .leftJoin('pogl.productOptionItemList', 'poil')
+        // .leftJoin('p.productOptionGroupList', 'pogl')
+        // .leftJoin('pogl.productOptionItemList', 'poil')
         .where('p.id IN (:...productIds)', { productIds })
         .andWhere('pcl.finishedAt IS NULL')
         .andWhere('c.finishedAt IS NULL')
-        .andWhere('pil.finishedAt IS NULL')
-        .andWhere('pogl.finishedAt IS NULL')
-        .andWhere('poil.finishedAt IS NULL')
+        // .andWhere('pil.finishedAt IS NULL')
+        // .andWhere('poil.finishedAt IS NULL')
         .orderBy(order, sort)
         .addOrderBy('c.order', 'ASC')
-        .addOrderBy('pogl.id', 'ASC')
-        .addOrderBy('poil.id', 'ASC')
+        // .addOrderBy('pogl.id', 'ASC')
+        // .addOrderBy('poil.id', 'ASC')
         .addOrderBy('pil.primary', 'DESC');
 
       const data = await queryBuilder.getMany();

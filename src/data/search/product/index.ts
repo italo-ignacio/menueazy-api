@@ -39,6 +39,47 @@ export const findProductQueryParams = [
   'pcl.id',
   'pcl.createdAt',
   'pcl.updatedAt',
+  'pcl.finishedAt'
+];
+
+export const findProductAllQueryParams = [
+  'c.id',
+  'c.name',
+  'c.description',
+  'c.order',
+  'c.createdAt',
+  'c.updatedAt',
+  'c.finishedAt',
+
+  'p.id',
+  'p.name',
+  'p.description',
+  'p.price',
+  'p.totalOrder',
+  'p.totalRate',
+  'p.avgRate',
+  'p.inStock',
+  'p.published',
+  'p.highlight',
+  'p.discount',
+  'p.startDiscountAt',
+  'p.finishDiscountAt',
+  'p.onlyInRestaurant',
+  'p.priceByKmInDelivery',
+  'p.createdAt',
+  'p.updatedAt',
+  'p.finishedAt',
+
+  'pil.id',
+  'pil.primary',
+  'pil.url',
+  'pil.createdAt',
+  'pil.updatedAt',
+  'pil.finishedAt',
+
+  'pcl.id',
+  'pcl.createdAt',
+  'pcl.updatedAt',
   'pcl.finishedAt',
 
   'pogl.id',

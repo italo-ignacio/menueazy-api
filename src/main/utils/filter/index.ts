@@ -45,8 +45,7 @@ const checkOrder = (query: queryProps, list: string[]): boolean =>
   (list.some((item) => item?.startsWith(query.orderBy)) ||
     query.orderBy === 'createdAt' ||
     query.orderBy === 'updatedAt') &&
-  (!query.orderBy.endsWith('MoreThan') ||
-    !query.orderBy.endsWith('LessThan') ||
+  (!query.orderBy.endsWith('Number') ||
     !query.orderBy.endsWith('Id') ||
     !query.orderBy.endsWith('Enum') ||
     !query.orderBy.endsWith('Boolean'));
@@ -80,32 +79,38 @@ export const getGenericFilter = <QueryType extends string>({
   }
 
   for (const item of list) {
-    const value = query[item];
+    if (item.endsWith('Number')) {
+      const qrMore = item.replace('Number', 'MT') as QueryType;
+      const qrLess = item.replace('Number', 'LT') as QueryType;
 
-    if (typeof value === 'string') {
-      if (item.endsWith('MoreThan'))
-        Object.assign(where, {
-          [item.replace('MoreThan', '')]: MoreThanOrEqual(Number(value))
-        });
-      else if (item.endsWith('LessThan'))
-        Object.assign(where, {
-          [item.replace('LessThan', '')]: LessThanOrEqual(Number(value))
-        });
-      else if (item.endsWith('Boolean'))
-        Object.assign(where, {
-          [item.replace('Boolean', '')]: Boolean(value)
-        });
-      else if (item.endsWith('Id')) {
-        if (toNumber(value) > 0) Object.assign(where, { [item]: toNumber(value) });
-      } else if (item.endsWith('Enum')) Object.assign(where, { [item.replace('Enum', '')]: value });
-      else if (item === 'zipCode' || item === 'phone')
-        Object.assign(where, { [item]: ILike(`%${value?.replace(/\D/gu, '') ?? ''}%`) });
-      else Object.assign(where, { [item]: ILike(`%${value ?? ''}%`) });
-    } else if (typeof value === 'object' && String(value)?.length > 0) {
-      const list = String(value).split(',') as unknown[];
+      const mt = query[qrMore];
+      const lt = query[qrLess];
 
-      if (item.endsWith('Id'))
-        Object.assign(where, { [item]: In(list.map((listItem) => toNumber(listItem))) });
+      if (!isNaN(Number(mt)) && !isNaN(Number(lt)))
+        Object.assign(where, { [item.replace('Number', '')]: Between(Number(mt), Number(lt)) });
+      else if (!isNaN(Number(mt)))
+        Object.assign(where, { [item.replace('Number', '')]: MoreThanOrEqual(Number(mt)) });
+      else if (!isNaN(Number(lt)))
+        Object.assign(where, { [item.replace('Number', '')]: LessThanOrEqual(Number(lt)) });
+    } else {
+      const value = query[item];
+
+      if (typeof value === 'string') {
+        if (item.endsWith('Boolean'))
+          Object.assign(where, { [item.replace('Boolean', '')]: value === 'true' ? true : false });
+        else if (item.endsWith('Id')) {
+          if (toNumber(value) > 0) Object.assign(where, { [item]: toNumber(value) });
+        } else if (item.endsWith('Enum'))
+          Object.assign(where, { [item.replace('Enum', '')]: value });
+        else if (item === 'zipCode' || item === 'phone')
+          Object.assign(where, { [item]: ILike(`%${value?.replace(/\D/gu, '') ?? ''}%`) });
+        else Object.assign(where, { [item]: ILike(`%${value ?? ''}%`) });
+      } else if (typeof value === 'object' && String(value)?.length > 0) {
+        const list = String(value).split(',') as unknown[];
+
+        if (item.endsWith('Id'))
+          Object.assign(where, { [item]: In(list.map((listItem) => toNumber(listItem))) });
+      }
     }
   }
 

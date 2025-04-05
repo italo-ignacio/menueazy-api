@@ -56,7 +56,7 @@ export const findCategoryController: Controller =
         'c.finishedAt'
       ];
 
-      const payload = await categoryRepository
+      const content = await categoryRepository
         .createQueryBuilder('c')
         .select(selectValues)
         .leftJoin('c.productCategoryList', 'pcl')
@@ -70,7 +70,7 @@ export const findCategoryController: Controller =
         .andWhere('c.name ILIKE :name', { name })
         .getMany();
 
-      return ok({ payload, lang, response });
+      return ok({ payload: { content }, lang, response });
     } catch (error) {
       errorLogger(error);
 

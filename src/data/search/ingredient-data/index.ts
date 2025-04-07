@@ -7,6 +7,8 @@ export const ingredientDataFindParams: FindOptionsSelect<IngredientDataEntity> =
   expiresAt: true,
   quantity: true,
   unitPrice: true,
+  priceInStock: true,
+  totalPrice: true,
 
   createdAt: true,
   updatedAt: true,

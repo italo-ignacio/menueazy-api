@@ -95,7 +95,7 @@ export const getGenericFilter = <QueryType extends string>({
     } else {
       const value = query[item];
 
-      if (typeof value === 'string') {
+      if (typeof value === 'string' && value !== '') {
         if (item.endsWith('Boolean'))
           Object.assign(where, { [item.replace('Boolean', '')]: value === 'true' ? true : false });
         else if (item.endsWith('Id')) {
@@ -106,10 +106,17 @@ export const getGenericFilter = <QueryType extends string>({
           Object.assign(where, { [item]: ILike(`%${value?.replace(/\D/gu, '') ?? ''}%`) });
         else Object.assign(where, { [item]: ILike(`%${value ?? ''}%`) });
       } else if (typeof value === 'object' && String(value)?.length > 0) {
-        const list = String(value).split(',') as unknown[];
+        const list = String(value)
+          .split(',')
+          .filter((listItem) => listItem !== '') as unknown[];
 
         if (item.endsWith('Id'))
           Object.assign(where, { [item]: In(list.map((listItem) => toNumber(listItem))) });
+
+        if (item.endsWith('Enum'))
+          Object.assign(where, {
+            [item.replace('Enum', '')]: In(list.map((listItem) => listItem))
+          });
       }
     }
   }

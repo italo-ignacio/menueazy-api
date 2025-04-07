@@ -7,6 +7,7 @@ import { IngredientEntity } from '@entity/ingredient';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
 import {
+  badRequest,
   deleteFiles,
   errorLogger,
   messageErrorResponse,
@@ -16,11 +17,13 @@ import {
 } from '@main/utils';
 import { ingredientRepository } from '@repository/ingredient';
 import type { Request, Response } from 'express';
+import { Not } from 'typeorm';
 
 interface Body {
   name?: string;
   measure?: IngredientMeasure;
   minAlert?: number;
+  removeImage?: boolean;
   images?: string[];
 }
 
@@ -29,6 +32,7 @@ interface Body {
  * @property {string} name
  * @property {string} measure - enum:GRAM,KILOGRAM,MILLILITER,LITER,UNIT
  * @property {number} minAlert
+ * @property {boolean} removeImage
  * @property {string} images - Ingredient image - binary
  */
 
@@ -51,7 +55,7 @@ export const updateIngredientController: Controller =
     try {
       await updateIngredientSchema.validate(request, { abortEarly: false });
 
-      const { name, minAlert, measure, images } = request.body as Body;
+      const { name, minAlert, removeImage, measure, images } = request.body as Body;
 
       const ingredient = await ingredientRepository.findOne({
         select: { ...ingredientFindParams },
@@ -61,7 +65,21 @@ export const updateIngredientController: Controller =
       if (!ingredient)
         return notFound({ entity: messages[lang].entity.ingredient, lang, response });
 
-      const imageUrl = images?.[0] ?? undefined;
+      const imageUrl = images?.[0] ? images?.[0] : removeImage ? null : undefined;
+
+      if (typeof name !== 'undefined') {
+        const hasIngredient = await ingredientRepository.findOne({
+          select: { id: true },
+          where: { restaurantId: restaurant.id, name, finishedAt, id: Not(ingredient.id) }
+        });
+
+        if (hasIngredient)
+          return badRequest({
+            lang,
+            response,
+            message: messages[lang].error.ingredientAlreadyExist
+          });
+      }
 
       await DataSource.transaction(async (manager) => {
         await manager.update(
@@ -76,7 +94,8 @@ export const updateIngredientController: Controller =
           }
         );
 
-        if (ingredient.imageUrl && images && images?.length > 0) deleteFiles([ingredient.imageUrl]);
+        if (ingredient.imageUrl && ((images && images?.length > 0) || removeImage))
+          deleteFiles([ingredient.imageUrl]);
       });
 
       return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });

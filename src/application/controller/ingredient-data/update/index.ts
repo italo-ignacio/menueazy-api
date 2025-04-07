@@ -2,10 +2,11 @@ import { finishedAt } from '@application/helper';
 import { updateIngredientDataSchema } from '@data/validation';
 import { IngredientMovementType } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
+import { IngredientEntity } from '@entity/ingredient';
 import { IngredientMovementEntity } from '@entity/ingredient-movement';
 import { messages } from '@i18n/index';
 import { DataSource } from '@infra/database';
-import { errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
+import { badRequest, errorLogger, messageErrorResponse, notFound, ok, toNumber } from '@main/utils';
 import { ingredientDataRepository } from '@repository/ingredient-data';
 import type { Request, Response } from 'express';
 
@@ -41,6 +42,7 @@ interface Body {
 export const updateIngredientDataController: Controller =
   () =>
   async ({ lang, restaurant, user, ...request }: Request, response: Response) => {
+    let err = 0;
     try {
       await updateIngredientDataSchema.validate(request, { abortEarly: false });
 
@@ -55,7 +57,23 @@ export const updateIngredientDataController: Controller =
             finishedAt
           },
           finishedAt
-        }
+        },
+        select: {
+          id: true,
+          entryQuantity: true,
+          expiresAt: true,
+          unitPrice: true,
+          priceInStock: true,
+          totalPrice: true,
+          quantity: true,
+          ingredient: {
+            id: true,
+            quantity: true,
+            priceInStock: true,
+            totalPrice: true
+          }
+        },
+        relations: { ingredient: true }
       });
 
       if (!ingredientData)
@@ -64,10 +82,34 @@ export const updateIngredientDataController: Controller =
       const oldData = { ...ingredientData };
 
       await DataSource.transaction(async (manager) => {
-        if (typeof quantity !== 'undefined') ingredientData.quantity = quantity;
-        if (typeof unitPrice !== 'undefined') ingredientData.unitPrice = unitPrice;
         if (typeof expiresAt !== 'undefined') ingredientData.expiresAt = expiresAt;
-        if (typeof entryQuantity !== 'undefined') ingredientData.entryQuantity = entryQuantity;
+
+        if (typeof unitPrice !== 'undefined') {
+          ingredientData.unitPrice = unitPrice;
+
+          if (typeof quantity === 'undefined') {
+            ingredientData.priceInStock = oldData.quantity * unitPrice;
+          }
+
+          if (typeof entryQuantity === 'undefined') {
+            ingredientData.entryQuantity = oldData.entryQuantity * unitPrice;
+          }
+        }
+
+        if (typeof quantity !== 'undefined') {
+          ingredientData.quantity = quantity;
+          ingredientData.priceInStock = quantity * ingredientData.unitPrice;
+        }
+
+        if (typeof entryQuantity !== 'undefined') {
+          ingredientData.entryQuantity = entryQuantity;
+          ingredientData.totalPrice = entryQuantity * ingredientData.unitPrice;
+        }
+
+        if (ingredientData.quantity > ingredientData.entryQuantity) {
+          err = 1;
+          throw new Error();
+        }
 
         await manager.save(ingredientData);
 
@@ -78,11 +120,50 @@ export const updateIngredientDataController: Controller =
           type: IngredientMovementType.ADJUST,
           userId: user.id
         });
+
+        let quantityValue: number | undefined = undefined;
+        let priceInStockValue: number | undefined = undefined;
+        let totalPriceValue: number | undefined = undefined;
+
+        if (oldData.quantity !== ingredientData.quantity) {
+          quantityValue =
+            ingredientData.ingredient.quantity + ingredientData.quantity - oldData.quantity;
+        }
+
+        if (oldData.priceInStock !== ingredientData.priceInStock) {
+          priceInStockValue =
+            ingredientData.ingredient.priceInStock +
+            ingredientData.priceInStock -
+            oldData.priceInStock;
+        }
+
+        if (oldData.totalPrice !== ingredientData.totalPrice) {
+          totalPriceValue =
+            ingredientData.ingredient.totalPrice + ingredientData.totalPrice - oldData.totalPrice;
+        }
+
+        if (
+          typeof quantityValue !== 'undefined' ||
+          typeof priceInStockValue !== 'undefined' ||
+          typeof totalPriceValue !== 'undefined'
+        )
+          await manager.update(
+            IngredientEntity,
+            { id: ingredientData.ingredient.id },
+            {
+              quantity: quantityValue,
+              priceInStock: priceInStockValue,
+              totalPrice: totalPriceValue
+            }
+          );
       });
 
       return ok({ payload: messages[lang].default.successfullyUpdated, lang, response });
     } catch (error) {
       errorLogger(error);
+
+      if (err === 1)
+        badRequest({ lang, response, message: messages[lang].error.quantityBiggestThanTotal });
 
       return messageErrorResponse({ error, lang, response });
     }

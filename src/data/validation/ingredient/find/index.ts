@@ -1,3 +1,12 @@
-export type ingredientQueryFields = 'name';
+export type ingredientQueryFields =
+  | 'name'
+  | 'quantityNumber'
+  | 'priceInStockNumber'
+  | 'totalPriceNumber';
 
-export const ingredientListQueryFields: ingredientQueryFields[] = ['name'];
+export const ingredientListQueryFields: ingredientQueryFields[] = [
+  'name',
+  'quantityNumber',
+  'priceInStockNumber',
+  'totalPriceNumber'
+];

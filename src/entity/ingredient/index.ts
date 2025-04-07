@@ -15,7 +15,6 @@ import { IngredientMovementEntity } from '../ingredient-movement';
 import { ProductIngredientEntity } from '../product-ingredient';
 import { RestaurantEntity } from '../restaurant';
 
-@Index('ingredient_name_restaurant', ['name', 'restaurant'], { unique: true })
 @Index('ingredient_restaurant', ['restaurant'])
 @Entity('ingredient')
 export class IngredientEntity {
@@ -24,6 +23,15 @@ export class IngredientEntity {
 
   @Column({ length: 255, type: 'varchar' })
   public name: string;
+
+  @Column({ type: 'float', default: 0 })
+  public quantity: number;
+
+  @Column({ type: 'float4', name: 'total_price', default: 0 })
+  public totalPrice: number;
+
+  @Column({ type: 'float4', name: 'price_in_stock', default: 0 })
+  public priceInStock: number;
 
   @Column({ type: 'enum', enum: IngredientMeasure })
   public measure: IngredientMeasure;

@@ -43,7 +43,7 @@ export const insertIngredientDataController: Controller =
       const { quantity, unitPrice, expiresAt } = request.body as Body;
 
       const ingredient = await ingredientRepository.findOne({
-        select: { id: true },
+        select: { id: true, quantity: true, priceInStock: true, totalPrice: true },
         where: {
           id: toNumber(request.params.ingredientId),
           finishedAt,
@@ -58,6 +58,8 @@ export const insertIngredientDataController: Controller =
         await manager.insert(IngredientDataEntity, {
           entryQuantity: quantity,
           expiresAt,
+          priceInStock: quantity * unitPrice,
+          totalPrice: quantity * unitPrice,
           ingredient,
           quantity,
           unitPrice
@@ -69,6 +71,12 @@ export const insertIngredientDataController: Controller =
           type: IngredientMovementType.INPUT,
           userId: user.id
         });
+
+        ingredient.quantity += quantity;
+        ingredient.priceInStock += quantity * unitPrice;
+        ingredient.totalPrice += quantity * unitPrice;
+
+        manager.save(ingredient);
       });
 
       return created({ lang, response });

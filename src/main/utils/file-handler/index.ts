@@ -51,12 +51,16 @@ export const handleMulterError = (
   response: Response,
   next: NextFunction
 ) => {
-  if (err instanceof MulterError)
+  if (err instanceof MulterError) {
+    errorLogger(err);
+    console.log(err);
+
     badRequest({
       response,
-      lang: req.lang
+      lang: req.lang,
+      message: 'filsa'
     });
-  else next();
+  } else next();
 };
 
 export const insertImage: Controller =

@@ -12,11 +12,13 @@
   "isAlreadyInUse": "is already in use",
   "notPermission": "Permission denied",
   "oneCategoryIsRequired": "Having a category is required",
+  "ingredientAlreadyExist": "Ingredient with this name already exist",
   "timeout": "Request timed out. Please try again later",
   "invalidOrderValue": "Invalid order value",
   "internalServerError": "Internal server error",
   "checkYourEmail": "Check your email before logging in",
   "maxCategories": "Max of categories is",
+  "quantityBiggestThanTotal": "Quantity is biggest than total entry",
   "maxRestaurant": "You have reached the maximum number of restaurants in your plan",
   "maxProduct": "You have reached the maximum number of products in your plan",
   "selectAValidCurrencyType": "Select a valid currency type"

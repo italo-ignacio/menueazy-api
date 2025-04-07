@@ -13,9 +13,11 @@
   "oneCategoryIsRequired": "Having a category is required",
   "isAlreadyInUse": "já está em uso",
   "timeout": "Solicitação expirou. Tente novamente mais tarde",
+  "ingredientAlreadyExist": "Já existe um ingrediente com este nome",
   "internalServerError": "Erro interno do servidor",
   "invalidOrderValue": "Valor da ordem invalido",
   "checkYourEmail": "Verifique seu e-mail antes de realizar login",
+  "quantityBiggestThanTotal": "Quantidade e maior que o total de entrada",
   "maxCategories": "O maximo de categorias e",
   "maxRestaurant": "Você atingiu o número máximo de restaurantes do seu plano",
   "selectAValidCurrencyType": "Selecione um tipo de moeda válido"

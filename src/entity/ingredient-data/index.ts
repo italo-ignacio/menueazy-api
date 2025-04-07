@@ -22,6 +22,12 @@ export class IngredientDataEntity {
   @Column({ type: 'float4', name: 'unit_price' })
   public unitPrice: number;
 
+  @Column({ type: 'float4', name: 'total_price' })
+  public totalPrice: number;
+
+  @Column({ type: 'float4', name: 'price_in_stock' })
+  public priceInStock: number;
+
   @Column({ type: 'float4' })
   public quantity: number;
 

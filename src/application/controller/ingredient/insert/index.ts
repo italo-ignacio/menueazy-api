@@ -1,7 +1,9 @@
+import { finishedAt } from '@application/helper';
 import { insertIngredientSchema } from '@data/validation';
 import { IngredientMeasure } from '@domain/enum';
 import type { Controller } from '@domain/protocols';
-import { created, errorLogger, messageErrorResponse } from '@main/utils';
+import { messages } from '@i18n/index';
+import { badRequest, created, errorLogger, messageErrorResponse } from '@main/utils';
 import { ingredientRepository } from '@repository/ingredient';
 import type { Request, Response } from 'express';
 
@@ -39,6 +41,14 @@ export const insertIngredientController: Controller =
       const { name, measure, minAlert, images } = request.body as Body;
 
       const imageUrl = images?.[0] ?? undefined;
+
+      const hasIngredient = await ingredientRepository.findOne({
+        select: { id: true },
+        where: { restaurantId: restaurant.id, name, finishedAt }
+      });
+
+      if (hasIngredient)
+        return badRequest({ lang, response, message: messages[lang].error.ingredientAlreadyExist });
 
       await ingredientRepository.insert({
         measure,

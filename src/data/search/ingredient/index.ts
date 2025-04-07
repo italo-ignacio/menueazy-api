@@ -6,6 +6,9 @@ export const ingredientFindParams: FindOptionsSelect<IngredientEntity> = {
   name: true,
   minAlert: true,
   measure: true,
+  quantity: true,
+  priceInStock: true,
+  totalPrice: true,
   imageUrl: true,
 
   createdAt: true,

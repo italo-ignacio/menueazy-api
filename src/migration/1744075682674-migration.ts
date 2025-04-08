@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Migration1743182089675 implements MigrationInterface {
-  name = 'Migration1743182089675';
+export class Migration1744075682674 implements MigrationInterface {
+  name = 'Migration1744075682674';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -20,13 +20,10 @@ export class Migration1743182089675 implements MigrationInterface {
       `CREATE TABLE "product_image" ("id" SERIAL NOT NULL, "url" text NOT NULL, "primary" boolean NOT NULL DEFAULT false, "product_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_99d98a80f57857d51b5f63c8240" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
-      `CREATE TABLE "ingredient_data" ("id" SERIAL NOT NULL, "entry_quantity" real NOT NULL, "unit_price" real NOT NULL, "quantity" real NOT NULL, "expires_at" TIMESTAMP WITH TIME ZONE, "ingredient_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_3d58a4167fb735da60fc9164b03" PRIMARY KEY ("id"))`
+      `CREATE TABLE "ingredient_data" ("id" SERIAL NOT NULL, "entry_quantity" real NOT NULL, "unit_price" real NOT NULL, "total_price" real NOT NULL, "price_in_stock" real NOT NULL, "quantity" real NOT NULL, "expires_at" TIMESTAMP WITH TIME ZONE, "ingredient_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_3d58a4167fb735da60fc9164b03" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE INDEX "ingredient_data_ingredient" ON "ingredient_data" ("ingredient_id") `
-    );
-    await queryRunner.query(
-      `CREATE TYPE "public"."ingredient_movement_type_enum" AS ENUM('INPUT', 'OUTPUT', 'ADJUST')`
     );
     await queryRunner.query(
       `CREATE TABLE "ingredient_movement" ("id" SERIAL NOT NULL, "type" "public"."ingredient_movement_type_enum" NOT NULL, "old_quantity" real, "quantity" real NOT NULL, "ingredient_id" integer NOT NULL, "order_id" integer, "user_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_fe362171a2bb702730cf3519fe3" PRIMARY KEY ("id"))`
@@ -35,16 +32,10 @@ export class Migration1743182089675 implements MigrationInterface {
       `CREATE INDEX "ingredient_movement_ingredient" ON "ingredient_movement" ("ingredient_id") `
     );
     await queryRunner.query(
-      `CREATE TYPE "public"."ingredient_measure_enum" AS ENUM('GRAM', 'KILOGRAM', 'MILLILITER', 'LITER', 'UNIT')`
-    );
-    await queryRunner.query(
-      `CREATE TABLE "ingredient" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "measure" "public"."ingredient_measure_enum" NOT NULL, "min_alert" real, "image_url" text, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_6f1e945604a0b59f56a57570e98" PRIMARY KEY ("id"))`
+      `CREATE TABLE "ingredient" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "quantity" double precision NOT NULL DEFAULT '0', "total_price" real NOT NULL DEFAULT '0', "price_in_stock" real NOT NULL DEFAULT '0', "measure" "public"."ingredient_measure_enum" NOT NULL, "min_alert" real, "image_url" text, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_6f1e945604a0b59f56a57570e98" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE INDEX "ingredient_restaurant" ON "ingredient" ("restaurant_id") `
-    );
-    await queryRunner.query(
-      `CREATE UNIQUE INDEX "ingredient_name_restaurant" ON "ingredient" ("name", "restaurant_id") `
     );
     await queryRunner.query(
       `CREATE TABLE "product_ingredient" ("id" SERIAL NOT NULL, "quantity" real NOT NULL, "can_remove" boolean NOT NULL DEFAULT true, "can_add" boolean NOT NULL DEFAULT true, "max_add_quantity" integer NOT NULL DEFAULT '9', "additional_price" real, "product_id" integer NOT NULL, "ingredient_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_e7431906c21f94c0152d6b0db99" PRIMARY KEY ("id"))`
@@ -59,10 +50,10 @@ export class Migration1743182089675 implements MigrationInterface {
       `CREATE TABLE "product_option_item" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "description" text, "image_url" text, "product_id" integer, "additional_price" real, "product_option_group_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_8559d5b48467930210ce983e3f3" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
-      `CREATE TABLE "review" ("id" SERIAL NOT NULL, "description" text NOT NULL, "rate" "public"."review_rate_enum" NOT NULL, "client_id" integer NOT NULL, "product_id" integer, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_2e4299a343a81574217255c00ca" PRIMARY KEY ("id"))`
+      `CREATE TABLE "review" ("id" SERIAL NOT NULL, "description" text NOT NULL, "rate_numeric" double precision NOT NULL, "rate" "public"."review_rate_enum" NOT NULL, "client_id" integer NOT NULL, "product_id" integer, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_2e4299a343a81574217255c00ca" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
-      `CREATE TABLE "product" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "description" text, "price" real NOT NULL, "in_stock" boolean NOT NULL DEFAULT false, "discount" real, "start_discount_at" TIMESTAMP WITH TIME ZONE, "finish_discount_at" TIMESTAMP WITH TIME ZONE, "only_in_restaurant" boolean NOT NULL DEFAULT false, "published" boolean NOT NULL DEFAULT false, "highlight" boolean NOT NULL DEFAULT false, "price_by_km_in_delivery" real, "restaurant_id" integer NOT NULL, "max_additional_ingredient" integer NOT NULL DEFAULT '9', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id"))`
+      `CREATE TABLE "product" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "description" text, "price" real NOT NULL, "in_stock" boolean NOT NULL DEFAULT true, "discount" real, "start_discount_at" TIMESTAMP WITH TIME ZONE, "finish_discount_at" TIMESTAMP WITH TIME ZONE, "only_in_restaurant" boolean NOT NULL DEFAULT false, "published" boolean NOT NULL DEFAULT false, "highlight" boolean NOT NULL DEFAULT false, "price_by_km_in_delivery" real, "restaurant_id" integer NOT NULL, "total_order" integer NOT NULL DEFAULT '0', "total_rate" integer NOT NULL DEFAULT '0', "avg_rate" real NOT NULL DEFAULT '0', "max_additional_ingredient" integer NOT NULL DEFAULT '9', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE TABLE "product_option_group" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "description" text, "min_selection" integer NOT NULL DEFAULT '0', "max_selection" integer NOT NULL DEFAULT '1', "required" boolean NOT NULL, "product_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_d76e92fdbbb5a2e6752ffd4a2c1" PRIMARY KEY ("id"))`
@@ -527,13 +518,10 @@ export class Migration1743182089675 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX "public"."product_ingredient_unique"`);
     await queryRunner.query(`DROP INDEX "public"."product_ingredient_product"`);
     await queryRunner.query(`DROP TABLE "product_ingredient"`);
-    await queryRunner.query(`DROP INDEX "public"."ingredient_name_restaurant"`);
     await queryRunner.query(`DROP INDEX "public"."ingredient_restaurant"`);
     await queryRunner.query(`DROP TABLE "ingredient"`);
-    await queryRunner.query(`DROP TYPE "public"."ingredient_measure_enum"`);
     await queryRunner.query(`DROP INDEX "public"."ingredient_movement_ingredient"`);
     await queryRunner.query(`DROP TABLE "ingredient_movement"`);
-    await queryRunner.query(`DROP TYPE "public"."ingredient_movement_type_enum"`);
     await queryRunner.query(`DROP INDEX "public"."ingredient_data_ingredient"`);
     await queryRunner.query(`DROP TABLE "ingredient_data"`);
     await queryRunner.query(`DROP TABLE "product_image"`);

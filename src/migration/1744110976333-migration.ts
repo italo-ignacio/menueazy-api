@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Migration1744075682674 implements MigrationInterface {
-  name = 'Migration1744075682674';
+export class Migration1744110976333 implements MigrationInterface {
+  name = 'Migration1744110976333';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -26,10 +26,16 @@ export class Migration1744075682674 implements MigrationInterface {
       `CREATE INDEX "ingredient_data_ingredient" ON "ingredient_data" ("ingredient_id") `
     );
     await queryRunner.query(
+      `CREATE TYPE "public"."ingredient_movement_type_enum" AS ENUM('INPUT', 'OUTPUT', 'ADJUST')`
+    );
+    await queryRunner.query(
       `CREATE TABLE "ingredient_movement" ("id" SERIAL NOT NULL, "type" "public"."ingredient_movement_type_enum" NOT NULL, "old_quantity" real, "quantity" real NOT NULL, "ingredient_id" integer NOT NULL, "order_id" integer, "user_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_fe362171a2bb702730cf3519fe3" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE INDEX "ingredient_movement_ingredient" ON "ingredient_movement" ("ingredient_id") `
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."ingredient_measure_enum" AS ENUM('GRAM', 'KILOGRAM', 'MILLILITER', 'LITER', 'UNIT')`
     );
     await queryRunner.query(
       `CREATE TABLE "ingredient" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "quantity" double precision NOT NULL DEFAULT '0', "total_price" real NOT NULL DEFAULT '0', "price_in_stock" real NOT NULL DEFAULT '0', "measure" "public"."ingredient_measure_enum" NOT NULL, "min_alert" real, "image_url" text, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_6f1e945604a0b59f56a57570e98" PRIMARY KEY ("id"))`
@@ -50,6 +56,9 @@ export class Migration1744075682674 implements MigrationInterface {
       `CREATE TABLE "product_option_item" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "description" text, "image_url" text, "product_id" integer, "additional_price" real, "product_option_group_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_8559d5b48467930210ce983e3f3" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
+      `CREATE TYPE "public"."review_rate_enum" AS ENUM('TERRIBLE', 'BAD', 'AVERAGE', 'GOOD', 'EXCELLENT')`
+    );
+    await queryRunner.query(
       `CREATE TABLE "review" ("id" SERIAL NOT NULL, "description" text NOT NULL, "rate_numeric" double precision NOT NULL, "rate" "public"."review_rate_enum" NOT NULL, "client_id" integer NOT NULL, "product_id" integer, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_2e4299a343a81574217255c00ca" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
@@ -62,12 +71,21 @@ export class Migration1744075682674 implements MigrationInterface {
       `CREATE TABLE "order_product_option_item" ("id" SERIAL NOT NULL, "quantity" integer NOT NULL, "order_product_id" integer NOT NULL, "product_option_item_id" integer NOT NULL, "product_option_group_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_9656ecf7004f670538ed959f622" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
+      `CREATE TYPE "public"."order_product_status_enum" AS ENUM('PENDING', 'PREPARING', 'FINISHED', 'CANCELED_BY_RESTAURANT', 'CANCELED_BY_CLIENT')`
+    );
+    await queryRunner.query(
       `CREATE TABLE "order_product" ("id" SERIAL NOT NULL, "observation" text, "quantity" integer NOT NULL, "price" real NOT NULL, "subtotal" real NOT NULL, "status" "public"."order_product_status_enum" NOT NULL DEFAULT 'PENDING', "order_id" integer NOT NULL, "product_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_539ede39e518562dfdadfddb492" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE TABLE "table" ("id" SERIAL NOT NULL, "code" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(100) NOT NULL, "description" text, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_28914b55c485fc2d7a101b1b2a4" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(`CREATE UNIQUE INDEX "table_code_key" ON "table" ("code") `);
+    await queryRunner.query(
+      `CREATE TYPE "public"."order_status_enum" AS ENUM('OPENING', 'PENDING', 'IN_PROGRESS', 'ON_THE_WAY', 'FINISHED', 'CANCELED_BY_RESTAURANT', 'CANCELED_BY_CLIENT')`
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."order_type_enum" AS ENUM('RESTAURANT', 'DELIVERY', 'PICKUP')`
+    );
     await queryRunner.query(
       `CREATE TABLE "order" ("id" SERIAL NOT NULL, "price" real NOT NULL, "total" real NOT NULL, "delivery_price" real, "observation" text, "status" "public"."order_status_enum" NOT NULL, "type" "public"."order_type_enum" NOT NULL, "client_id" integer, "delivery_person_id" integer, "restaurant_id" integer NOT NULL, "table_id" integer, "address_id" integer, "review_id" integer, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "REL_59c426f683eb876b8be2f033fd" UNIQUE ("review_id"), CONSTRAINT "PK_1031171c13130102495201e3e20" PRIMARY KEY ("id"))`
     );
@@ -89,6 +107,9 @@ export class Migration1744075682674 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE TABLE "plan" ("id" SERIAL NOT NULL, "name" character varying(50) NOT NULL, "description" text, "minimum_of_restaurant" integer NOT NULL, "minimum_of_product" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_54a2b686aed3b637654bf7ddbb3" PRIMARY KEY ("id"))`
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."plan_price_period_enum" AS ENUM('MONTHLY', 'ANNUAL')`
     );
     await queryRunner.query(
       `CREATE TABLE "plan_price" ("id" SERIAL NOT NULL, "currency_id" integer NOT NULL, "plan_id" integer NOT NULL, "monthly_price" real NOT NULL, "price_of_restaurant" real NOT NULL, "price_of_product" real NOT NULL, "discount" real NOT NULL, "period" "public"."plan_price_period_enum" NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_4333279b07456b24b55fff8b740" PRIMARY KEY ("id"))`
@@ -125,6 +146,9 @@ export class Migration1744075682674 implements MigrationInterface {
       `CREATE TABLE "device" ("id" SERIAL NOT NULL, "token" text NOT NULL, "code" text NOT NULL, "last_active" TIMESTAMP WITH TIME ZONE, "client_id" integer, "user_id" integer, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_2dc10972aa4e27c01378dad2c72" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
+      `CREATE TYPE "public"."user_role_enum" AS ENUM('ADMIN', 'OWNER', 'MANAGER', 'SUPERVISOR', 'EMPLOYEE')`
+    );
+    await queryRunner.query(
       `CREATE TABLE "user" ("id" SERIAL NOT NULL, "email" character varying(255) NOT NULL, "password" text NOT NULL, "name" character varying(255), "phone" character varying(25), "avatar_url" text, "role" "public"."user_role_enum" NOT NULL, "company_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(`CREATE UNIQUE INDEX "user_email_key" ON "user" ("email") `);
@@ -139,6 +163,9 @@ export class Migration1744075682674 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE TABLE "address" ("id" SERIAL NOT NULL, "street" character varying(255) NOT NULL, "city" character varying(255) NOT NULL, "state" character varying(255) NOT NULL, "zip_code" character varying(25) NOT NULL, "country" character varying(255) NOT NULL, "complement" character varying(255), "number" character varying(30) NOT NULL, "latitude" numeric(10,8) NOT NULL, "longitude" numeric(11,8) NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_d92de1f82754668b5f5f5dd4fd5" PRIMARY KEY ("id"))`
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."opening_hour_day_of_week_enum" AS ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')`
     );
     await queryRunner.query(
       `CREATE TABLE "opening_hour" ("id" SERIAL NOT NULL, "day_of_week" "public"."opening_hour_day_of_week_enum" NOT NULL, "opening_time" TIME WITH TIME ZONE NOT NULL, "closing_time" TIME WITH TIME ZONE NOT NULL, "restaurant_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), "finished_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_6551ceb95c04da8afd85da470c9" PRIMARY KEY ("id"))`
@@ -479,12 +506,14 @@ export class Migration1744075682674 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "restaurant"`);
     await queryRunner.query(`DROP TABLE "payment_method"`);
     await queryRunner.query(`DROP TABLE "opening_hour"`);
+    await queryRunner.query(`DROP TYPE "public"."opening_hour_day_of_week_enum"`);
     await queryRunner.query(`DROP TABLE "address"`);
     await queryRunner.query(`DROP TABLE "client_address"`);
     await queryRunner.query(`DROP TABLE "client"`);
     await queryRunner.query(`DROP TABLE "client_report"`);
     await queryRunner.query(`DROP INDEX "public"."user_email_key"`);
     await queryRunner.query(`DROP TABLE "user"`);
+    await queryRunner.query(`DROP TYPE "public"."user_role_enum"`);
     await queryRunner.query(`DROP TABLE "device"`);
     await queryRunner.query(`DROP INDEX "public"."company_company_url_domain_verified_idx"`);
     await queryRunner.query(`DROP INDEX "public"."company_custom_domain_domain_verified_idx"`);
@@ -497,6 +526,7 @@ export class Migration1744075682674 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "currency"`);
     await queryRunner.query(`DROP INDEX "public"."plan_price_currency_plan_period_idx"`);
     await queryRunner.query(`DROP TABLE "plan_price"`);
+    await queryRunner.query(`DROP TYPE "public"."plan_price_period_enum"`);
     await queryRunner.query(`DROP TABLE "plan"`);
     await queryRunner.query(`DROP TABLE "subscription"`);
     await queryRunner.query(`DROP TABLE "subscription_coupon"`);
@@ -507,21 +537,27 @@ export class Migration1744075682674 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX "public"."IDX_cbd56e27bea2abf5d138cd32f9"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_7a9573d6a1fb982772a9123320"`);
     await queryRunner.query(`DROP TABLE "order"`);
+    await queryRunner.query(`DROP TYPE "public"."order_type_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."order_status_enum"`);
     await queryRunner.query(`DROP INDEX "public"."table_code_key"`);
     await queryRunner.query(`DROP TABLE "table"`);
     await queryRunner.query(`DROP TABLE "order_product"`);
+    await queryRunner.query(`DROP TYPE "public"."order_product_status_enum"`);
     await queryRunner.query(`DROP TABLE "order_product_option_item"`);
     await queryRunner.query(`DROP TABLE "product_option_group"`);
     await queryRunner.query(`DROP TABLE "product"`);
     await queryRunner.query(`DROP TABLE "review"`);
+    await queryRunner.query(`DROP TYPE "public"."review_rate_enum"`);
     await queryRunner.query(`DROP TABLE "product_option_item"`);
     await queryRunner.query(`DROP INDEX "public"."product_ingredient_unique"`);
     await queryRunner.query(`DROP INDEX "public"."product_ingredient_product"`);
     await queryRunner.query(`DROP TABLE "product_ingredient"`);
     await queryRunner.query(`DROP INDEX "public"."ingredient_restaurant"`);
     await queryRunner.query(`DROP TABLE "ingredient"`);
+    await queryRunner.query(`DROP TYPE "public"."ingredient_measure_enum"`);
     await queryRunner.query(`DROP INDEX "public"."ingredient_movement_ingredient"`);
     await queryRunner.query(`DROP TABLE "ingredient_movement"`);
+    await queryRunner.query(`DROP TYPE "public"."ingredient_movement_type_enum"`);
     await queryRunner.query(`DROP INDEX "public"."ingredient_data_ingredient"`);
     await queryRunner.query(`DROP TABLE "ingredient_data"`);
     await queryRunner.query(`DROP TABLE "product_image"`);

@@ -63,6 +63,7 @@ export const findRestaurantController: Controller =
         select: restaurantFindParams,
         skip,
         take,
+        relations: { openingHourList: true },
         where
       });
 

@@ -1,6 +1,7 @@
 import type { RestaurantEntity } from '@entity/restaurant';
 import type { FindOptionsSelect } from 'typeorm';
 import { addressFindParams } from '../address';
+import { openingHourFindParams } from '../opening-hour';
 import { styleFindParams } from '../style';
 
 export const restaurantFindParams: FindOptionsSelect<RestaurantEntity> = {
@@ -20,6 +21,7 @@ export const restaurantFindParams: FindOptionsSelect<RestaurantEntity> = {
   restaurantUrl: true,
   style: styleFindParams,
   address: addressFindParams,
+  openingHourList: openingHourFindParams,
 
   createdAt: true,
   updatedAt: true,

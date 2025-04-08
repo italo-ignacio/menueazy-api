@@ -55,7 +55,9 @@ export const updateIngredientController: Controller =
     try {
       await updateIngredientSchema.validate(request, { abortEarly: false });
 
-      const { name, minAlert, removeImage, measure, images } = request.body as Body;
+      const { name, minAlert, removeImage: ri, measure, images } = request.body as Body;
+
+      const removeImage = String(ri) === 'true' ? true : false;
 
       const ingredient = await ingredientRepository.findOne({
         select: { ...ingredientFindParams },

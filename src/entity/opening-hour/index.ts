@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -10,6 +11,7 @@ import {
 import { DaysOfWeek as DayOfWeek } from '../../domain/enum';
 import { RestaurantEntity } from '../restaurant';
 
+@Index('opening_hour_day_of_week_restaurant_unique', ['dayOfWeek', 'restaurant'], { unique: true })
 @Entity('opening_hour')
 export class OpeningHourEntity {
   @PrimaryGeneratedColumn({ type: 'integer' })

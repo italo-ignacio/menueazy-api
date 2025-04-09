@@ -26,8 +26,8 @@ export class ProductOptionItemEntity {
   @Column({ type: 'text', name: 'image_url', nullable: true })
   public imageUrl: string | null;
 
-  @Column({ type: 'integer', name: 'product_id', nullable: true })
-  public productId: number | null;
+  @Column({ type: 'integer', name: 'product_id' })
+  public productId: number;
 
   @Column({ type: 'float4', name: 'additional_price', nullable: true })
   public additionalPrice: number | null;
@@ -38,10 +38,10 @@ export class ProductOptionItemEntity {
   @ManyToOne(() => ProductEntity, (product) => product.productOptionItemList, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
-    nullable: true
+    nullable: false
   })
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
-  public product: ProductEntity | null;
+  public product: ProductEntity;
 
   @ManyToOne(
     () => ProductOptionGroupEntity,

@@ -1,6 +1,7 @@
 import { findProductQueryParams } from '@data/search';
 import { CategoryEntity } from '@entity/category';
 import { ProductEntity } from '@entity/product';
+import { ProductImageEntity } from '@entity/product-image';
 import { productRepository } from '@repository/product';
 
 export const findOneFullProduct = async (
@@ -32,10 +33,11 @@ export const findOneFullProduct = async (
 
   if (data === null) return null;
 
-  const { productCategoryList, ...values } = data;
+  const { productCategoryList, productImageList, ...values } = data;
 
   return {
     ...values,
-    categoryList: productCategoryList.map((itemCategory) => ({ ...itemCategory.category }))
-  } as ProductEntity & { categoryList: CategoryEntity[] };
+    categoryList: productCategoryList.map((itemCategory) => ({ ...itemCategory.category })),
+    imageList: productImageList
+  } as ProductEntity & { categoryList: CategoryEntity[]; imageList: ProductImageEntity[] };
 };

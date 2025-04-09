@@ -37,7 +37,7 @@ interface Body {
 /**
  * POST /restaurant/{restaurantId}/product/{productId}/ingredient/{id}
  * @summary Insert Product Ingredient
- * @tags Product
+ * @tags Product Ingredient
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
  * @param {integer} productId.path.required

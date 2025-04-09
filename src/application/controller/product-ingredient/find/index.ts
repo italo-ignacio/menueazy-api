@@ -31,7 +31,7 @@ import { request, type Request, type Response } from 'express';
 /**
  * GET /restaurant/{restaurantId}/product/{id}/ingredient
  * @summary Find Product Ingredient
- * @tags Product
+ * @tags Product Ingredient
  * @param {integer} restaurantId.path.required
  * @param {integer} id.path.required
  * @param {string} name.query

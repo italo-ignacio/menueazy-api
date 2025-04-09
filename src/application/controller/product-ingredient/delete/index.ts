@@ -9,8 +9,8 @@ import type { Request, Response } from 'express';
 
 /**
  * DELETE /restaurant/{restaurantId}/product/{productId}/ingredient/{id}
- * @summary Delete Product
- * @tags Product
+ * @summary Delete Product Ingredient
+ * @tags Product Ingredient
  * @security BearerAuth
  * @param {integer} restaurantId.path.required
  * @param {integer} productId.path.required

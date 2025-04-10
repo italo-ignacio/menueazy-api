@@ -86,6 +86,7 @@ export const findProductController: Controller =
           'price',
           'published',
           'highlight',
+          'finalPrice',
           'inStock',
           'totalRate',
           'avgRate',

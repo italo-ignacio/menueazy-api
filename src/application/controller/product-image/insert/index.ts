@@ -12,6 +12,7 @@ import {
 } from '@main/utils';
 import { productRepository } from '@repository/product';
 import { productImageRepository } from '@repository/product-image';
+import { ok } from 'assert';
 import type { Request, Response } from 'express';
 
 interface Body {
@@ -55,9 +56,13 @@ export const insertProductImageController: Controller =
         newImages.push({ primary: false, productId: product.id, url });
       });
 
-      if (newImages.length) await productImageRepository.insert(newImages);
+      if (newImages.length) {
+        const { generatedMaps } = await productImageRepository.insert(newImages);
 
-      return created({ lang, response });
+        return created({ lang, payload: generatedMaps, response });
+      }
+
+      return ok({ lang, response });
     } catch (error) {
       errorLogger(error);
 

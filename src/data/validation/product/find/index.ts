@@ -5,6 +5,7 @@ export type productQueryFields =
   | 'highlightBoolean'
   | 'inStockBoolean'
   | 'totalRate'
+  | 'finalPrice'
   | 'avgRateNumber'
   | 'totalOrderNumber';
 
@@ -13,6 +14,7 @@ export const productListQueryFields: productQueryFields[] = [
   'priceNumber',
   'publishedBoolean',
   'totalRate',
+  'finalPrice',
   'avgRateNumber',
   'totalOrderNumber',
   'highlightBoolean',

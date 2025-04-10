@@ -6,7 +6,8 @@ import {
   dateNotRequired,
   numberNotRequired,
   numberRequired,
-  stringNotRequired
+  stringNotRequired,
+  stringRequired
 } from '@main/utils';
 
 export const updateProductOptionItemListSchema = yup.object().shape({
@@ -33,9 +34,9 @@ export const updateProductCategoryListSchema = yup.object().shape({
 
 export const updateProductSchema = yup.object().shape({
   body: yup.object().shape({
-    name: stringNotRequired(100),
+    name: stringRequired(100),
+    price: numberRequired(),
     description: stringNotRequired(),
-    price: numberNotRequired(),
     inStock: booleanNotRequired(),
     published: booleanNotRequired(),
     highlight: booleanNotRequired(),

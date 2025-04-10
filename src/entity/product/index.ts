@@ -31,6 +31,9 @@ export class ProductEntity {
   @Column({ type: 'float4' })
   public price: number;
 
+  @Column({ type: 'float4', default: 0, name: 'final_price' })
+  public finalPrice: number;
+
   @Column({ type: 'boolean', name: 'in_stock', default: true })
   public inStock: boolean;
 

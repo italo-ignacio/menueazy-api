@@ -15,9 +15,9 @@ import type { Request, Response } from 'express';
 import { In } from 'typeorm';
 
 interface Body {
-  name?: string;
+  name: string;
+  price: number;
   description?: string;
-  price?: number;
   inStock?: boolean;
   published?: boolean;
   highlight?: boolean;
@@ -126,6 +126,7 @@ export const updateProductController: Controller =
             price,
             inStock,
             published,
+            finalPrice: discount ?? price,
             highlight,
             discount,
             startDiscountAt,
